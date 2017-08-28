@@ -2,6 +2,7 @@ package org.semanticweb.owl.explanation.impl.blackbox;
 
 import org.semanticweb.owl.explanation.api.ExplanationProgressMonitor;
 import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owl.explanation.impl.blackbox.checker.ConsistencyEntailmentChecker;
 
 import java.util.Set;
@@ -27,6 +28,7 @@ import java.util.Set;
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+import java.util.function.Supplier;
 
 /**
  * Author: Matthew Horridge<br>
@@ -38,10 +40,16 @@ public class InconsistentOntologyClashExpansionStrategy implements ExpansionStra
 
     private int count = 0;
 
-    private StructuralTypePriorityExpansionStrategy strategy = new StructuralTypePriorityExpansionStrategy();
+    private StructuralTypePriorityExpansionStrategy strategy;
 
     private InconsistentOntologyExpansionStrategy defaultStrategy = new InconsistentOntologyExpansionStrategy();
-    
+
+    private Supplier<OWLOntologyManager> m;
+
+    public InconsistentOntologyClashExpansionStrategy(Supplier<OWLOntologyManager> m) {
+        this.m = m;
+        this.strategy=new StructuralTypePriorityExpansionStrategy(null, m);
+    }
     public Set<OWLAxiom> doExpansion(Set<OWLAxiom> axioms, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor) {
         return defaultStrategy.doExpansion(axioms, checker, progressMonitor);
     }

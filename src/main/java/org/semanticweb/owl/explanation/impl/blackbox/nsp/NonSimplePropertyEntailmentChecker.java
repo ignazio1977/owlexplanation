@@ -1,6 +1,5 @@
 package org.semanticweb.owl.explanation.impl.blackbox.nsp;
 
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owl.explanation.impl.blackbox.EntailmentChecker;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.util.OWLObjectPropertyManager;
@@ -29,6 +28,7 @@ import java.util.Set;
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+import java.util.function.Supplier;
 
 
 /**
@@ -41,8 +41,11 @@ public class NonSimplePropertyEntailmentChecker implements EntailmentChecker<OWL
 
     private int counter = 0;
 
-    public NonSimplePropertyEntailmentChecker(OWLObjectPropertyExpression prop) {
+    private Supplier<OWLOntologyManager> m;
+
+    public NonSimplePropertyEntailmentChecker(OWLObjectPropertyExpression prop, Supplier<OWLOntologyManager> m) {
         this.prop = prop;
+        this.m = m;
     }
 
 
@@ -71,9 +74,8 @@ public class NonSimplePropertyEntailmentChecker implements EntailmentChecker<OWL
     public boolean isEntailed(Set<OWLAxiom> axioms) {
         try {
             counter++;
-            OWLOntologyManager man = OWLManager.createOWLOntologyManager();
-            OWLOntology ont = man.createOntology(axioms);
-            OWLObjectPropertyManager propman = new OWLObjectPropertyManager(man, ont);
+            OWLOntology ont = m.get().createOntology(axioms);
+            OWLObjectPropertyManager propman = new OWLObjectPropertyManager(ont);
             return propman.isNonSimple(prop);
         }
         catch (OWLOntologyCreationException e) {

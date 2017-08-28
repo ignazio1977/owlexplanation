@@ -6,7 +6,6 @@ import org.semanticweb.owl.explanation.telemetry.DefaultTelemetryInfo;
 import org.semanticweb.owl.explanation.telemetry.TelemetryInfo;
 import org.semanticweb.owl.explanation.telemetry.TelemetryTimer;
 import org.semanticweb.owl.explanation.telemetry.TelemetryTransmitter;
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owl.explanation.impl.blackbox.EntailmentChecker;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.*;
@@ -42,6 +41,7 @@ import java.util.Set;
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+import java.util.function.Supplier;
 
 
 /**
@@ -51,6 +51,8 @@ import java.util.Set;
 public class SatisfiabilityEntailmentChecker implements EntailmentChecker<OWLAxiom> {
 
     private OWLOntologyManager man;
+    
+    private Supplier<OWLOntologyManager> m;
 
     private OWLAxiom axiom;
 
@@ -74,11 +76,11 @@ public class SatisfiabilityEntailmentChecker implements EntailmentChecker<OWLAxi
 
     private long timeOutMS = Long.MAX_VALUE;
 
-    public SatisfiabilityEntailmentChecker(OWLReasonerFactory reasonerFactory, OWLAxiom entailment) {
-        this(reasonerFactory, entailment, true, Long.MAX_VALUE);
+    public SatisfiabilityEntailmentChecker(OWLReasonerFactory reasonerFactory, OWLAxiom entailment, Supplier<OWLOntologyManager> m) {
+        this(reasonerFactory, entailment, m, true, Long.MAX_VALUE);
     }
 
-    public SatisfiabilityEntailmentChecker(OWLReasonerFactory reasonerFactory, OWLAxiom entailment, boolean useModularisation, long timeOutMS) {
+    public SatisfiabilityEntailmentChecker(OWLReasonerFactory reasonerFactory, OWLAxiom entailment, Supplier<OWLOntologyManager> m, boolean useModularisation, long timeOutMS) {
         this.reasonerFactory = reasonerFactory;
         this.axiom = entailment;
         this.useModularisation = useModularisation;
@@ -87,7 +89,8 @@ public class SatisfiabilityEntailmentChecker implements EntailmentChecker<OWLAxi
         this.lastAxioms = new HashSet<OWLAxiom>();
         this.lastEntailingAxioms = new HashSet<OWLAxiom>();
         freshEntities = new HashSet<OWLEntity>();
-        man = OWLManager.createOWLOntologyManager();
+        this.man = m.get();
+        this.m = m;
 
         if (entailment instanceof OWLSubClassOfAxiom && ((OWLSubClassOfAxiom) entailment).getSuperClass().isOWLNothing()) {
             unsatDesc = ((OWLSubClassOfAxiom) entailment).getSubClass();
@@ -148,9 +151,8 @@ public class SatisfiabilityEntailmentChecker implements EntailmentChecker<OWLAxi
                 return Collections.emptySet();
             }
 
-            OWLOntologyManager man2 = OWLManager.createOWLOntologyManager();
             moduleType = ModuleType.STAR;
-            SyntacticLocalityModuleExtractor extractor = new SyntacticLocalityModuleExtractor(man2, createEmptyOntology(man2), axioms, moduleType);
+            SyntacticLocalityModuleExtractor extractor = new SyntacticLocalityModuleExtractor(m.get(), axioms.stream(), moduleType);
             return extractor.extract(getEntailmentSignature());
         }
         else {

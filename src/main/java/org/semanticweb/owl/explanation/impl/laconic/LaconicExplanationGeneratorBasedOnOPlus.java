@@ -2,13 +2,12 @@ package org.semanticweb.owl.explanation.impl.laconic;
 
 import org.semanticweb.owl.explanation.api.*;
 import org.semanticweb.owl.explanation.impl.blackbox.EntailmentCheckerFactory;
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
-import uk.ac.manchester.cs.owl.owlapi.OWLDataFactoryImpl;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 /**
  * Author: Matthew Horridge<br>
@@ -30,11 +29,14 @@ public class LaconicExplanationGeneratorBasedOnOPlus implements ExplanationGener
 
     private ModularityTreatment modularityTreatment = ModularityTreatment.MODULE;
 
-    public LaconicExplanationGeneratorBasedOnOPlus(Set<? extends OWLAxiom> inputAxioms, EntailmentCheckerFactory<OWLAxiom> entailmentCheckerFactory, ExplanationGeneratorFactory<OWLAxiom> delegateFactory, ExplanationProgressMonitor<OWLAxiom> progressMonitor) {
+    private Supplier<OWLOntologyManager> m;
+
+    public LaconicExplanationGeneratorBasedOnOPlus(Set<? extends OWLAxiom> inputAxioms, EntailmentCheckerFactory<OWLAxiom> entailmentCheckerFactory, ExplanationGeneratorFactory<OWLAxiom> delegateFactory, ExplanationProgressMonitor<OWLAxiom> progressMonitor, Supplier<OWLOntologyManager> m) {
         this.inputAxioms = new HashSet<OWLAxiom>(inputAxioms);
         this.entailmentCheckerFactory = entailmentCheckerFactory;
         this.delegateFactory = delegateFactory;
         this.progressMonitor = progressMonitor;
+        this.m = m;
     }
 
     /**
@@ -59,14 +61,14 @@ public class LaconicExplanationGeneratorBasedOnOPlus implements ExplanationGener
      */
     public Set<Explanation<OWLAxiom>> getExplanations(OWLAxiom entailment, int limit) throws ExplanationException {
 
-        OWLDataFactory dataFactory = new OWLDataFactoryImpl();
+        OWLOntologyManager man = m.get();
+        OWLDataFactory dataFactory = man.getOWLDataFactory();
 
         OPlusGenerator transformation = new OPlusGenerator(dataFactory, oplusSplitting);
-        OWLOntologyManager man = OWLManager.createOWLOntologyManager();
 
         Set<OWLAxiom> oplusInput;
         if(modularityTreatment.equals(ModularityTreatment.MODULE)) {
-            SyntacticLocalityModuleExtractor extractor = new SyntacticLocalityModuleExtractor(man, (OWLOntology) null, inputAxioms, ModuleType.STAR);
+            SyntacticLocalityModuleExtractor extractor = new SyntacticLocalityModuleExtractor(man, inputAxioms.stream(), ModuleType.STAR);
             oplusInput = extractor.extract(entailment.getSignature());
         }
         else {

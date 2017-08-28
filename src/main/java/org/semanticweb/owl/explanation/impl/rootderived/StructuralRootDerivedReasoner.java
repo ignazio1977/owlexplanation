@@ -266,12 +266,8 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
         SuperClassChecker checker = new SuperClassChecker();
         for (OWLClass cls : unsatisfiableClasses) {
             checker.reset();
-            for (OWLClassExpression sup : EntitySearcher.getSuperClasses(cls, reasoner.getRootOntology().getImportsClosure())) {
-                sup.accept(checker);
-            }
-            for (OWLClassExpression sup : EntitySearcher.getEquivalentClasses(cls, reasoner.getRootOntology().getImportsClosure())) {
-                sup.accept(checker);
-            }
+            EntitySearcher.getSuperClasses(cls, reasoner.getRootOntology().importsClosure()).forEach(sup-> sup.accept(checker));
+            EntitySearcher.getEquivalentClasses(cls, reasoner.getRootOntology().importsClosure()).forEach(sup-> sup.accept(checker));
             Set<OWLClass> dependencies = checker.getDependencies();
             child2Parent.put(cls, new HashSet<OWLClass>(dependencies));
             if (dependencies.isEmpty()) {

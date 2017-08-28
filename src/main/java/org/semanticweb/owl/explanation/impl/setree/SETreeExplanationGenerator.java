@@ -6,7 +6,6 @@ import org.semanticweb.owl.explanation.api.ExplanationGenerator;
 import org.semanticweb.owl.explanation.api.NullExplanationProgressMonitor;
 import org.semanticweb.owl.explanation.impl.blackbox.*;
 import org.semanticweb.owl.explanation.impl.blackbox.checker.SatisfiabilityEntailmentCheckerFactory;
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
@@ -16,6 +15,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Supplier;
 
 /**
  * Author: Matthew Horridge<br>
@@ -33,10 +33,13 @@ public class SETreeExplanationGenerator implements ExplanationGenerator<OWLAxiom
 
     private Set<OWLAxiom> module = new HashSet<OWLAxiom>();
 
-    public SETreeExplanationGenerator(OWLReasonerFactory reasonerFactory, EntailmentCheckerFactory<OWLAxiom> entailmentCheckerFactory, Set<? extends OWLAxiom> workingAxioms) {
+    private Supplier<OWLOntologyManager> m;
+
+    public SETreeExplanationGenerator(OWLReasonerFactory reasonerFactory, EntailmentCheckerFactory<OWLAxiom> entailmentCheckerFactory, Set<? extends OWLAxiom> workingAxioms, Supplier<OWLOntologyManager> m) {
         this.workingAxioms = new HashSet<OWLAxiom>(workingAxioms);
         this.reasonerFactory = reasonerFactory;
         this.entailmentCheckerFactory = entailmentCheckerFactory;
+        this.m = m;
     }
 
     /**
@@ -60,10 +63,10 @@ public class SETreeExplanationGenerator implements ExplanationGenerator<OWLAxiom
      *          if there was a problem generating the explanation.
      */
     public Set<Explanation<OWLAxiom>> getExplanations(OWLAxiom entailment, int limit) throws ExplanationException {
-        OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-        SyntacticLocalityModuleExtractor extractor = new SyntacticLocalityModuleExtractor(manager, (OWLOntology) null, workingAxioms, ModuleType.STAR);
+        OWLOntologyManager manager = m.get();
+        SyntacticLocalityModuleExtractor extractor = new SyntacticLocalityModuleExtractor(manager, workingAxioms.stream(), ModuleType.STAR);
         module = extractor.extract(entailment.getSignature());
-        BlackBoxExplanationGenerator2<OWLAxiom> gen = new BlackBoxExplanationGenerator2<OWLAxiom>(module, entailmentCheckerFactory, new StructuralTypePriorityExpansionStrategy(), new DivideAndConquerContractionStrategy(), new NullExplanationProgressMonitor<OWLAxiom>());
+        BlackBoxExplanationGenerator2<OWLAxiom> gen = new BlackBoxExplanationGenerator2<OWLAxiom>(module, entailmentCheckerFactory, new StructuralTypePriorityExpansionStrategy(null, m), new DivideAndConquerContractionStrategy(), new NullExplanationProgressMonitor<OWLAxiom>(), m);
         Set<Explanation<OWLAxiom>> expls = gen.getExplanations(entailment, 1);
         Explanation<OWLAxiom> expl = expls.iterator().next();
         Set<OWLAxiom> commonAxioms = new HashSet<OWLAxiom>();

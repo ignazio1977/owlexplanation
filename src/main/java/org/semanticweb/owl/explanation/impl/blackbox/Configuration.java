@@ -1,5 +1,7 @@
 package org.semanticweb.owl.explanation.impl.blackbox;
 
+import java.util.function.Supplier;
+
 import org.semanticweb.owl.explanation.api.ExplanationProgressMonitor;
 /*
  * Copyright (C) 2008, University of Manchester
@@ -23,6 +25,7 @@ import org.semanticweb.owl.explanation.api.ExplanationProgressMonitor;
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 
 /**
@@ -41,25 +44,28 @@ public class Configuration<E> {
 
     private ContractionStrategy contractionStrategy;
 
-    public Configuration(EntailmentCheckerFactory<E> checkerFactory, ExpansionStrategy expansionStrategy, ContractionStrategy contractionStrategy) {
-        this(checkerFactory, expansionStrategy, contractionStrategy, null);
+    private final Supplier<OWLOntologyManager> m;
+
+    public Configuration(EntailmentCheckerFactory<E> checkerFactory, ExpansionStrategy expansionStrategy, ContractionStrategy contractionStrategy, Supplier<OWLOntologyManager> m) {
+        this(checkerFactory, expansionStrategy, contractionStrategy, null, m);
     }
 
 
-    public Configuration(EntailmentCheckerFactory<E> checkerFactory, ExpansionStrategy expansionStrategy, ContractionStrategy contractionStrategy, ExplanationProgressMonitor<E> progressMonitor) {
+    public Configuration(EntailmentCheckerFactory<E> checkerFactory, ExpansionStrategy expansionStrategy, ContractionStrategy contractionStrategy, ExplanationProgressMonitor<E> progressMonitor, Supplier<OWLOntologyManager> m) {
         this.checkerFactory = checkerFactory;
         this.contractionStrategy = contractionStrategy;
         this.expansionStrategy = expansionStrategy;
+        this.m = m;
     }
 
 
-    public Configuration(EntailmentCheckerFactory<E> checkerFactory) {
-        this(checkerFactory, new StructuralTypePriorityExpansionStrategy(), new DivideAndConquerContractionStrategy());
+    public Configuration(EntailmentCheckerFactory<E> checkerFactory, Supplier<OWLOntologyManager> m) {
+        this(checkerFactory, new StructuralTypePriorityExpansionStrategy(null, m), new DivideAndConquerContractionStrategy(), m);
     }
 
 
-    public Configuration(EntailmentCheckerFactory<E> checkerFactory, ExplanationProgressMonitor<E> progressMonitor) {
-        this(checkerFactory, new StructuralTypePriorityExpansionStrategy(), new DivideAndConquerContractionStrategy(), progressMonitor);
+    public Configuration(EntailmentCheckerFactory<E> checkerFactory, ExplanationProgressMonitor<E> progressMonitor, Supplier<OWLOntologyManager> m) {
+        this(checkerFactory, new StructuralTypePriorityExpansionStrategy(null, m), new DivideAndConquerContractionStrategy(), progressMonitor, m);
     }
 
 
@@ -77,4 +83,7 @@ public class Configuration<E> {
         return expansionStrategy;
     }
 
+    public Supplier<OWLOntologyManager> getOntologyManagerSupplier() {
+        return this.m;
+    }
 }

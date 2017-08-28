@@ -64,7 +64,8 @@ public class BlackBoxExplanationGeneratorFactory<E> implements ExplanationGenera
                 configuration.getCheckerFactory(),
                 configuration.getExpansionStrategy(),
                 configuration.getContractionStrategy(),
-                progressMonitor);
+                progressMonitor,
+                configuration.getOntologyManagerSupplier());
     }
 
     public ExplanationGenerator<E> createExplanationGenerator(Set<? extends OWLAxiom> axioms) {
@@ -77,6 +78,7 @@ public class BlackBoxExplanationGeneratorFactory<E> implements ExplanationGenera
                 configuration.getCheckerFactory(),
                 configuration.getExpansionStrategy(),
                 configuration.getContractionStrategy(),
-                progressMonitor);
+                progressMonitor,
+                configuration.getOntologyManagerSupplier());
     }
 }

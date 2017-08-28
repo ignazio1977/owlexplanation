@@ -6,13 +6,12 @@ import org.semanticweb.owl.explanation.telemetry.DefaultTelemetryInfo;
 import org.semanticweb.owl.explanation.telemetry.TelemetryInfo;
 import org.semanticweb.owl.explanation.telemetry.TelemetryTimer;
 import org.semanticweb.owl.explanation.telemetry.TelemetryTransmitter;
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
-import uk.ac.manchester.cs.owl.owlapi.OWLDataFactoryImpl;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 /**
  * Author: Matthew Horridge<br>
@@ -36,13 +35,16 @@ public class LaconicExplanationGeneratorBasedOnOPlusWithDeltaPlusFiltering imple
 
     private int numberOfOPlusJustificationsFound = 0;
 
-    public LaconicExplanationGeneratorBasedOnOPlusWithDeltaPlusFiltering(Set<? extends OWLAxiom> inputAxioms, EntailmentCheckerFactory<OWLAxiom> entailmentCheckerFactory, ExplanationGeneratorFactory<OWLAxiom> delegateFactory, ExplanationProgressMonitor<OWLAxiom> progressMonitor, OPlusSplitting spiltting, ModularityTreatment inputType) {
+    private Supplier<OWLOntologyManager> m;
+
+    public LaconicExplanationGeneratorBasedOnOPlusWithDeltaPlusFiltering(Set<? extends OWLAxiom> inputAxioms, EntailmentCheckerFactory<OWLAxiom> entailmentCheckerFactory, ExplanationGeneratorFactory<OWLAxiom> delegateFactory, ExplanationProgressMonitor<OWLAxiom> progressMonitor, OPlusSplitting spiltting, ModularityTreatment inputType, Supplier<OWLOntologyManager> m) {
         this.inputAxioms = new HashSet<OWLAxiom>(inputAxioms);
         this.entailmentCheckerFactory = entailmentCheckerFactory;
         this.delegateFactory = delegateFactory;
         this.progressMonitor = progressMonitor;
         this.oplusSplitting = spiltting;
         this.modularityTreatment = inputType;
+        this.m = m;
     }
 
 
@@ -87,16 +89,15 @@ public class LaconicExplanationGeneratorBasedOnOPlusWithDeltaPlusFiltering imple
 
         final Set<Explanation<OWLAxiom>> preferredLaconicExplanations;
         try {
-            OWLDataFactory dataFactory = new OWLDataFactoryImpl();
+            OWLOntologyManager man = m.get();
+            OWLDataFactory dataFactory = man.getOWLDataFactory();
 
             OPlusGenerator transformation = new OPlusGenerator(dataFactory, oplusSplitting);
-            OWLOntologyManager man = OWLManager.createOWLOntologyManager();
-
             transmitter.recordMeasurement(info, "input axioms size", inputAxioms.size());
 
             Set<OWLAxiom> oplusInput;
             if (modularityTreatment.equals(ModularityTreatment.MODULE)) {
-                SyntacticLocalityModuleExtractor extractor = new SyntacticLocalityModuleExtractor(man, (OWLOntology) null, inputAxioms, ModuleType.STAR);
+                SyntacticLocalityModuleExtractor extractor = new SyntacticLocalityModuleExtractor(man, inputAxioms.stream(), ModuleType.STAR);
                 oplusInput = extractor.extract(entailment.getSignature());
             }
             else {
@@ -216,7 +217,7 @@ public class LaconicExplanationGeneratorBasedOnOPlusWithDeltaPlusFiltering imple
                             public boolean isCancelled() {
                                 return cancelled;
                             }
-                        });
+                        }, m);
                         Set<Explanation<OWLAxiom>> deltaPlusGeneratedExpls = lacGen.getExplanations(laconicExpl.getEntailment());
 
 

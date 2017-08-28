@@ -1,5 +1,7 @@
 package org.semanticweb.owl.explanation.impl.blackbox.checker;
 
+import java.util.function.Supplier;
+
 import org.semanticweb.owl.explanation.impl.blackbox.Configuration;
 import org.semanticweb.owl.explanation.impl.blackbox.ContractionStrategy;
 import org.semanticweb.owl.explanation.impl.blackbox.ExpansionStrategy;
@@ -27,6 +29,7 @@ import org.semanticweb.owlapi.model.OWLAxiom;
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 
 /**
@@ -39,13 +42,14 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 public class DefaultBlackBoxConfiguration extends Configuration<OWLAxiom> {
 
 
-    public DefaultBlackBoxConfiguration(OWLReasonerFactory reasonerFactory) {
-        super(new SatisfiabilityEntailmentCheckerFactory(reasonerFactory));
+    public DefaultBlackBoxConfiguration(OWLReasonerFactory reasonerFactory, Supplier<OWLOntologyManager> m) {
+        super(new SatisfiabilityEntailmentCheckerFactory(reasonerFactory, m), m);
     }
 
     public DefaultBlackBoxConfiguration(OWLReasonerFactory reasonerFactory,
                                       ExpansionStrategy expansionStrategy,
-                                      ContractionStrategy contractionStrategy) {
-        super(new SatisfiabilityEntailmentCheckerFactory(reasonerFactory), expansionStrategy, contractionStrategy);
+                                      ContractionStrategy contractionStrategy,
+                                      Supplier<OWLOntologyManager> m) {
+        super(new SatisfiabilityEntailmentCheckerFactory(reasonerFactory, m), expansionStrategy, contractionStrategy, m);
     }
 }

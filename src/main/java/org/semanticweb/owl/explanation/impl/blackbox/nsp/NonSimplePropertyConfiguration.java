@@ -1,5 +1,7 @@
 package org.semanticweb.owl.explanation.impl.blackbox.nsp;
 
+import java.util.function.Supplier;
+
 import org.semanticweb.owl.explanation.impl.blackbox.*;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 /*
@@ -24,6 +26,7 @@ import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 
 /**
@@ -33,12 +36,12 @@ import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 public class NonSimplePropertyConfiguration extends Configuration<OWLObjectPropertyExpression> {
 
 
-    public NonSimplePropertyConfiguration() {
-        super(new NSPEntailmentCheckerFactory(), new StructuralExpansionStrategy(), new SlidingWindowContractionStrategy());
+    public NonSimplePropertyConfiguration(Supplier<OWLOntologyManager> m) {
+        super(new NSPEntailmentCheckerFactory(m), new StructuralExpansionStrategy(m), new SlidingWindowContractionStrategy(), m);
     }
 
 
-    public NonSimplePropertyConfiguration(ExpansionStrategy expansionStrategy, ContractionStrategy contractionStrategy) {
-        super(new NSPEntailmentCheckerFactory(), expansionStrategy, contractionStrategy);
+    public NonSimplePropertyConfiguration(ExpansionStrategy expansionStrategy, ContractionStrategy contractionStrategy, Supplier<OWLOntologyManager> m) {
+        super(new NSPEntailmentCheckerFactory(m), expansionStrategy, contractionStrategy, m);
     }
 }

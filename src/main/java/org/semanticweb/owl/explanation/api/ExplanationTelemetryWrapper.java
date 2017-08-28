@@ -5,6 +5,7 @@ import org.semanticweb.owlapi.model.*;
 
 import java.io.*;
 import java.util.Collections;
+import java.util.function.Supplier;
 
 /**
  * Author: Matthew Horridge<br>
@@ -15,9 +16,11 @@ import java.util.Collections;
 public class ExplanationTelemetryWrapper implements TelemetryObject {
 
     private Explanation<OWLAxiom> explanation;
+    private Supplier<OWLOntologyManager> m;
 
-    public ExplanationTelemetryWrapper(Explanation<OWLAxiom> explanation) {
+    public ExplanationTelemetryWrapper(Explanation<OWLAxiom> explanation, Supplier<OWLOntologyManager> m) {
         this.explanation = explanation;
+        this.m = m;
     }
 
     public String getPreferredSerialisedName() {
@@ -30,7 +33,7 @@ public class ExplanationTelemetryWrapper implements TelemetryObject {
 
     public void serialise(OutputStream outputStream) throws IOException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        Explanation.store(explanation, bos);
+        Explanation.store(explanation, bos, m);
         String rendering = new String(bos.toByteArray());
         rendering = rendering.replace("<?xml version=\"1.0\"?>\n", "");
         PrintWriter pw = new PrintWriter(outputStream);

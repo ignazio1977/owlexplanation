@@ -558,8 +558,8 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
     public Set<? extends OWLAxiom> visit(OWLInverseObjectPropertiesAxiom axiom) {
         // Implication
         Set<OWLAxiom> result = new HashSet<OWLAxiom>();
-        result.add(dataFactory.getOWLSubObjectPropertyOfAxiom(axiom.getFirstProperty(), dataFactory.getOWLObjectInverseOf(axiom.getSecondProperty())));
-        result.add(dataFactory.getOWLSubObjectPropertyOfAxiom(axiom.getSecondProperty(), dataFactory.getOWLObjectInverseOf(axiom.getFirstProperty())));
+        result.add(dataFactory.getOWLSubObjectPropertyOfAxiom(axiom.getFirstProperty(), dataFactory.getOWLObjectInverseOf(axiom.getSecondProperty().asOWLObjectProperty())));
+        result.add(dataFactory.getOWLSubObjectPropertyOfAxiom(axiom.getSecondProperty(), dataFactory.getOWLObjectInverseOf(axiom.getFirstProperty().asOWLObjectProperty())));
         return log(axiom, result);
     }
 

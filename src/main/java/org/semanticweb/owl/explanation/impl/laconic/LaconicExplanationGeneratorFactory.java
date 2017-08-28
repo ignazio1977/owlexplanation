@@ -5,6 +5,7 @@ import org.semanticweb.owl.explanation.api.ExplanationGeneratorFactory;
 import org.semanticweb.owl.explanation.api.ExplanationProgressMonitor;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -30,6 +31,7 @@ import java.util.Set;
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+import java.util.function.Supplier;
 
 
 /**
@@ -39,10 +41,12 @@ import java.util.Set;
 public class LaconicExplanationGeneratorFactory<E> implements ExplanationGeneratorFactory<E> {
 
     private ExplanationGeneratorFactory<E> explanationGeneratorFactory;
+    private Supplier<OWLOntologyManager> m;
 
 
-    public LaconicExplanationGeneratorFactory( ExplanationGeneratorFactory<E> explanationGeneratorFactory) {
+    public LaconicExplanationGeneratorFactory( ExplanationGeneratorFactory<E> explanationGeneratorFactory, Supplier<OWLOntologyManager> m) {
         this.explanationGeneratorFactory = explanationGeneratorFactory;
+        this.m = m;
     }
 
     public ExplanationGenerator<E> createExplanationGenerator(OWLOntology ontology) {
@@ -62,6 +66,6 @@ public class LaconicExplanationGeneratorFactory<E> implements ExplanationGenerat
     }
 
     public ExplanationGenerator<E> createExplanationGenerator(Set<? extends OWLAxiom> axioms, ExplanationProgressMonitor<E> progressMonitor) {
-        return new LaconicExplanationGenerator<E>(axioms, explanationGeneratorFactory, progressMonitor);
+        return new LaconicExplanationGenerator<E>(axioms, explanationGeneratorFactory, progressMonitor, m);
     }
 }

@@ -2,7 +2,6 @@ package org.semanticweb.owl.explanation.impl.blackbox;
 
 import org.semanticweb.owl.explanation.api.ExplanationGeneratorInterruptedException;
 import org.semanticweb.owl.explanation.api.ExplanationProgressMonitor;
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 
 import java.util.ArrayList;
@@ -31,6 +30,7 @@ import java.util.Set;
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+import java.util.function.Supplier;
 
 
 /**
@@ -43,11 +43,11 @@ public class StructuralTypePriorityExpansionStrategy implements ExpansionStrateg
 
     private InitialEntailmentCheckStrategy initialEntailmentCheckStrategy = InitialEntailmentCheckStrategy.PERFORM;
 
-    public StructuralTypePriorityExpansionStrategy() {
-    }
+    private Supplier<OWLOntologyManager> m;
 
-    public StructuralTypePriorityExpansionStrategy(InitialEntailmentCheckStrategy initialEntailmentCheckStrategy) {
+    public StructuralTypePriorityExpansionStrategy(InitialEntailmentCheckStrategy initialEntailmentCheckStrategy, Supplier<OWLOntologyManager> m) {
         this.initialEntailmentCheckStrategy = initialEntailmentCheckStrategy;
+        this.m = m;
     }
 
     public Set<OWLAxiom> doExpansion(Set<OWLAxiom> axioms, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor) {
@@ -67,8 +67,7 @@ public class StructuralTypePriorityExpansionStrategy implements ExpansionStrateg
                 }
             }
 
-            OWLOntologyManager man = OWLManager.createOWLOntologyManager();
-            OWLOntology ont = man.createOntology(axioms);
+            OWLOntology ont = m.get().createOntology(axioms);
 //            createOntology(axioms, checker);
 
 
@@ -78,7 +77,7 @@ public class StructuralTypePriorityExpansionStrategy implements ExpansionStrateg
             Set<OWLEntity> expandedWithDefinition = new HashSet<OWLEntity>();
             Set<OWLAxiom> addedAxioms = new HashSet<OWLAxiom>();
             for(OWLEntity ent : entailmentSignature) {
-                OWLDeclarationAxiom declAx = man.getOWLDataFactory().getOWLDeclarationAxiom(ent);
+                OWLDeclarationAxiom declAx = ont.getOWLOntologyManager().getOWLDataFactory().getOWLDeclarationAxiom(ent);
                 expansion.add(declAx);
                 addedAxioms.add(declAx);
             }

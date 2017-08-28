@@ -1,11 +1,11 @@
 package org.semanticweb.owl.explanation.impl.blackbox.checker;
 
 import org.semanticweb.owl.explanation.impl.blackbox.EntailmentChecker;
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 /**
  * Author: Matthew Horridge<br>
@@ -19,10 +19,9 @@ public class PatternBasedConsistencyEntailmentChecker implements EntailmentCheck
     
     private OWLDataFactory df;
     
-    public PatternBasedConsistencyEntailmentChecker(OWLReasonerFactory rf, long timeout) {
-        delegate = new ConsistencyEntailmentChecker(rf, timeout);
-        OWLOntologyManager man = OWLManager.createOWLOntologyManager();
-        df = man.getOWLDataFactory();
+    public PatternBasedConsistencyEntailmentChecker(OWLReasonerFactory rf, Supplier<OWLOntologyManager> m, OWLDataFactory df, long timeout) {
+        delegate = new ConsistencyEntailmentChecker(rf, m, df, timeout);
+        this.df = df;
     }
 
     private int counter = 0;

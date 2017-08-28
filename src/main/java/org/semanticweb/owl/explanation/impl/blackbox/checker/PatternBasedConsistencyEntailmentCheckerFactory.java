@@ -1,8 +1,11 @@
 package org.semanticweb.owl.explanation.impl.blackbox.checker;
 
+import java.util.function.Supplier;
+
 import org.semanticweb.owl.explanation.impl.blackbox.EntailmentChecker;
 import org.semanticweb.owl.explanation.impl.blackbox.EntailmentCheckerFactory;
 import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 
 /**
@@ -17,12 +20,15 @@ public class PatternBasedConsistencyEntailmentCheckerFactory implements Entailme
 
     private long timeout;
 
-    public PatternBasedConsistencyEntailmentCheckerFactory(OWLReasonerFactory rf, long timeout) {
+    private Supplier<OWLOntologyManager> m;
+
+    public PatternBasedConsistencyEntailmentCheckerFactory(OWLReasonerFactory rf, Supplier<OWLOntologyManager> m, long timeout) {
         this.rf = rf;
         this.timeout = timeout;
+        this.m = m;
     }
 
     public EntailmentChecker<OWLAxiom> createEntailementChecker(OWLAxiom entailment) {
-        return new PatternBasedConsistencyEntailmentChecker(rf, timeout);
+        return new PatternBasedConsistencyEntailmentChecker(rf, m, m.get().getOWLDataFactory(), timeout);
     }
 }

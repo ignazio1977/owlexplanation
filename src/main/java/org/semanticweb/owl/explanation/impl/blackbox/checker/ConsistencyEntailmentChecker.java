@@ -8,14 +8,13 @@ import org.semanticweb.owl.explanation.telemetry.TelemetryTransmitter;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import org.semanticweb.owlapi.reasoner.TimeOutException;
-import uk.ac.manchester.cs.owl.owlapi.OWLDataFactoryImpl;
 /*
  * Copyright (C) 2008, University of Manchester
  *
@@ -56,10 +55,12 @@ public class ConsistencyEntailmentChecker implements org.semanticweb.owl.explana
 
     private long timeout = Long.MAX_VALUE;
 
-    public ConsistencyEntailmentChecker(OWLReasonerFactory reasonerFactory, long timeout) {
+    private Supplier<OWLOntologyManager> m;
+
+    public ConsistencyEntailmentChecker(OWLReasonerFactory reasonerFactory, Supplier<OWLOntologyManager> man, OWLDataFactory df, long timeout) {
         this.timeout = timeout;
         this.reasonerFactory = reasonerFactory;
-        OWLDataFactory df = new OWLDataFactoryImpl();
+        this.m = man;
         this.entailment = df.getOWLSubClassOfAxiom(
                 df.getOWLThing(),
                 df.getOWLNothing()
@@ -106,8 +107,7 @@ public class ConsistencyEntailmentChecker implements org.semanticweb.owl.explana
             transmitter.recordMeasurement(info, "input size", axiom.size());
             counter++;
             timer.start();
-            OWLOntologyManager man = OWLManager.createOWLOntologyManager();
-            OWLOntology ont = man.createOntology(axiom);
+            OWLOntology ont = m.get().createOntology(axiom);
             SimpleConfiguration config = new SimpleConfiguration(timeout);
             timer.start();
             loadTimer.start();

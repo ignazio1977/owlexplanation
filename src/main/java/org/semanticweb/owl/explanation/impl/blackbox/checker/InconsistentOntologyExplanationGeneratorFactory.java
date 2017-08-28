@@ -1,7 +1,9 @@
 package org.semanticweb.owl.explanation.impl.blackbox.checker;
 
 import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owl.explanation.api.ExplanationGeneratorFactory;
 import org.semanticweb.owl.explanation.api.ExplanationGenerator;
 import org.semanticweb.owl.explanation.api.ExplanationProgressMonitor;
@@ -10,6 +12,7 @@ import org.semanticweb.owl.explanation.impl.blackbox.*;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.HashSet;
 /*
  * Copyright (C) 2009, University of Manchester
@@ -49,11 +52,14 @@ public class InconsistentOntologyExplanationGeneratorFactory implements Explanat
 
     private ConsistencyEntailmentCheckerFactory consistencyEntailmentCheckerFactory;
 
-    public InconsistentOntologyExplanationGeneratorFactory(OWLReasonerFactory reasonerFactory, long entailmentCheckingTimeout) {
+    private Supplier<OWLOntologyManager> m;
+
+    public InconsistentOntologyExplanationGeneratorFactory(OWLReasonerFactory reasonerFactory, OWLDataFactory df, Supplier<OWLOntologyManager> m, long entailmentCheckingTimeout) {
         expansionStrategy = new InconsistentOntologyExpansionStrategy();
 //        expansionStrategy = new InconsistentOntologyClashExpansionStrategy();
         contractionStrategy = new InconsistentOntologyContractionStrategy();
-        consistencyEntailmentCheckerFactory = new ConsistencyEntailmentCheckerFactory(reasonerFactory, entailmentCheckingTimeout);
+        this.m = m;
+        consistencyEntailmentCheckerFactory = new ConsistencyEntailmentCheckerFactory(reasonerFactory, m, df, entailmentCheckingTimeout);
     }
 
 
@@ -71,7 +77,8 @@ public class InconsistentOntologyExplanationGeneratorFactory implements Explanat
                 consistencyEntailmentCheckerFactory,
                 expansionStrategy,
                 contractionStrategy,
-                progressMonitor);
+                progressMonitor,
+                m);
     }
 
     public ExplanationGenerator<OWLAxiom> createExplanationGenerator(Set<? extends OWLAxiom> axioms) {
@@ -84,6 +91,7 @@ public class InconsistentOntologyExplanationGeneratorFactory implements Explanat
                 consistencyEntailmentCheckerFactory,
                 expansionStrategy,
                 contractionStrategy,
-                progressMonitor);
+                progressMonitor,
+                m);
     }
 }
