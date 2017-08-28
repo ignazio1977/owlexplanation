@@ -30,6 +30,7 @@ import java.util.*;
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+import java.util.function.Supplier;
 
 /**
  * Author: Matthew Horridge<br>
@@ -57,6 +58,8 @@ public class BlackBoxExplanationGenerator2<E> implements ExplanationGenerator<E>
     private TelemetryTimer generatorTimer = new TelemetryTimer();
 //    private TelemetryTimer findOneElapsedTimer;
 
+    private Supplier<OWLOntologyManager> m;
+
     /**
      * Constructs a blackbox explanation generator.
      * @param axioms The ontologies that provide the source axioms for the explanation
@@ -66,7 +69,7 @@ public class BlackBoxExplanationGenerator2<E> implements ExplanationGenerator<E>
      * @param contractionStrategy The strategy to be used during the contraction phase
      * @param progressMonitor A progress monitor - may be <code>null</code>
      */
-    public BlackBoxExplanationGenerator2(Set<? extends OWLAxiom> axioms, EntailmentCheckerFactory<E> checkerFactory, ExpansionStrategy expansionStrategy, ContractionStrategy contractionStrategy, ExplanationProgressMonitor<E> progressMonitor) {
+    public BlackBoxExplanationGenerator2(Set<? extends OWLAxiom> axioms, EntailmentCheckerFactory<E> checkerFactory, ExpansionStrategy expansionStrategy, ContractionStrategy contractionStrategy, ExplanationProgressMonitor<E> progressMonitor, Supplier<OWLOntologyManager> m) {
         workingAxioms = new HashSet<OWLAxiom>(axioms);
         this.checkerFactory = checkerFactory;
         this.expansionStrategy = expansionStrategy;
@@ -78,6 +81,7 @@ public class BlackBoxExplanationGenerator2<E> implements ExplanationGenerator<E>
             this.progressMonitor = new NullExplanationProgressMonitor<E>();
         }
 //        findOneElapsedTimer = new TelemetryTimer();
+        this.m = m;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -219,7 +223,7 @@ public class BlackBoxExplanationGenerator2<E> implements ExplanationGenerator<E>
         TelemetryTransmitter transmitter = TelemetryTransmitter.getTransmitter();
         if (!result.isEmpty()) {
             if (entailment instanceof OWLAxiom) {
-                ExplanationTelemetryWrapper telemetryObject = new ExplanationTelemetryWrapper((Explanation<OWLAxiom>) result);
+                ExplanationTelemetryWrapper telemetryObject = new ExplanationTelemetryWrapper((Explanation<OWLAxiom>) result, m);
                 transmitter.recordObject(findOneInfo, "justification", ".owl.xml", telemetryObject);
             }
         }

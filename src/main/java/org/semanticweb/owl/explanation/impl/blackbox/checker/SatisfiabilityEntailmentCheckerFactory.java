@@ -1,8 +1,11 @@
 package org.semanticweb.owl.explanation.impl.blackbox.checker;
 
+import java.util.function.Supplier;
+
 import org.semanticweb.owl.explanation.impl.blackbox.EntailmentChecker;
 import org.semanticweb.owl.explanation.impl.blackbox.EntailmentCheckerFactory;
 import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 /*
  * Copyright (C) 2008, University of Manchester
@@ -40,28 +43,33 @@ public class SatisfiabilityEntailmentCheckerFactory implements EntailmentChecker
 
     private long entailmentCheckTimeOutMS = Long.MAX_VALUE;
 
-    public SatisfiabilityEntailmentCheckerFactory(OWLReasonerFactory reasonerFactory) {
-        this(reasonerFactory, true);
+    private Supplier<OWLOntologyManager> m;
+
+    public SatisfiabilityEntailmentCheckerFactory(OWLReasonerFactory reasonerFactory, Supplier<OWLOntologyManager> m) {
+        this(reasonerFactory, true, m);
     }
 
-    public SatisfiabilityEntailmentCheckerFactory(OWLReasonerFactory reasonerFactory, long entailmentCheckTimeOutMS) {
+    public SatisfiabilityEntailmentCheckerFactory(OWLReasonerFactory reasonerFactory, long entailmentCheckTimeOutMS, Supplier<OWLOntologyManager> m) {
         this.reasonerFactory = reasonerFactory;
         this.entailmentCheckTimeOutMS = entailmentCheckTimeOutMS;
         this.useModularisation = true;
+        this.m = m;
     }
 
-    public SatisfiabilityEntailmentCheckerFactory(OWLReasonerFactory reasonerFactory, boolean useModularisation) {
+    public SatisfiabilityEntailmentCheckerFactory(OWLReasonerFactory reasonerFactory, boolean useModularisation, Supplier<OWLOntologyManager> m) {
         this.reasonerFactory = reasonerFactory;
         this.useModularisation = useModularisation;
+        this.m = m;
     }
 
-    public SatisfiabilityEntailmentCheckerFactory(OWLReasonerFactory reasonerFactory, boolean useModularisation, long entailmentCheckTimeOutMS) {
+    public SatisfiabilityEntailmentCheckerFactory(OWLReasonerFactory reasonerFactory, boolean useModularisation, long entailmentCheckTimeOutMS, Supplier<OWLOntologyManager> m) {
         this.reasonerFactory = reasonerFactory;
         this.useModularisation = useModularisation;
         this.entailmentCheckTimeOutMS = entailmentCheckTimeOutMS;
+        this.m = m;
     }
 
     public EntailmentChecker<OWLAxiom> createEntailementChecker(OWLAxiom entailment) {
-        return new SatisfiabilityEntailmentChecker(reasonerFactory, entailment, useModularisation, entailmentCheckTimeOutMS);
+        return new SatisfiabilityEntailmentChecker(reasonerFactory, entailment, m, useModularisation, entailmentCheckTimeOutMS);
     }
 }

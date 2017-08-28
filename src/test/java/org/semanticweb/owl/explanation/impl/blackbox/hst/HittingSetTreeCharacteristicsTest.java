@@ -3,7 +3,6 @@ package org.semanticweb.owl.explanation.impl.blackbox.hst;
 import org.semanticweb.owl.explanation.api.ConsoleExplanationProgressMonitor;
 import org.semanticweb.owl.explanation.api.Explanation;
 import org.semanticweb.owl.explanation.api.Explanation;
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 
 import java.io.*;

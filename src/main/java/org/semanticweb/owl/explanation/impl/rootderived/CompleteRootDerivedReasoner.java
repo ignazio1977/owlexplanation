@@ -4,13 +4,13 @@ import org.semanticweb.owl.explanation.api.*;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.ToStringRenderer;
 import org.semanticweb.owlapi.util.SimpleRenderer;
 import org.semanticweb.owlapi.util.SimpleShortFormProvider;
 import org.semanticweb.owlapi.util.DefaultPrefixManager;
 
 import java.util.*;
+import java.util.function.Supplier;
 import java.net.URI;
 /*
  * Copyright (C) 2009, University of Manchester
@@ -53,11 +53,14 @@ public class CompleteRootDerivedReasoner implements RootDerivedReasoner {
 
     private Set<OWLClass> roots = new HashSet<OWLClass>();
 
+    private Supplier<OWLOntologyManager> m;
 
-    public CompleteRootDerivedReasoner(OWLOntologyManager manager, OWLReasoner baseReasoner, OWLReasonerFactory reasonerFactory) {
+
+    public CompleteRootDerivedReasoner(OWLOntologyManager manager, OWLReasoner baseReasoner, OWLReasonerFactory reasonerFactory, Supplier<OWLOntologyManager> m) {
         this.manager = manager;
         this.baseReasoner = baseReasoner;
         this.reasonerFactory = reasonerFactory;
+        this.m = m;
     }
 
     /**
@@ -82,7 +85,7 @@ public class CompleteRootDerivedReasoner implements RootDerivedReasoner {
         int done = 0;
         roots.addAll(estimatedRoots);
         for (final OWLClass estimatedRoot : estimatedRoots) {
-            ExplanationGeneratorFactory<OWLAxiom> genFac = ExplanationManager.createExplanationGeneratorFactory(reasonerFactory);
+            ExplanationGeneratorFactory<OWLAxiom> genFac = ExplanationManager.createExplanationGeneratorFactory(reasonerFactory, m);
             ExplanationGenerator<OWLAxiom> gen = genFac.createExplanationGenerator(allAxioms);
             OWLDataFactory df = manager.getOWLDataFactory();
             Set<Explanation<OWLAxiom>> expls = gen.getExplanations(df.getOWLSubClassOfAxiom(estimatedRoot, df.getOWLNothing()));

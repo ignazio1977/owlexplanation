@@ -1,5 +1,7 @@
 package org.semanticweb.owl.explanation.impl.blackbox.nsp;
 
+import java.util.function.Supplier;
+
 import org.semanticweb.owl.explanation.impl.blackbox.EntailmentChecker;
 import org.semanticweb.owl.explanation.impl.blackbox.EntailmentCheckerFactory;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
@@ -25,6 +27,7 @@ import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 
 /**
@@ -33,9 +36,12 @@ import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
  */
 public class NSPEntailmentCheckerFactory implements EntailmentCheckerFactory<OWLObjectPropertyExpression> {
 
-
+    private Supplier<OWLOntologyManager> m;
+    public NSPEntailmentCheckerFactory(Supplier<OWLOntologyManager> m) {
+        this.m = m;
+    }
     public EntailmentChecker<OWLObjectPropertyExpression> createEntailementChecker(
             OWLObjectPropertyExpression entailment) {
-        return new NonSimplePropertyEntailmentChecker(entailment);
+        return new NonSimplePropertyEntailmentChecker(entailment, m);
     }
 }

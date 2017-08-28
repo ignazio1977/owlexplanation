@@ -1,12 +1,12 @@
 package org.semanticweb.owl.explanation.impl.laconic;
 
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owl.explanation.api.*;
 import org.semanticweb.owl.explanation.api.Explanation;
 import org.semanticweb.owlapi.model.*;
 import uk.ac.manchester.cs.owl.explanation.ordering.MutableTree;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 /*
  * Copyright (C) 2008, University of Manchester
@@ -40,9 +40,7 @@ public class LaconicExplanationGenerator<E> implements ExplanationGenerator<E>, 
 
     private ExplanationGeneratorFactory<E> explanationGeneratorFactory;
 
-
     private OWLOntologyManager man;
-
 
     private OWLOntology ont;
 
@@ -59,8 +57,8 @@ public class LaconicExplanationGenerator<E> implements ExplanationGenerator<E>, 
     private Set<? extends OWLAxiom> axioms;
 
 
-    public LaconicExplanationGenerator(Set<? extends OWLAxiom> axioms, ExplanationGeneratorFactory<E> explanationGeneratorFactory, ExplanationProgressMonitor<E> progressMonitor) {
-        this.man = OWLManager.createOWLOntologyManager();
+    public LaconicExplanationGenerator(Set<? extends OWLAxiom> axioms, ExplanationGeneratorFactory<E> explanationGeneratorFactory, ExplanationProgressMonitor<E> progressMonitor, Supplier<OWLOntologyManager> m) {
+        this.man = m.get();
         this.progressMonitor = progressMonitor;
         this.explanationGeneratorFactory = explanationGeneratorFactory;
         this.limit = Integer.MAX_VALUE;

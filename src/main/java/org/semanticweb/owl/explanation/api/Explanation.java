@@ -1,10 +1,10 @@
 package org.semanticweb.owl.explanation.api;
 
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.formats.OWLXMLDocumentFormat;
 import org.semanticweb.owlapi.model.*;
 import uk.ac.manchester.cs.owl.explanation.ordering.ExplanationOrderer;
 import uk.ac.manchester.cs.owl.explanation.ordering.ExplanationOrdererImpl;
+import uk.ac.manchester.cs.owl.explanation.ordering.ExplanationOrdererImplNoManager;
 
 import java.io.*;
 import java.util.*;
@@ -30,6 +30,7 @@ import java.util.*;
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+import java.util.function.Supplier;
 
 
 /**
@@ -143,7 +144,7 @@ public class Explanation<E> {
         Collection<OWLAxiom> orderedAxioms;
         if (entailment instanceof OWLAxiom) {
             OWLAxiom entailedAxiom = (OWLAxiom) entailment;
-            ExplanationOrderer orderer = new ExplanationOrdererImpl(OWLManager.createOWLOntologyManager());
+            ExplanationOrderer orderer = new ExplanationOrdererImplNoManager();
             List<OWLAxiom> axs = new ArrayList<OWLAxiom>(orderer.getOrderedExplanation(entailedAxiom, justification).fillDepthFirst());
             axs.remove(0);
             orderedAxioms = axs;
@@ -183,18 +184,18 @@ public class Explanation<E> {
      * @param os The output stream to store the explanation to
      * @throws IOException if there was a problem writing out the explanation
      */
-    public static void store(Explanation<OWLAxiom> explanation, OutputStream os) throws IOException {
+    public static void store(Explanation<OWLAxiom> explanation, OutputStream os, Supplier<OWLOntologyManager> m) throws IOException {
         try {
-            OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-            OWLOntology ontology = manager.createOntology(explanation.getAxioms());
-            OWLDataFactory df = manager.getOWLDataFactory();
+            OWLOntology ontology = m.get().createOntology(explanation.getAxioms());
+            OWLDataFactory df = ontology.getOWLOntologyManager().getOWLDataFactory();
             OWLAnnotationProperty entailmentMarkerAnnotationProperty = df.getOWLAnnotationProperty(ENTAILMENT_MARKER_IRI);
             OWLAnnotation entailmentAnnotation = df.getOWLAnnotation(entailmentMarkerAnnotationProperty, df.getOWLLiteral(true));
             OWLAxiom annotatedEntailment = explanation.getEntailment().getAnnotatedAxiom(Collections.singleton(entailmentAnnotation));
-            manager.addAxiom(ontology, annotatedEntailment);
+            ontology.add(annotatedEntailment);
             BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(os);
             OWLXMLDocumentFormat justificationOntologyFormat = new OWLXMLDocumentFormat();
-            manager.saveOntology(ontology, justificationOntologyFormat, bufferedOutputStream);
+            ontology.saveOntology(justificationOntologyFormat, bufferedOutputStream);
+            bufferedOutputStream.flush();
         }
         catch (OWLOntologyStorageException | OWLOntologyCreationException e) {
             throw new RuntimeException(e);
@@ -209,11 +210,10 @@ public class Explanation<E> {
      * @throws IOException if there was a problem reading the explanation
      * @throws IllegalStateException if the input stream does not appear to contain a serialisation of an explanation.
      */
-    public static Explanation<OWLAxiom> load(InputStream is) throws IOException {
+    public static Explanation<OWLAxiom> load(InputStream is, Supplier<OWLOntologyManager> m) throws IOException {
         try {
-            OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-            OWLOntology ontology = manager.loadOntologyFromOntologyDocument(new BufferedInputStream(is));
-            OWLDataFactory df = manager.getOWLDataFactory();
+            OWLOntology ontology = m.get().loadOntologyFromOntologyDocument(new BufferedInputStream(is));
+            OWLDataFactory df = ontology.getOWLOntologyManager().getOWLDataFactory();
             OWLAnnotationProperty entailmentMarkerAnnotationProperty = df.getOWLAnnotationProperty(ENTAILMENT_MARKER_IRI);
             Set<OWLAxiom> justificationAxioms = new HashSet<OWLAxiom>();
             OWLAxiom entailment = null;

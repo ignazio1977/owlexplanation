@@ -1,7 +1,6 @@
 package org.semanticweb.owl.explanation.impl.blackbox;
 
 import org.semanticweb.owl.explanation.api.ExplanationProgressMonitor;
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import uk.ac.manchester.cs.owl.explanation.ordering.Tree;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
@@ -30,6 +29,7 @@ import java.util.*;
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+import java.util.function.Supplier;
 
 
 /**
@@ -43,6 +43,12 @@ public class ModularityContractionStrategy implements ContractionStrategy {
     private int windowSize;
 
     private int counter = 0;
+
+    private Supplier<OWLOntologyManager> m;
+
+    public ModularityContractionStrategy(Supplier<OWLOntologyManager> m) {
+        this.m = m;
+    }
 
     private static void toList(Tree<OWLAxiom> tree, List<OWLAxiom> axioms, EntailmentChecker checker) {
         OWLAxiom axiom = tree.getUserObject();
@@ -112,9 +118,8 @@ public class ModularityContractionStrategy implements ContractionStrategy {
 
     private Set<OWLAxiom> computeModule(Set<OWLAxiom> contraction, EntailmentChecker checker) {
         try {
-            OWLOntologyManager man = OWLManager.createOWLOntologyManager();
-            OWLOntology ont = man.createOntology(contraction);
-            SyntacticLocalityModuleExtractor extractor = new SyntacticLocalityModuleExtractor(man, ont, ModuleType.BOT);
+            OWLOntology ont = m.get().createOntology(contraction);
+            SyntacticLocalityModuleExtractor extractor = new SyntacticLocalityModuleExtractor(ont.getOWLOntologyManager(), ont, ModuleType.BOT);
             return extractor.extract(checker.getEntailmentSignature());
         }
         catch (OWLOntologyCreationException e) {

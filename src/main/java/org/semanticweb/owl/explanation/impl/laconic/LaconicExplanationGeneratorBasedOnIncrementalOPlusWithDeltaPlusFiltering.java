@@ -6,17 +6,17 @@ import org.semanticweb.owl.explanation.telemetry.DefaultTelemetryInfo;
 import org.semanticweb.owl.explanation.telemetry.TelemetryInfo;
 import org.semanticweb.owl.explanation.telemetry.TelemetryTimer;
 import org.semanticweb.owl.explanation.telemetry.TelemetryTransmitter;
-import org.semanticweb.owlapi.dlsyntax.renderer.DLSyntaxObjectRenderer;
 import org.semanticweb.owlapi.io.OWLObjectRenderer;
 import org.semanticweb.owlapi.io.ToStringRenderer;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.util.SimpleRenderer;
-import uk.ac.manchester.cs.owl.owlapi.OWLDataFactoryImpl;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 /**
  * Author: Matthew Horridge<br>
@@ -32,13 +32,16 @@ public class LaconicExplanationGeneratorBasedOnIncrementalOPlusWithDeltaPlusFilt
 
     private EntailmentCheckerFactory<OWLAxiom> entailmentCheckerFactory;
 
-    private OWLDataFactory dataFactory = new OWLDataFactoryImpl();
+    private OWLDataFactory dataFactory;
 
     private ExplanationProgressMonitor<OWLAxiom> progressMonitor = new NullExplanationProgressMonitor<OWLAxiom>();
 
     private int numberOfOPlusJustificationsFound;
 
-    public LaconicExplanationGeneratorBasedOnIncrementalOPlusWithDeltaPlusFiltering(Set<OWLAxiom> inputAxioms, EntailmentCheckerFactory<OWLAxiom> cf, ExplanationGeneratorFactory<OWLAxiom> delegate, ExplanationProgressMonitor<OWLAxiom> progressMonitor) {
+    private Supplier<OWLOntologyManager> m;
+
+    public LaconicExplanationGeneratorBasedOnIncrementalOPlusWithDeltaPlusFiltering(Set<OWLAxiom> inputAxioms, EntailmentCheckerFactory<OWLAxiom> cf, ExplanationGeneratorFactory<OWLAxiom> delegate, ExplanationProgressMonitor<OWLAxiom> progressMonitor, OWLDataFactory df, Supplier<OWLOntologyManager> m) {
+        this.dataFactory=df;
         this.inputAxioms = new HashSet<OWLAxiom>(inputAxioms.size());
         for (OWLAxiom in : inputAxioms) {
             this.inputAxioms.add(in.getAxiomWithoutAnnotations());
@@ -46,6 +49,7 @@ public class LaconicExplanationGeneratorBasedOnIncrementalOPlusWithDeltaPlusFilt
         this.delegate = delegate;
         this.entailmentCheckerFactory = cf;
         this.progressMonitor = progressMonitor;
+        this.m = m;
     }
 
     /**
@@ -188,12 +192,9 @@ public class LaconicExplanationGeneratorBasedOnIncrementalOPlusWithDeltaPlusFilt
             if (laconicExplanations.isEmpty()) {
                 System.out.println("I didn't find any oplus explanations that were laconic!!!");
                 System.out.println("Here's what I found:");
-                ToStringRenderer.getInstance().setRenderer(new DLSyntaxObjectRenderer());
                 for (Explanation<OWLAxiom> expl : oplusExpls) {
                     System.out.println(expl);
                 }
-
-                ToStringRenderer.getInstance().setRenderer(new SimpleRenderer());
             }
 
             reconstituteTimer.start();
@@ -269,7 +270,7 @@ public class LaconicExplanationGeneratorBasedOnIncrementalOPlusWithDeltaPlusFilt
                             public boolean isCancelled() {
                                 return cancelled;
                             }
-                        });
+                        }, m);
                         Set<Explanation<OWLAxiom>> deltaPlusGeneratedExpls = lacGen.getExplanations(laconicExpl.getEntailment());
 
 
@@ -311,7 +312,7 @@ public class LaconicExplanationGeneratorBasedOnIncrementalOPlusWithDeltaPlusFilt
         try {
             transmitter.beginTransmission(info);
             for(Explanation<OWLAxiom> expl : expls) {
-                transmitter.recordObject(info, "justification", "", new ExplanationTelemetryWrapper(expl));
+                transmitter.recordObject(info, "justification", "", new ExplanationTelemetryWrapper(expl, m));
             }
         }
         finally {

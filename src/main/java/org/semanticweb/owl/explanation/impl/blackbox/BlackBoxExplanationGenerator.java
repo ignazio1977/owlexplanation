@@ -2,7 +2,6 @@ package org.semanticweb.owl.explanation.impl.blackbox;
 
 import org.semanticweb.owl.explanation.api.*;
 import org.semanticweb.owl.explanation.api.Explanation;
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import uk.ac.manchester.cs.owl.explanation.ordering.*;
 
@@ -470,7 +469,7 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
         if (isLoggable()) {
             log("Expanding axioms");
             StringBuilder sb = new StringBuilder();
-            ExplanationOrderer orderer = new ExplanationOrdererImpl(OWLManager.createOWLOntologyManager());
+            ExplanationOrderer orderer = new ExplanationOrdererImplNoManager();
             Tree<OWLAxiom> tree = orderer.getOrderedExplanation((OWLAxiom) checker.getEntailment(), expandedAxioms);
             List<OWLAxiom> axiomList = tree.fillDepthFirst();
             for (OWLAxiom ax : axiomList) {

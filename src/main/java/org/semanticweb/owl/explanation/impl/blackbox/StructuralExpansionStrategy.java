@@ -1,7 +1,6 @@
 package org.semanticweb.owl.explanation.impl.blackbox;
 
 import org.semanticweb.owl.explanation.api.ExplanationProgressMonitor;
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 
 import java.util.Collections;
@@ -29,6 +28,7 @@ import java.util.Set;
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+import java.util.function.Supplier;
 
 
 /**
@@ -38,17 +38,17 @@ import java.util.Set;
 public class StructuralExpansionStrategy implements ExpansionStrategy {
 
     private int count = 0;
+    private Supplier<OWLOntologyManager> m;
 
-    public StructuralExpansionStrategy() {
+    public StructuralExpansionStrategy(Supplier<OWLOntologyManager> m) {
+        this.m = m;
     }
 
     public Set<OWLAxiom> doExpansion(final Set<OWLAxiom> axioms, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor) {
 
         count = 0;
         try {
-            OWLOntologyManager man = OWLManager.createOWLOntologyManager();
-
-            OWLOntology ont = man.createOntology(axioms);
+            OWLOntology ont = m.get().createOntology(axioms);
 
             Set<OWLEntity> entailmentSignature = new HashSet<OWLEntity>();
             entailmentSignature.addAll(checker.getEntailmentSignature());

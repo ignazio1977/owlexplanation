@@ -2,11 +2,9 @@ package org.semanticweb.owl.explanation.impl.util;
 
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.util.DefaultPrefixManager;
-import uk.ac.manchester.cs.owl.owlapi.OWLDataFactoryImpl;
 
 import java.util.*;
 
-import static org.semanticweb.owlapi.apibinding.OWLFunctionalSyntaxFactory.*;
 /**
  * Author: Matthew Horridge<br>
  * The University of Manchester<br>
@@ -182,7 +180,7 @@ public class DeltaTransformation implements AxiomTransformation {
 
         private ClassExpressionTransformer negativeTransformer = new ClassExpressionTransformer(Polarity.NEGATIVE);
 
-        private Set<OWLAxiom> visit(Set<? extends OWLAxiom> axioms) {
+        private Set<OWLAxiom> visit(Collection<? extends OWLAxiom> axioms) {
             Set<OWLAxiom> result = new HashSet<OWLAxiom>();
             for (OWLAxiom ax : axioms) {
                 result.addAll(ax.accept(this));
@@ -415,7 +413,7 @@ public class DeltaTransformation implements AxiomTransformation {
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private class ClassExpressionTransformer implements OWLClassExpressionVisitorEx<OWLClassExpression>, OWLDataRangeVisitorEx<OWLDataRange> {
+    private class ClassExpressionTransformer implements OWLClassExpressionVisitorEx<OWLClassExpression> {
 
         private Polarity polarity;
 
@@ -595,31 +593,4 @@ public class DeltaTransformation implements AxiomTransformation {
             return node;
         }
     }
-
-    public static void main(String[] args) {
-        DefaultPrefixManager pm = new DefaultPrefixManager("http://test.com#");
-        OWLClass A = Class(":A", pm);
-        OWLClass B = Class(":B", pm);
-        OWLClass C = Class(":C", pm);
-        OWLObjectProperty prop = ObjectProperty(":p", pm);
-        OWLIndividual i = NamedIndividual(":i", pm);
-        OWLIndividual j = NamedIndividual(":j", pm);
-        OWLIndividual k = NamedIndividual(":k", pm);
-        OWLIndividual l = NamedIndividual(":l", pm);
-        OWLDataFactory df = new OWLDataFactoryImpl();
-//        OWLAxiom ax = SubClassOf(A, ObjectIntersectionOf(B, ObjectIntersectionOf(ObjectComplementOf(B), C)));
-//        OWLAxiom ax = SubClassOf(A, ObjectSomeValuesFrom(prop, OWLThing()));
-//        OWLAxiom ax = SubClassOf(A, ObjectAllValuesFrom(prop, B));
-        OWLAxiom ax = SubClassOf(A, ObjectOneOf(i, j, k, l));
-//        ToStringRenderer.getInstance().setRenderer(new DLSyntaxObjectRenderer());
-        System.out.println(ax);
-        System.out.println("---------------------------------------------------");
-        DeltaTransformation transformation = new DeltaTransformation(df);
-        for(OWLAxiom axt : transformation.transform(Collections.singleton(ax))) {
-            System.out.println(axt);
-        }
-
-
-    }
-
 }

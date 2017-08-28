@@ -1,14 +1,15 @@
 package org.semanticweb.owl.explanation.impl.laconic;
 
+import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.util.DefaultPrefixManager;
-import uk.ac.manchester.cs.owl.owlapi.OWLDataFactoryImpl;
+
+import openllet.owlapi.OWLManagerGroup;
 
 import java.util.Set;
 
-import static org.semanticweb.owlapi.apibinding.OWLFunctionalSyntaxFactory.*;
 /*
  * Copyright (C) 2010, University of Manchester
  *
@@ -42,10 +43,11 @@ public class NestedIntersectionTestCase {
 
     public static void main(String[] args) {
         DefaultPrefixManager pm = new DefaultPrefixManager("http://test.com#");
-        OWLClass clsA = Class("A", pm);
-        OWLClass clsB = Class("B", pm);
-        OWLClassExpression ce = ObjectIntersectionOf(clsA, ObjectIntersectionOf(clsB, clsA));
-        TauGenerator tauGenerator = new TauGenerator(new OWLDataFactoryImpl());
+        OWLDataFactory df=OWLManager.getOWLDataFactory();
+        OWLClass clsA = df.getOWLClass("A", pm);
+        OWLClass clsB = df.getOWLClass("B", pm);
+        OWLClassExpression ce = df.getOWLObjectIntersectionOf(clsA, df.getOWLObjectIntersectionOf(clsB, clsA));
+        TauGenerator tauGenerator = new TauGenerator(df);
         Set<OWLClassExpression> classExpressions = ce.accept(tauGenerator);
         for(OWLClassExpression classExpression : classExpressions) {
             System.out.println(classExpression);

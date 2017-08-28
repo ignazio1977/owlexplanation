@@ -1,9 +1,13 @@
 package org.semanticweb.owl.explanation.impl.blackbox.checker;
 
 import org.semanticweb.owl.explanation.impl.blackbox.EntailmentCheckerFactory;
+
+import java.util.function.Supplier;
+
 import org.semanticweb.owl.explanation.impl.blackbox.EntailmentChecker;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLDataFactory;
 /*
  * Copyright (C) 2009, University of Manchester
  *
@@ -26,6 +30,7 @@ import org.semanticweb.owlapi.model.OWLAxiom;
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 /**
  * Author: Matthew Horridge<br>
@@ -39,17 +44,22 @@ public class ConsistencyEntailmentCheckerFactory implements EntailmentCheckerFac
 
     private long timeout = Long.MAX_VALUE;
 
+    private OWLDataFactory df;
+
+    private Supplier<OWLOntologyManager> m;
 
 //    public ConsistencyEntailmentCheckerFactory(OWLReasonerFactory reasonerFactory) {
 //        this(reasonerFactory, Long.MAX_VALUE);
 //    }
 
-    public ConsistencyEntailmentCheckerFactory(OWLReasonerFactory reasonerFactory, long timeout) {
+    public ConsistencyEntailmentCheckerFactory(OWLReasonerFactory reasonerFactory, Supplier<OWLOntologyManager> m, OWLDataFactory df, long timeout) {
         this.reasonerFactory = reasonerFactory;
         this.timeout = timeout;
+        this.df = df;
+        this.m = m;
     }
 
     public EntailmentChecker<OWLAxiom> createEntailementChecker(OWLAxiom entailment) {
-        return new ConsistencyEntailmentChecker(reasonerFactory, timeout);
+        return new ConsistencyEntailmentChecker(reasonerFactory, m, df, timeout);
     }
 }

@@ -1,7 +1,9 @@
 package org.semanticweb.owl.explanation.impl.blackbox;
 
-import com.clarkparsia.pellet.owlapiv3.PelletReasonerFactory;
 import com.google.common.collect.Sets;
+
+import openllet.owlapi.OpenlletReasonerFactory;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,16 +11,16 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.semanticweb.owl.explanation.api.Explanation;
 import org.semanticweb.owl.explanation.api.NullExplanationProgressMonitor;
 import org.semanticweb.owl.explanation.impl.blackbox.checker.SatisfiabilityEntailmentCheckerFactory;
+import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
-import uk.ac.manchester.cs.owl.owlapi.OWLDataFactoryImpl;
 
 import java.util.Set;
+import java.util.function.Supplier;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
-import static org.semanticweb.owlapi.apibinding.OWLFunctionalSyntaxFactory.SubClassOf;
 
 /**
  * Matthew Horridge
@@ -32,6 +34,7 @@ public class BlackBoxExplanationGenerator2_TestCase {
 
     private OWLReasonerFactory reasonerFactory;
 
+    private OWLDataFactory df=OWLManager.getOWLDataFactory();
 
     private OWLAxiom entailment;
 
@@ -39,30 +42,32 @@ public class BlackBoxExplanationGenerator2_TestCase {
 
     private OWLAxiom BSubClassOfC;
 
+    private Supplier<OWLOntologyManager> m=OWLManager::createOWLOntologyManager;
+
     @Before
     public void setUp() throws Exception {
 
-        OWLDataFactory dataFactory = new OWLDataFactoryImpl();
-        OWLClass A = dataFactory.getOWLClass(IRI.create("http://example.com/A"));
-        OWLClass B = dataFactory.getOWLClass(IRI.create("http://example.com/B"));
-        OWLClass C = dataFactory.getOWLClass(IRI.create("http://example.com/C"));
+        OWLClass A = df.getOWLClass(IRI.create("http://example.com/A"));
+        OWLClass B = df.getOWLClass(IRI.create("http://example.com/B"));
+        OWLClass C = df.getOWLClass(IRI.create("http://example.com/C"));
 
 
-        ASubClassOfB = SubClassOf(A, B);
-        BSubClassOfC = SubClassOf(B, C);
+        ASubClassOfB = df.getOWLSubClassOfAxiom(A, B);
+        BSubClassOfC = df.getOWLSubClassOfAxiom(B, C);
 
 
 
-        entailment = SubClassOf(A, C);
+        entailment = df.getOWLSubClassOfAxiom(A, C);
 
-        reasonerFactory = new PelletReasonerFactory();
+        reasonerFactory = new OpenlletReasonerFactory();
 
         generator = new BlackBoxExplanationGenerator2<>(
                 Sets.newHashSet(ASubClassOfB, BSubClassOfC),
-                new SatisfiabilityEntailmentCheckerFactory(reasonerFactory),
-                new StructuralExpansionStrategy(),
+                new SatisfiabilityEntailmentCheckerFactory(reasonerFactory, m),
+                new StructuralExpansionStrategy(m),
                 new SimpleContractionStrategy(),
-                new NullExplanationProgressMonitor<OWLAxiom>()
+                new NullExplanationProgressMonitor<OWLAxiom>(),
+                m
         );
 
     }

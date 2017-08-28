@@ -5,14 +5,13 @@ import org.semanticweb.owl.explanation.impl.blackbox.EntailmentCheckerFactory;
 import org.semanticweb.owl.explanation.impl.util.AxiomTransformation;
 import org.semanticweb.owl.explanation.impl.util.DeltaPlusTransformation;
 import org.semanticweb.owl.explanation.impl.util.DeltaTransformationUnfolder;
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
-import uk.ac.manchester.cs.owl.owlapi.OWLDataFactoryImpl;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * Author: Matthew Horridge<br>
@@ -30,11 +29,14 @@ public class LaconicExplanationGeneratorBasedOnDeltaPlus implements ExplanationG
 
     private ExplanationProgressMonitor<OWLAxiom> progressMonitor;
 
-    public LaconicExplanationGeneratorBasedOnDeltaPlus(Set<? extends OWLAxiom> inputAxioms, EntailmentCheckerFactory<OWLAxiom> entailmentCheckerFactory, ExplanationGeneratorFactory<OWLAxiom> delegateFactory, ExplanationProgressMonitor<OWLAxiom> progressMonitor) {
+    private Supplier<OWLOntologyManager> m;
+
+    public LaconicExplanationGeneratorBasedOnDeltaPlus(Set<? extends OWLAxiom> inputAxioms, EntailmentCheckerFactory<OWLAxiom> entailmentCheckerFactory, ExplanationGeneratorFactory<OWLAxiom> delegateFactory, ExplanationProgressMonitor<OWLAxiom> progressMonitor, Supplier<OWLOntologyManager> m) {
         this.inputAxioms = new HashSet<OWLAxiom>(inputAxioms);
         this.entailmentCheckerFactory = entailmentCheckerFactory;
         this.delegateFactory = delegateFactory;
         this.progressMonitor = progressMonitor;
+        this.m = m;
     }
 
     /**
@@ -62,10 +64,10 @@ public class LaconicExplanationGeneratorBasedOnDeltaPlus implements ExplanationG
         for(OWLAxiom ax : inputAxioms) {
             signature.addAll(ax.getSignature());
         }
-        final OWLDataFactory dataFactory = new OWLDataFactoryImpl();
+        OWLOntologyManager man = m.get();
+        final OWLDataFactory dataFactory = man.getOWLDataFactory();
         AxiomTransformation transformation = new DeltaPlusTransformation(dataFactory);
-        OWLOntologyManager man = OWLManager.createOWLOntologyManager();
-        SyntacticLocalityModuleExtractor extractor = new SyntacticLocalityModuleExtractor(man, (OWLOntology) null, inputAxioms, ModuleType.STAR);
+        SyntacticLocalityModuleExtractor extractor = new SyntacticLocalityModuleExtractor(man, inputAxioms.stream(), ModuleType.STAR);
         Set<OWLAxiom> moduleAxioms = extractor.extract(entailment.getSignature());
 //
 //        ExplanationGenerator<OWLAxiom> regGen = delegateFactory.createExplanationGenerator(inputAxioms, new NullExplanationProgressMonitor<OWLAxiom>());
