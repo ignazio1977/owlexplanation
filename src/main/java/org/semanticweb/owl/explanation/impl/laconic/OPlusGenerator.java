@@ -44,7 +44,7 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
 
     private TriviallyTopChecker topChecker;
 
-    private Map<OWLAxiom, Set<OWLAxiom>> axiom2SourceMap = new HashMap<OWLAxiom, Set<OWLAxiom>>();
+    private Map<OWLAxiom, Set<OWLAxiom>> axiom2SourceMap = new HashMap<>();
 
     private OPlusSplitting splitting;
 
@@ -59,8 +59,9 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
         topChecker = new TriviallyTopChecker();
     }
 
+    @Override
     public Set<OWLAxiom> transform(Set<OWLAxiom> axioms) {
-        Set<OWLAxiom> result = new HashSet<OWLAxiom>();
+        Set<OWLAxiom> result = new HashSet<>();
         int count = 0;
         for(OWLAxiom ax : axioms) {
             count++;
@@ -128,7 +129,7 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
         if(axiomSources == null) {
             return Collections.emptySet();
         }
-        Set<OWLAxiom> result = new HashSet<OWLAxiom>();
+        Set<OWLAxiom> result = new HashSet<>();
         for(OWLAxiom ax : toSearch) {
             Set<OWLAxiom> sources = axiom2SourceMap.get(ax);
             if(sources != null) {
@@ -146,7 +147,7 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
     public void addSources(OWLAxiom ax, Set<OWLAxiom> sources) {
         Set<OWLAxiom> existingSources = axiom2SourceMap.get(ax);
         if (existingSources == null) {
-            existingSources = new HashSet<OWLAxiom>();
+            existingSources = new HashSet<>();
             axiom2SourceMap.put(ax, existingSources);
         }
         existingSources.addAll(sources);
@@ -172,7 +173,7 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
         for(OWLAxiom ax : axioms) {
             Set<OWLAxiom> sourceAxioms = axiom2SourceMap.get(ax);
             if(sourceAxioms == null) {
-                sourceAxioms = new HashSet<OWLAxiom>(4);
+                sourceAxioms = new HashSet<>(4);
                 axiom2SourceMap.put(ax, sourceAxioms);
             }
             sourceAxioms.add(currentSourceAxiom);
@@ -190,14 +191,15 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
         return log(source, Collections.singleton(source));
     }
 
+    @Override
     public Set<OWLAxiom> visit(OWLSubClassOfAxiom axiom) {
         // Make the LHS smaller and the RHS larger
-        Set<OWLAxiom> axioms = new HashSet<OWLAxiom>();
+        Set<OWLAxiom> axioms = new HashSet<>();
 
 
         // Optimisation
-        Set<OWLClassExpression> tau = new HashSet<OWLClassExpression>();
-        Set<OWLClassExpression> beta = new HashSet<OWLClassExpression>();
+        Set<OWLClassExpression> tau = new HashSet<>();
+        Set<OWLClassExpression> beta = new HashSet<>();
 
         Set<OWLAnnotation> sourceAnnotations;
         if(splitting.equals(OPlusSplitting.TOP_LEVEL)) {
@@ -271,21 +273,25 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLNegativeObjectPropertyAssertionAxiom axiom) {
         return log(axiom);
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLAsymmetricObjectPropertyAxiom axiom) {
         return log(axiom);
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLReflexiveObjectPropertyAxiom axiom) {
         return log(axiom);
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLDisjointClassesAxiom axiom) {
         boolean containAnonDescriptions = false;
         for (OWLClassExpression desc : axiom.getClassExpressions()) {
@@ -299,8 +305,8 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
         }
         // We treat DisjointClasses(C, D) as syntactic sugar for
         // SubClassOf(C, ObjectComplementOf(D)).
-        Set<OWLAxiom> axioms = new HashSet<OWLAxiom>();
-        List<OWLClassExpression> descs = new ArrayList<OWLClassExpression>(axiom.getClassExpressions());
+        Set<OWLAxiom> axioms = new HashSet<>();
+        List<OWLClassExpression> descs = new ArrayList<>(axiom.getClassExpressions());
         for (int i = 0; i < descs.size(); i++) {
             for (int j = i + 1; j < descs.size(); j++) {
                 Set<? extends OWLAxiom> weakendAxioms = dataFactory.getOWLSubClassOfAxiom(descs.get(i), dataFactory.getOWLObjectComplementOf(descs.get(j))).accept(this);
@@ -331,16 +337,18 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLDataPropertyDomainAxiom axiom) {
         return log(axiom);
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLObjectPropertyDomainAxiom axiom) {
         // A domain checker, Domain(R, C) is syntactic sugar for
         // R some Thing -> C.  Therefore, we just weaken the domain using
         // a tau transform
-        Set<OWLAxiom> result = new HashSet<OWLAxiom>();
+        Set<OWLAxiom> result = new HashSet<>();
         for (OWLClassExpression dom : axiom.getDomain().accept(tauGenerator)) {
             if (!isThing(dom)) {
                 result.add(dataFactory.getOWLObjectPropertyDomainAxiom(axiom.getProperty(), dom));
@@ -350,9 +358,10 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLEquivalentObjectPropertiesAxiom axiom) {
         // Bi-implications
-        Set<OWLAxiom> result = new HashSet<OWLAxiom>();
+        Set<OWLAxiom> result = new HashSet<>();
         for (OWLObjectPropertyExpression propA : axiom.getProperties()) {
             for (OWLObjectPropertyExpression propB : axiom.getProperties()) {
                 if (!propA.equals(propB)) {
@@ -364,17 +373,19 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLNegativeDataPropertyAssertionAxiom axiom) {
         return log(axiom);
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLDifferentIndividualsAxiom axiom) {
         // Pairwise, or the power set?  It should be pairwise - an optimisation.
         // This means if we have something like  Diff(a, b, c, d) and we only
         // care that Diff(a, b) and Diff(a, c) then we can strike out d
         // from the original checker. In otherwords, we only need the weakest sets
-        Set<OWLAxiom> result = new HashSet<OWLAxiom>();
+        Set<OWLAxiom> result = new HashSet<>();
         for (OWLIndividual indA : axiom.getIndividuals()) {
             for (OWLIndividual indB : axiom.getIndividuals()) {
                 if (!indA.equals(indB)) {
@@ -386,38 +397,45 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLDisjointDataPropertiesAxiom axiom) {
         return log(axiom);
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLDisjointObjectPropertiesAxiom axiom) {
         return log(axiom);
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLHasKeyAxiom owlHasKeyAxiom) {
         return log(owlHasKeyAxiom);
     }
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLSubAnnotationPropertyOfAxiom owlSubAnnotationPropertyOfAxiom) {
         return log(owlSubAnnotationPropertyOfAxiom);
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLAnnotationPropertyDomainAxiom owlAnnotationPropertyDomainAxiom) {
         return log(owlAnnotationPropertyDomainAxiom);
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLAnnotationPropertyRangeAxiom owlAnnotationPropertyRangeAxiom) {
         return log(owlAnnotationPropertyRangeAxiom);
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLObjectPropertyRangeAxiom axiom) {
         // Range(R, C) is syntactic sugar for Thing -> R only C
-        Set<OWLAxiom> result = new HashSet<OWLAxiom>();
+        Set<OWLAxiom> result = new HashSet<>();
         for (OWLClassExpression rng : axiom.getRange().accept(tauGenerator)) {
             if (!isThing(rng)) {
                 result.add(dataFactory.getOWLObjectPropertyRangeAxiom(axiom.getProperty(), rng));
@@ -427,10 +445,11 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLObjectPropertyAssertionAxiom axiom) {
         // Here, we can weaken the checker by "striking out the object" - to do this, we
         // must use nominals and change the syntax to a subclass checker OR a class assertion!
-        Set<OWLAxiom> result = new HashSet<OWLAxiom>(2);
+        Set<OWLAxiom> result = new HashSet<>(2);
         result.add(axiom);
         OWLClassExpression type = dataFactory.getOWLObjectSomeValuesFrom(axiom.getProperty(), dataFactory.getOWLThing());
         result.add(dataFactory.getOWLClassAssertionAxiom(type, axiom.getSubject()));
@@ -438,16 +457,19 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLFunctionalObjectPropertyAxiom axiom) {
         return log(axiom);
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLSubObjectPropertyOfAxiom axiom) {
         return log(axiom);
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLDisjointUnionAxiom axiom) {
         // Hmmm
         System.err.println("WARNING: Not weakening disjoint union");
@@ -455,41 +477,48 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLDeclarationAxiom axiom) {
         return Collections.singleton(axiom);
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLAnnotationAssertionAxiom axiom) {
         return Collections.singleton(axiom);
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLSymmetricObjectPropertyAxiom axiom) {
         return log(axiom);
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLDataPropertyRangeAxiom axiom) {
         return log(axiom);
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLFunctionalDataPropertyAxiom axiom) {
         return log(axiom);
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLEquivalentDataPropertiesAxiom axiom) {
         // TODO: Data subprops
         return log(axiom);
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLClassAssertionAxiom axiom) {
         // a : C is syntactic sugar for
         // {a} -> C, so we just use tau weakening on C
-        Set<OWLAxiom> result = new HashSet<OWLAxiom>();
+        Set<OWLAxiom> result = new HashSet<>();
         for (OWLClassExpression cls : axiom.getClassExpression().accept(tauGenerator)) {
             if (!isThing(cls)) {
                 result.add(dataFactory.getOWLClassAssertionAxiom(cls, axiom.getIndividual()));
@@ -499,8 +528,9 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLEquivalentClassesAxiom axiom) {
-        Set<OWLAxiom> axioms = new HashSet<OWLAxiom>();
+        Set<OWLAxiom> axioms = new HashSet<>();
         for (OWLClassExpression descA : axiom.getClassExpressions()) {
             for (OWLClassExpression descB : axiom.getClassExpressions()) {
                 if (!descA.equals(descB)) {
@@ -512,10 +542,11 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLDataPropertyAssertionAxiom axiom) {
         // Here, we can weaken the checker by "striking out the object" - to do this, we
         // must use nominals and change the syntax to a subclass checker
-        Set<OWLAxiom> result = new HashSet<OWLAxiom>(2);
+        Set<OWLAxiom> result = new HashSet<>(2);
         result.add(axiom);
 //        OWLClassExpression nominal = dataFactory.getOWLObjectOneOf(axiom.getSubject());
 //        OWLClassExpression type = dataFactory.getOWLDataSomeValuesFrom(axiom.getProperty(), dataFactory.getTopDatatype());
@@ -524,49 +555,58 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLTransitiveObjectPropertyAxiom axiom) {
         return log(axiom);
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLIrreflexiveObjectPropertyAxiom axiom) {
         return log(axiom);
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLSubDataPropertyOfAxiom axiom) {
         return log(axiom);
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLInverseFunctionalObjectPropertyAxiom axiom) {
         return log(axiom);
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLSameIndividualAxiom axiom) {
         // Pairwise or setree?
         return log(axiom);
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLSubPropertyChainOfAxiom axiom) {
         return log(axiom);
     }
 
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLInverseObjectPropertiesAxiom axiom) {
         // Implication
-        Set<OWLAxiom> result = new HashSet<OWLAxiom>();
+        Set<OWLAxiom> result = new HashSet<>();
         result.add(dataFactory.getOWLSubObjectPropertyOfAxiom(axiom.getFirstProperty(), dataFactory.getOWLObjectInverseOf(axiom.getSecondProperty().asOWLObjectProperty())));
         result.add(dataFactory.getOWLSubObjectPropertyOfAxiom(axiom.getSecondProperty(), dataFactory.getOWLObjectInverseOf(axiom.getFirstProperty().asOWLObjectProperty())));
         return log(axiom, result);
     }
 
+    @Override
     public Set<? extends OWLAxiom> visit(OWLDatatypeDefinitionAxiom axiom) {
-        return null;
+        return Collections.emptySet();
     }
 
+    @Override
     public Set<? extends OWLAxiom> visit(SWRLRule rule) {
         return log(rule);
     }

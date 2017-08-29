@@ -5,7 +5,6 @@ import org.semanticweb.owl.explanation.api.ExplanationException;
 import org.semanticweb.owl.explanation.api.ExplanationGenerator;
 import org.semanticweb.owl.explanation.api.NullExplanationProgressMonitor;
 import org.semanticweb.owl.explanation.impl.blackbox.*;
-import org.semanticweb.owl.explanation.impl.blackbox.checker.SatisfiabilityEntailmentCheckerFactory;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
@@ -29,14 +28,14 @@ public class SETreeExplanationGenerator implements ExplanationGenerator<OWLAxiom
 
     private EntailmentCheckerFactory<OWLAxiom> entailmentCheckerFactory;
 
-    private Set<OWLAxiom> workingAxioms = new HashSet<OWLAxiom>();
+    private Set<OWLAxiom> workingAxioms = new HashSet<>();
 
-    private Set<OWLAxiom> module = new HashSet<OWLAxiom>();
+    private Set<OWLAxiom> module = new HashSet<>();
 
     private Supplier<OWLOntologyManager> m;
 
     public SETreeExplanationGenerator(OWLReasonerFactory reasonerFactory, EntailmentCheckerFactory<OWLAxiom> entailmentCheckerFactory, Set<? extends OWLAxiom> workingAxioms, Supplier<OWLOntologyManager> m) {
-        this.workingAxioms = new HashSet<OWLAxiom>(workingAxioms);
+        this.workingAxioms = new HashSet<>(workingAxioms);
         this.reasonerFactory = reasonerFactory;
         this.entailmentCheckerFactory = entailmentCheckerFactory;
         this.m = m;
@@ -49,6 +48,7 @@ public class SETreeExplanationGenerator implements ExplanationGenerator<OWLAxiom
      * @throws org.semanticweb.owl.explanation.api.ExplanationException
      *          if there was a problem generating the explanation.
      */
+    @Override
     public Set<Explanation<OWLAxiom>> getExplanations(OWLAxiom entailment) throws ExplanationException {
         return getExplanations(entailment, Integer.MAX_VALUE);
     }
@@ -62,14 +62,15 @@ public class SETreeExplanationGenerator implements ExplanationGenerator<OWLAxiom
      * @throws org.semanticweb.owl.explanation.api.ExplanationException
      *          if there was a problem generating the explanation.
      */
+    @Override
     public Set<Explanation<OWLAxiom>> getExplanations(OWLAxiom entailment, int limit) throws ExplanationException {
         OWLOntologyManager manager = m.get();
         SyntacticLocalityModuleExtractor extractor = new SyntacticLocalityModuleExtractor(manager, workingAxioms.stream(), ModuleType.STAR);
         module = extractor.extract(entailment.getSignature());
-        BlackBoxExplanationGenerator2<OWLAxiom> gen = new BlackBoxExplanationGenerator2<OWLAxiom>(module, entailmentCheckerFactory, new StructuralTypePriorityExpansionStrategy(null, m), new DivideAndConquerContractionStrategy(), new NullExplanationProgressMonitor<OWLAxiom>(), m);
+        BlackBoxExplanationGenerator2<OWLAxiom> gen = new BlackBoxExplanationGenerator2<>(module, entailmentCheckerFactory, new StructuralTypePriorityExpansionStrategy(null, m), new DivideAndConquerContractionStrategy(), new NullExplanationProgressMonitor<OWLAxiom>(), m);
         Set<Explanation<OWLAxiom>> expls = gen.getExplanations(entailment, 1);
         Explanation<OWLAxiom> expl = expls.iterator().next();
-        Set<OWLAxiom> commonAxioms = new HashSet<OWLAxiom>();
+        Set<OWLAxiom> commonAxioms = new HashSet<>();
         for(OWLAxiom ax : expl.getAxioms()) {
             module.remove(ax);
             EntailmentChecker<OWLAxiom> entailmentChecker = entailmentCheckerFactory.createEntailementChecker(entailment);
@@ -79,14 +80,14 @@ public class SETreeExplanationGenerator implements ExplanationGenerator<OWLAxiom
             module.add(ax);
         }
         System.out.println("There are " + commonAxioms.size() + " common axioms");
-        Set<OWLEntity> commonAxiomsSig = new HashSet<OWLEntity>();
+        Set<OWLEntity> commonAxiomsSig = new HashSet<>();
         for(OWLAxiom ax : commonAxioms) {
             System.out.println("\t" + ax);
             commonAxiomsSig.addAll(ax.getSignature());
         }
 
-        Set<OWLAxiom> expansionCandidates = new HashSet<OWLAxiom>();
-        Set<OWLAxiom> directExpansionCandidates = new HashSet<OWLAxiom>();
+        Set<OWLAxiom> expansionCandidates = new HashSet<>();
+        Set<OWLAxiom> directExpansionCandidates = new HashSet<>();
         for(OWLAxiom ax : module) {
             if (!commonAxioms.contains(ax)) {
                 for(OWLEntity ent : ax.getSignature()) {
@@ -102,11 +103,11 @@ public class SETreeExplanationGenerator implements ExplanationGenerator<OWLAxiom
             }
         }
         System.out.println("There are " + directExpansionCandidates.size() + " direct expansion candidates");
-        for(OWLAxiom ax : new TreeSet<OWLAxiom>(directExpansionCandidates)) {
+        for(OWLAxiom ax : new TreeSet<>(directExpansionCandidates)) {
             System.out.println("\t" + ax);
         }
         System.out.println("There are " + expansionCandidates.size() + " expansion candidates");
-        for(OWLAxiom ax : new TreeSet<OWLAxiom>(expansionCandidates)) {
+        for(OWLAxiom ax : new TreeSet<>(expansionCandidates)) {
             System.out.println("\t" + ax);
         }
 

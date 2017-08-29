@@ -45,7 +45,7 @@ public class BlackBoxExplanationGenerator2_TestCase {
     private Supplier<OWLOntologyManager> m=OWLManager::createOWLOntologyManager;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
 
         OWLClass A = df.getOWLClass(IRI.create("http://example.com/A"));
         OWLClass B = df.getOWLClass(IRI.create("http://example.com/B"));

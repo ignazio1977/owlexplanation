@@ -30,7 +30,7 @@ public class IsLaconicChecker {
 
     private DeltaTransformation deltaTransformation;
 
-    private Set<OWLAnnotation> nonLaconicSourceAxioms = new HashSet<OWLAnnotation>();
+    private Set<OWLAnnotation> nonLaconicSourceAxioms = new HashSet<>();
 
     public IsLaconicChecker(OWLDataFactory dataFactory, EntailmentCheckerFactory<OWLAxiom> entailmentCheckerFactory) {
         this(dataFactory, entailmentCheckerFactory, LaconicCheckerMode.EARLY_TERMINATING);
@@ -66,7 +66,7 @@ public class IsLaconicChecker {
 
             EntailmentChecker<OWLAxiom> checker = entailmentCheckerFactory.createEntailementChecker(expl.getEntailment());
 
-            for (OWLAxiom curAxiom : new ArrayList<OWLAxiom>(flattened)) {
+            for (OWLAxiom curAxiom : new ArrayList<>(flattened)) {
                 flattened.remove(curAxiom);
                 entailmentCheckCount++;
                 if (checker.isEntailed(flattened)) {

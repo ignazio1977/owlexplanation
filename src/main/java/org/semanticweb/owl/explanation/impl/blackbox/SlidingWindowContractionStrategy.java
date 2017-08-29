@@ -55,11 +55,12 @@ public class SlidingWindowContractionStrategy implements ContractionStrategy {
 
 
 
+    @Override
     public Set<OWLAxiom> doPruning(Set<OWLAxiom> axioms, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor) {
         count = 0;
-        List<OWLAxiom> axiomList = new ArrayList<OWLAxiom>(axioms);
+        List<OWLAxiom> axiomList = new ArrayList<>(axioms);
         int windowCount = axiomList.size() / windowSize;
-        Set<OWLAxiom> contraction = new HashSet<OWLAxiom>(axioms);
+        Set<OWLAxiom> contraction = new HashSet<>(axioms);
         
         for(int windowIndex = 0; windowIndex < windowCount; windowIndex++) {
             int start = windowIndex * windowSize;
@@ -74,7 +75,7 @@ public class SlidingWindowContractionStrategy implements ContractionStrategy {
 
 
         // Slow
-        Set<OWLAxiom> contractionCopy = new HashSet<OWLAxiom>(contraction);
+        Set<OWLAxiom> contractionCopy = new HashSet<>(contraction);
         for(OWLAxiom ax : contractionCopy) {
             contraction.remove(ax);
             count++;
@@ -86,6 +87,7 @@ public class SlidingWindowContractionStrategy implements ContractionStrategy {
         return contraction;
     }
 
+    @Override
     public int getNumberOfSteps() {
         return count;
     }

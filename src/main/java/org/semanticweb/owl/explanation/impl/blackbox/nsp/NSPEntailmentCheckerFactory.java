@@ -40,6 +40,7 @@ public class NSPEntailmentCheckerFactory implements EntailmentCheckerFactory<OWL
     public NSPEntailmentCheckerFactory(Supplier<OWLOntologyManager> m) {
         this.m = m;
     }
+    @Override
     public EntailmentChecker<OWLObjectPropertyExpression> createEntailementChecker(
             OWLObjectPropertyExpression entailment) {
         return new NonSimplePropertyEntailmentChecker(entailment, m);

@@ -1,6 +1,5 @@
 package org.semanticweb.owl.explanation.api;
 
-import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLRuntimeException;
 /*
  * Copyright (C) 2008, University of Manchester

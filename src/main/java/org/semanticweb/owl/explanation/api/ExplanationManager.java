@@ -1,6 +1,5 @@
 package org.semanticweb.owl.explanation.api;
 
-import org.semanticweb.owl.explanation.impl.blackbox.checker.InconsistentOntologyExplanationGeneratorFactory;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owl.explanation.impl.blackbox.checker.BlackBoxExplanationGeneratorFactory;
@@ -64,8 +63,8 @@ public class ExplanationManager {
      */
     public static ExplanationGeneratorFactory<OWLAxiom> createExplanationGeneratorFactory(OWLReasonerFactory reasonerFactory, ExplanationProgressMonitor<OWLAxiom> progressMonitor, Supplier<OWLOntologyManager> m) {
         EntailmentCheckerFactory<OWLAxiom> checker = new SatisfiabilityEntailmentCheckerFactory(reasonerFactory, m);
-        Configuration<OWLAxiom> config = new Configuration<OWLAxiom>(checker, progressMonitor, m);
-        return new BlackBoxExplanationGeneratorFactory<OWLAxiom>(config);
+        Configuration<OWLAxiom> config = new Configuration<>(checker, progressMonitor, m);
+        return new BlackBoxExplanationGeneratorFactory<>(config);
     }
 
 
@@ -74,15 +73,15 @@ public class ExplanationManager {
     }
 
     public static ExplanationGeneratorFactory<OWLAxiom> createLaconicExplanationGeneratorFactory(OWLReasonerFactory reasonerFactory, ExplanationProgressMonitor<OWLAxiom> progressMonitor, Supplier<OWLOntologyManager> m) {
-        return new LaconicExplanationGeneratorFactory<OWLAxiom>(createExplanationGeneratorFactory(reasonerFactory, m), m);
+        return new LaconicExplanationGeneratorFactory<>(createExplanationGeneratorFactory(reasonerFactory, m), m);
     }
 
     public static <E> ExplanationGeneratorFactory<E> createExplanationGeneratorFactory(EntailmentCheckerFactory<E> entailmentCheckerFactory, Supplier<OWLOntologyManager> m) {
-        Configuration<E> config = new Configuration<E>(entailmentCheckerFactory, m);
-        return new BlackBoxExplanationGeneratorFactory<E>(config);
+        Configuration<E> config = new Configuration<>(entailmentCheckerFactory, m);
+        return new BlackBoxExplanationGeneratorFactory<>(config);
     }
 
     public static <E> ExplanationGeneratorFactory<E> createLaconicExplanationGeneratorFactory(EntailmentCheckerFactory<E> entailmentCheckerFactory, Supplier<OWLOntologyManager> m) {
-        return new LaconicExplanationGeneratorFactory<E>(createExplanationGeneratorFactory(entailmentCheckerFactory, m), m);
+        return new LaconicExplanationGeneratorFactory<>(createExplanationGeneratorFactory(entailmentCheckerFactory, m), m);
     }
 }

@@ -41,11 +41,12 @@ public class DivideAndConquerContractionStrategy implements ContractionStrategy 
 
     private int count;
 
+    @Override
     public Set<OWLAxiom> doPruning(Set<OWLAxiom> axioms, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor) {
         count = 0;
-        List<OWLAxiom> axiomList = new ArrayList<OWLAxiom>(axioms);
+        List<OWLAxiom> axiomList = new ArrayList<>(axioms);
         List<OWLAxiom> result = extract(new ArrayList<OWLAxiom>(), axiomList, checker, progressMonitor);
-        return new HashSet<OWLAxiom>(result);
+        return new HashSet<>(result);
     }
 
     public List<OWLAxiom> extract(List<OWLAxiom> listS, List<OWLAxiom> listO, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor) {
@@ -62,21 +63,21 @@ public class DivideAndConquerContractionStrategy implements ContractionStrategy 
         if(isEntailed(listS, halves.getS2(), checker)) {
             return extract(listS, halves.getS2(), checker, progressMonitor);
         }
-        List<OWLAxiom> listSWithS2 = new ArrayList<OWLAxiom>(listS);
+        List<OWLAxiom> listSWithS2 = new ArrayList<>(listS);
         listSWithS2.addAll(halves.getS2());
         List<OWLAxiom> listS1Prime = extract(listSWithS2, halves.getS1(), checker, progressMonitor);
 
-        List<OWLAxiom> listSWithS1Prime = new ArrayList<OWLAxiom>(listS);
+        List<OWLAxiom> listSWithS1Prime = new ArrayList<>(listS);
         listSWithS1Prime.addAll(listS1Prime);
         List<OWLAxiom> listS2Prime = extract(listSWithS1Prime, halves.getS2(), checker, progressMonitor);
-        List<OWLAxiom> listS1PrimeWithS2Prime = new ArrayList<OWLAxiom>(listS1Prime);
+        List<OWLAxiom> listS1PrimeWithS2Prime = new ArrayList<>(listS1Prime);
         listS1PrimeWithS2Prime.addAll(listS2Prime);
         return listS1PrimeWithS2Prime;
     }
 
     private boolean isEntailed(List<OWLAxiom> listA, List<OWLAxiom> listB, EntailmentChecker checker) {
         count++;
-        Set<OWLAxiom> axioms = new HashSet<OWLAxiom>((int)((listA.size() + listB.size()) * 1.3));
+        Set<OWLAxiom> axioms = new HashSet<>((int)((listA.size() + listB.size()) * 1.3));
         axioms.addAll(listA);
         axioms.addAll(listB);
         return checker.isEntailed(axioms);
@@ -86,6 +87,7 @@ public class DivideAndConquerContractionStrategy implements ContractionStrategy 
         return new ListHalves(axioms);
     }
 
+    @Override
     public int getNumberOfSteps() {
         return count;
     }
@@ -99,8 +101,8 @@ public class DivideAndConquerContractionStrategy implements ContractionStrategy 
 
         public ListHalves(List<OWLAxiom> input) {
             int listASize = input.size() / 2;
-            listS1 = new ArrayList<OWLAxiom>(input.subList(0, listASize));
-            listS2 = new ArrayList<OWLAxiom>(input.subList(listASize, input.size()));
+            listS1 = new ArrayList<>(input.subList(0, listASize));
+            listS2 = new ArrayList<>(input.subList(listASize, input.size()));
         }
 
         public List<OWLAxiom> getS1() {

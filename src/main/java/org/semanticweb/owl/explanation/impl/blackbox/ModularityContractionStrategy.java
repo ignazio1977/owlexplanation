@@ -61,6 +61,7 @@ public class ModularityContractionStrategy implements ContractionStrategy {
     }
 
 
+    @Override
     public Set<OWLAxiom> doPruning(Set<OWLAxiom> axioms, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor) {
         count = 0;
         windowSize = axioms.size() / 20;
@@ -68,13 +69,13 @@ public class ModularityContractionStrategy implements ContractionStrategy {
             windowSize = 1;
         }
 
-        List<OWLAxiom> axiomList = new ArrayList<OWLAxiom>(axioms);
-        Set<OWLAxiom> contraction = new HashSet<OWLAxiom>(axioms);
+        List<OWLAxiom> axiomList = new ArrayList<>(axioms);
+        Set<OWLAxiom> contraction = new HashSet<>(axioms);
 
 
         int cursor = 0;
         while (cursor < axiomList.size()) {
-            ArrayList<OWLAxiom> picked = new ArrayList<OWLAxiom>(12);
+            ArrayList<OWLAxiom> picked = new ArrayList<>(12);
             cursor = pickAxioms(axiomList, cursor, picked) + 1;
             if(!contraction.removeAll(picked)) {
                 continue;
@@ -101,7 +102,7 @@ public class ModularityContractionStrategy implements ContractionStrategy {
         counter++;
 
         // Slow
-        Set<OWLAxiom> contractionCopy = new HashSet<OWLAxiom>(contraction);
+        Set<OWLAxiom> contractionCopy = new HashSet<>(contraction);
         for (OWLAxiom ax : contractionCopy) {
             count++;
             contraction.remove(ax);
@@ -112,6 +113,7 @@ public class ModularityContractionStrategy implements ContractionStrategy {
         return contraction;
     }
 
+    @Override
     public int getNumberOfSteps() {
         return count;
     }

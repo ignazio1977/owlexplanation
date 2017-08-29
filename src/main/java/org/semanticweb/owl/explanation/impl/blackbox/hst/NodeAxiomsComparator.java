@@ -42,6 +42,7 @@ public class NodeAxiomsComparator<E> implements Comparator<OWLAxiom> {
     }
 
 
+    @Override
     public int compare(OWLAxiom o1, OWLAxiom o2) {
         if(o1.equals(o2)) {
             return 0;

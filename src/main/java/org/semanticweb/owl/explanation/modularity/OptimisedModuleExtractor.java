@@ -3,12 +3,12 @@ package org.semanticweb.owl.explanation.modularity;
 //import com.clarkparsia.owlapi.modularity.locality.LocalityClass;
 //import com.clarkparsia.owlapi.modularity.locality.SyntacticLocalityEvaluator;
 //import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.*;
+//import org.semanticweb.owlapi.model.*;
 //import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 //import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 
-import java.io.File;
-import java.util.*;
+//import java.io.File;
+//import java.util.*;
 
 /**
  * Author: Matthew Horridge<br>

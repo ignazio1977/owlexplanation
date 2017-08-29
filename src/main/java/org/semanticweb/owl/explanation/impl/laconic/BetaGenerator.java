@@ -41,16 +41,18 @@ public class BetaGenerator extends BaseDescriptionGenerator {
     }
 
 
+    @Override
     public Set<OWLClassExpression> visit(OWLClass desc) {
-        Set<OWLClassExpression> descs = new HashSet<OWLClassExpression>(3);
+        Set<OWLClassExpression> descs = new HashSet<>(3);
         descs.add(desc);
         descs.add(getDataFactory().getOWLNothing());
         return descs;
     }
 
 
+    @Override
     public Set<OWLClassExpression> visit(OWLObjectComplementOf desc) {
-        Set<OWLClassExpression> descs = new HashSet<OWLClassExpression>();
+        Set<OWLClassExpression> descs = new HashSet<>();
         for(OWLClassExpression d : computeTau(desc.getOperand())) {
             descs.add(getDataFactory().getOWLObjectComplementOf(d));
         }
@@ -63,10 +65,11 @@ public class BetaGenerator extends BaseDescriptionGenerator {
     }
 
 
+    @Override
     public Set<OWLClassExpression> visit(OWLObjectMaxCardinality desc) {
         // Decrease the cardinality and weaken the filler
         Set<OWLClassExpression> fillers = computeTau(desc.getFiller());
-        Set<OWLClassExpression> result = new HashSet<OWLClassExpression>();
+        Set<OWLClassExpression> result = new HashSet<>();
         for (int n = desc.getCardinality(); n > 0; n--) {
             for(OWLClassExpression filler : fillers) {
                 result.add(getDataFactory().getOWLObjectMinCardinality(n, desc.getProperty(), filler));
@@ -77,9 +80,10 @@ public class BetaGenerator extends BaseDescriptionGenerator {
     }
 
 
+    @Override
     public Set<OWLClassExpression> visit(OWLObjectExactCardinality desc) {
         Set<OWLClassExpression> fillers = computeBeta(desc.getFiller());
-        Set<OWLClassExpression> result = new HashSet<OWLClassExpression>();
+        Set<OWLClassExpression> result = new HashSet<>();
         for(OWLClassExpression filler : fillers) {
             result.add(getDataFactory().getOWLObjectExactCardinality(desc.getCardinality(), desc.getProperty(), filler));
         }
@@ -88,6 +92,7 @@ public class BetaGenerator extends BaseDescriptionGenerator {
     }
 
 
+    @Override
     public Set<OWLClassExpression> visit(OWLObjectUnionOf desc) {
 //        // If every disjunct is named, we can just split them
         boolean anon = false;
@@ -101,7 +106,7 @@ public class BetaGenerator extends BaseDescriptionGenerator {
             return super.visit(desc);
         }
         else {
-            Set<OWLClassExpression> result = new HashSet<OWLClassExpression>();
+            Set<OWLClassExpression> result = new HashSet<>();
             result.addAll(desc.asDisjunctSet());
             return result;
         }
@@ -109,10 +114,11 @@ public class BetaGenerator extends BaseDescriptionGenerator {
     }
 
 
+    @Override
     public Set<OWLClassExpression> visit(OWLObjectMinCardinality desc) {
         // Increase the cardinality and weaken filler
         Set<OWLClassExpression> fillers = computeBeta(desc.getFiller());
-        Set<OWLClassExpression> result = new HashSet<OWLClassExpression>();
+        Set<OWLClassExpression> result = new HashSet<>();
         for(OWLClassExpression filler : fillers) {
             result.add(getDataFactory().getOWLObjectMinCardinality(desc.getCardinality(), desc.getProperty(), filler));
         }
@@ -120,16 +126,19 @@ public class BetaGenerator extends BaseDescriptionGenerator {
         return result;
     }
 
+    @Override
     protected OWLClass getLimit() {
         return getDataFactory().getOWLNothing();
     }
 
 
+    @Override
     protected OWLDataRange getDataLimit() {
         return getDataFactory().getOWLDataComplementOf(getDataFactory().getTopDatatype());
     }
 
 
+    @Override
     public Set<OWLClassExpression> visit(OWLDataHasValue desc) {
         return Collections.singleton((OWLClassExpression) desc);
     }

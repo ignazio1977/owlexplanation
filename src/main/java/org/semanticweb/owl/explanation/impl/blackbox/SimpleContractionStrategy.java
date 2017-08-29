@@ -37,9 +37,10 @@ public class SimpleContractionStrategy implements ContractionStrategy {
 
     private int count = 0;
 
+    @Override
     public Set<OWLAxiom> doPruning(Set<OWLAxiom> axioms, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor) {
         count = 0;
-        Set<OWLAxiom> contraction = new HashSet<OWLAxiom>(axioms);
+        Set<OWLAxiom> contraction = new HashSet<>(axioms);
         for(OWLAxiom ax : axioms) {
             contraction.remove(ax);
             count++;
@@ -50,6 +51,7 @@ public class SimpleContractionStrategy implements ContractionStrategy {
         return contraction;
     }
 
+    @Override
     public int getNumberOfSteps() {
         return count;
     }

@@ -59,9 +59,9 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
         this.man = man;
         this.reasonerFactory = reasonerFactory;
         this.reasoner = reasoner;
-        this.child2Parent = new HashMap<OWLClass, Set<OWLClass>>();
-        this.parent2Child = new HashMap<OWLClass, Set<OWLClass>>();
-        roots = new HashSet<OWLClass>();
+        this.child2Parent = new HashMap<>();
+        this.parent2Child = new HashMap<>();
+        roots = new HashSet<>();
 
         try {
             getMergedOntology();
@@ -91,19 +91,21 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
     private Set<OWLClass> get(OWLClass c, Map<OWLClass, Set<OWLClass>> map) {
         Set<OWLClass> set = map.get(c);
         if (set == null) {
-            set = new HashSet<OWLClass>();
+            set = new HashSet<>();
             map.put(c, set);
         }
         return set;
     }
 
+    @Override
     public Set<OWLClass> getDependentChildClasses(OWLClass cls) {
         return get(cls, parent2Child);
     }
 
 
+    @Override
     public Set<OWLClass> getDependentDescendantClasses(OWLClass cls) {
-        Set<OWLClass> result = new HashSet<OWLClass>();
+        Set<OWLClass> result = new HashSet<>();
         getDescendants(cls, result);
         return result;
     }
@@ -119,6 +121,7 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
     }
 
 
+    @Override
     public Set<OWLClass> getRootUnsatisfiableClasses() throws ExplanationException {
         if (dirty) {
             computeRootDerivedClasses();
@@ -136,8 +139,8 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
                 }
             }
             // Now find cycles
-            HashSet<OWLClass> processed = new HashSet<OWLClass>();
-            HashSet<Set<OWLClass>> result = new HashSet<Set<OWLClass>>();
+            HashSet<OWLClass> processed = new HashSet<>();
+            HashSet<Set<OWLClass>> result = new HashSet<>();
 
             for (OWLClass cls : child2Parent.keySet()) {
                 if (!processed.contains(cls)) {
@@ -169,14 +172,14 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
     private void getPaths(OWLClass cls, List<OWLClass> curPath, Set<OWLClass> curPathSet, Set<List<OWLClass>> paths) {
         if (curPathSet.contains(cls)) {
             curPath.add(cls);
-            paths.add(new ArrayList<OWLClass>(curPath));
+            paths.add(new ArrayList<>(curPath));
             return;
         }
         curPathSet.add(cls);
         curPath.add(cls);
         Set<OWLClass> parents = child2Parent.get(cls);
         if (parents.isEmpty()) {
-            paths.add(new ArrayList<OWLClass>(curPath));
+            paths.add(new ArrayList<>(curPath));
         }
         for (OWLClass dep : parents) {
             getPaths(dep, curPath, curPathSet, paths);
@@ -205,7 +208,7 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
             }
         }
         if (lowlinkMap.get(cls).equals(indexMap.get(cls))) {
-            Set<OWLClass> scc = new HashSet<OWLClass>();
+            Set<OWLClass> scc = new HashSet<>();
             while (true) {
                 OWLClass clsPrime = stack.pop();
                 stackClass.remove(clsPrime);
@@ -223,11 +226,11 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
 
     private void pruneRoots() throws ExplanationException {
         try {
-            Set<OWLClass> rootUnsatClses = new HashSet<OWLClass>(roots);
-            List<OWLOntologyChange> appliedChanges = new ArrayList<OWLOntologyChange>();
+            Set<OWLClass> rootUnsatClses = new HashSet<>(roots);
+            List<OWLOntologyChange> appliedChanges = new ArrayList<>();
 
-            Set<OWLClass> potentialRoots = new HashSet<OWLClass>();
-            for (OWLDisjointClassesAxiom ax : new ArrayList<OWLDisjointClassesAxiom>(mergedOntology.getAxioms(AxiomType.DISJOINT_CLASSES))) {
+            Set<OWLClass> potentialRoots = new HashSet<>();
+            for (OWLDisjointClassesAxiom ax : new ArrayList<>(mergedOntology.getAxioms(AxiomType.DISJOINT_CLASSES))) {
                 for (OWLClass cls : rootUnsatClses) {
                     if (ax.getSignature().contains(cls)) {
                         RemoveAxiom chg = new RemoveAxiom(mergedOntology, ax);
@@ -248,7 +251,7 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
 
 
             OWLReasoner checkingReasoner = reasonerFactory.createReasoner(mergedOntology);
-            for (OWLClass root : new ArrayList<OWLClass>(rootUnsatClses)) {
+            for (OWLClass root : new ArrayList<>(rootUnsatClses)) {
                 if (!potentialRoots.contains(root) && checkingReasoner.isSatisfiable(root)) {
                     rootUnsatClses.remove(root);
                 }
@@ -269,7 +272,7 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
             EntitySearcher.getSuperClasses(cls, reasoner.getRootOntology().importsClosure()).forEach(sup-> sup.accept(checker));
             EntitySearcher.getEquivalentClasses(cls, reasoner.getRootOntology().importsClosure()).forEach(sup-> sup.accept(checker));
             Set<OWLClass> dependencies = checker.getDependencies();
-            child2Parent.put(cls, new HashSet<OWLClass>(dependencies));
+            child2Parent.put(cls, new HashSet<>(dependencies));
             if (dependencies.isEmpty()) {
                 // Definite root?
                 roots.add(cls);
@@ -290,9 +293,9 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
 
 
         public SuperClassChecker() {
-            modalDepth2UniversalRestrictionPropertyMap = new HashMap<Integer, Set<OWLObjectAllValuesFrom>>();
-            modalDepth2ExistsRestrictionPropertyMap = new HashMap<Integer, Set<OWLObjectPropertyExpression>>();
-            dependsOn = new HashSet<OWLClass>();
+            modalDepth2UniversalRestrictionPropertyMap = new HashMap<>();
+            modalDepth2ExistsRestrictionPropertyMap = new HashMap<>();
+            dependsOn = new HashSet<>();
             modalDepth = 0;
         }
 
@@ -300,7 +303,7 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
         public void addUniversalRestrictionProperty(OWLObjectAllValuesFrom r) {
             Set<OWLObjectAllValuesFrom> props = modalDepth2UniversalRestrictionPropertyMap.get(modalDepth);
             if (props == null) {
-                props = new HashSet<OWLObjectAllValuesFrom>();
+                props = new HashSet<>();
                 modalDepth2UniversalRestrictionPropertyMap.put(modalDepth, props);
             }
             props.add(r);
@@ -310,7 +313,7 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
         public void addExistsRestrictionProperty(OWLObjectPropertyExpression prop) {
             Set<OWLObjectPropertyExpression> props = modalDepth2ExistsRestrictionPropertyMap.get(modalDepth);
             if (props == null) {
-                props = new HashSet<OWLObjectPropertyExpression>();
+                props = new HashSet<>();
                 modalDepth2ExistsRestrictionPropertyMap.put(modalDepth, props);
             }
             props.add(prop);
@@ -342,6 +345,7 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
         }
 
 
+        @Override
         public void visit(OWLClass desc) {
             if (!reasoner.isSatisfiable(desc)) {
                 dependsOn.add(desc);
@@ -349,32 +353,39 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
         }
 
 
+        @Override
         public void visit(OWLDataAllValuesFrom desc) {
 
         }
 
 
+        @Override
         public void visit(OWLDataExactCardinality desc) {
 
         }
 
 
+        @Override
         public void visit(OWLDataMaxCardinality desc) {
         }
 
 
+        @Override
         public void visit(OWLDataMinCardinality desc) {
         }
 
 
+        @Override
         public void visit(OWLDataSomeValuesFrom desc) {
         }
 
 
+        @Override
         public void visit(OWLDataHasValue desc) {
         }
 
 
+        @Override
         public void visit(OWLObjectAllValuesFrom desc) {
             if (desc.getFiller().isAnonymous()) {
                 modalDepth++;
@@ -390,11 +401,13 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
         }
 
 
+        @Override
         public void visit(OWLObjectComplementOf desc) {
 
         }
 
 
+        @Override
         public void visit(OWLObjectExactCardinality desc) {
             if (desc.getFiller().isAnonymous()) {
                 modalDepth++;
@@ -412,6 +425,7 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
         }
 
 
+        @Override
         public void visit(OWLObjectIntersectionOf desc) {
             for (OWLClassExpression op : desc.getOperands()) {
                 if (op.isAnonymous()) {
@@ -426,11 +440,13 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
         }
 
 
+        @Override
         public void visit(OWLObjectMaxCardinality desc) {
 
         }
 
 
+        @Override
         public void visit(OWLObjectMinCardinality desc) {
             if (desc.getFiller().isAnonymous()) {
                 modalDepth++;
@@ -446,15 +462,18 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
         }
 
 
+        @Override
         public void visit(OWLObjectOneOf desc) {
         }
 
 
+        @Override
         public void visit(OWLObjectHasSelf desc) {
             addExistsRestrictionProperty(desc.getProperty());
         }
 
 
+        @Override
         public void visit(OWLObjectSomeValuesFrom desc) {
             if (desc.getFiller().isAnonymous()) {
                 modalDepth++;
@@ -470,6 +489,7 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
         }
 
 
+        @Override
         public void visit(OWLObjectUnionOf desc) {
             for (OWLClassExpression op : desc.getOperands()) {
                 if (reasoner.isSatisfiable(op)) {
@@ -487,6 +507,7 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
         }
 
 
+        @Override
         public void visit(OWLObjectHasValue desc) {
             addExistsRestrictionProperty(desc.getProperty());
         }

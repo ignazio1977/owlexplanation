@@ -63,16 +63,18 @@ public class InconsistentOntologyExplanationGeneratorFactory implements Explanat
     }
 
 
+    @Override
     public ExplanationGenerator<OWLAxiom> createExplanationGenerator(OWLOntology ontology) {
         return createExplanationGenerator(ontology, new NullExplanationProgressMonitor<OWLAxiom>());
     }
 
+    @Override
     public ExplanationGenerator<OWLAxiom> createExplanationGenerator(OWLOntology ontology, ExplanationProgressMonitor<OWLAxiom> progressMonitor) {
-        Set<OWLAxiom> axioms = new HashSet<OWLAxiom>(ontology.getLogicalAxiomCount());
+        Set<OWLAxiom> axioms = new HashSet<>(ontology.getLogicalAxiomCount());
         for(OWLOntology ont : ontology.getImportsClosure()) {
             axioms.addAll(ont.getLogicalAxioms());
         }
-        return new BlackBoxExplanationGenerator2<OWLAxiom>(
+        return new BlackBoxExplanationGenerator2<>(
                 axioms,
                 consistencyEntailmentCheckerFactory,
                 expansionStrategy,
@@ -81,12 +83,14 @@ public class InconsistentOntologyExplanationGeneratorFactory implements Explanat
                 m);
     }
 
+    @Override
     public ExplanationGenerator<OWLAxiom> createExplanationGenerator(Set<? extends OWLAxiom> axioms) {
         return createExplanationGenerator(axioms, new NullExplanationProgressMonitor<OWLAxiom>());
     }
 
+    @Override
     public ExplanationGenerator<OWLAxiom> createExplanationGenerator(Set<? extends OWLAxiom> axioms, ExplanationProgressMonitor<OWLAxiom> progressMonitor) {
-        return new BlackBoxExplanationGenerator2<OWLAxiom>(
+        return new BlackBoxExplanationGenerator2<>(
                 axioms,
                 consistencyEntailmentCheckerFactory,
                 expansionStrategy,

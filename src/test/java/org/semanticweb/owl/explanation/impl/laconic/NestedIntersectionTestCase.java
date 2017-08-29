@@ -6,8 +6,6 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.util.DefaultPrefixManager;
 
-import openllet.owlapi.OWLManagerGroup;
-
 import java.util.Set;
 
 /*

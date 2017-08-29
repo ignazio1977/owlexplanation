@@ -40,12 +40,13 @@ public class BreadthFirstStrategy<E> implements HittingSetTreeConstructionStrate
     public void start(HittingSetTree<E> hittingSetTree) {
     }
 
+    @Override
     public void constructTree(HittingSetTree<E> hittingSetTree, int limit, ExplanationGeneratorMediator<E> handler) {
         if (hittingSetTree.getProgressMonitor().isCancelled()) {
             throw new ExplanationGeneratorInterruptedException();
         }
 
-        List<HittingSetTreeNode<E>> queue = new ArrayList<HittingSetTreeNode<E>>();
+        List<HittingSetTreeNode<E>> queue = new ArrayList<>();
         queue.add(hittingSetTree.getRoot());
         boolean b = true;
         while (b) {
@@ -71,7 +72,7 @@ public class BreadthFirstStrategy<E> implements HittingSetTreeConstructionStrate
                     throw new ExplanationGeneratorInterruptedException();
                 }
 
-                Set<OWLAxiom> pathContents = new HashSet<OWLAxiom>(currentNode.getPathToRoot());
+                Set<OWLAxiom> pathContents = new HashSet<>(currentNode.getPathToRoot());
 
                 // Extend the path contents
                 pathContents.add(ax);
@@ -104,13 +105,13 @@ public class BreadthFirstStrategy<E> implements HittingSetTreeConstructionStrate
                         }
 
                         if (!expl.isEmpty()) {
-                            HittingSetTreeNode<E> hittingSetTreeNode = new HittingSetTreeNode<E>(hittingSetTree, ax, currentNode, expl, reuse);
+                            HittingSetTreeNode<E> hittingSetTreeNode = new HittingSetTreeNode<>(hittingSetTree, ax, currentNode, expl, reuse);
                             currentNode.addChild(ax, hittingSetTreeNode);
                             queue.add(hittingSetTreeNode);
                         }
                         else {
                             // Save some space - don't add empty leaf nodes
-                            hittingSetTree.addClosedPath(new HashSet<OWLAxiom>(pathContents));
+                            hittingSetTree.addClosedPath(new HashSet<>(pathContents));
                         }
 
                         // Add path contents back in

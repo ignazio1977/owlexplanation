@@ -3,7 +3,6 @@ package org.semanticweb.owl.explanation.api;
 import org.semanticweb.owlapi.formats.OWLXMLDocumentFormat;
 import org.semanticweb.owlapi.model.*;
 import uk.ac.manchester.cs.owl.explanation.ordering.ExplanationOrderer;
-import uk.ac.manchester.cs.owl.explanation.ordering.ExplanationOrdererImpl;
 import uk.ac.manchester.cs.owl.explanation.ordering.ExplanationOrdererImplNoManager;
 
 import java.io.*;
@@ -112,7 +111,7 @@ public class Explanation<E> {
      * @return A set of sub-concepts that appear in the axioms in this explanation
      */
     public Set<OWLClassExpression> getNestedClassExpressions() {
-        Set<OWLClassExpression> subConcepts = new HashSet<OWLClassExpression>();
+        Set<OWLClassExpression> subConcepts = new HashSet<>();
         for (OWLAxiom ax : justification) {
             subConcepts.addAll(ax.getNestedClassExpressions());
         }
@@ -124,15 +123,16 @@ public class Explanation<E> {
 
     public Explanation(E entailment, Set<OWLAxiom> justification) {
         this.entailment = entailment;
-        this.justification = Collections.unmodifiableSet(new HashSet<OWLAxiom>(justification));
+        this.justification = Collections.unmodifiableSet(new HashSet<>(justification));
     }
 
     public static <E> Explanation<E> getEmptyExplanation(E entailment) {
         Set<OWLAxiom> emptySet = Collections.emptySet();
-        return new Explanation<E>(entailment, emptySet);
+        return new Explanation<>(entailment, emptySet);
     }
 
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         if (justification.isEmpty()) {
@@ -145,12 +145,12 @@ public class Explanation<E> {
         if (entailment instanceof OWLAxiom) {
             OWLAxiom entailedAxiom = (OWLAxiom) entailment;
             ExplanationOrderer orderer = new ExplanationOrdererImplNoManager();
-            List<OWLAxiom> axs = new ArrayList<OWLAxiom>(orderer.getOrderedExplanation(entailedAxiom, justification).fillDepthFirst());
+            List<OWLAxiom> axs = new ArrayList<>(orderer.getOrderedExplanation(entailedAxiom, justification).fillDepthFirst());
             axs.remove(0);
             orderedAxioms = axs;
         }
         else {
-            orderedAxioms = new TreeSet<OWLAxiom>(justification);
+            orderedAxioms = new TreeSet<>(justification);
         }
 
         for (OWLAxiom ax : orderedAxioms) {
@@ -162,6 +162,7 @@ public class Explanation<E> {
     }
 
 
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -174,6 +175,7 @@ public class Explanation<E> {
     }
 
 
+    @Override
     public int hashCode() {
         return (entailment != null ? entailment.hashCode() : 0) + justification.hashCode();
     }
@@ -207,15 +209,14 @@ public class Explanation<E> {
      * Loads a previously stored explanation from the specified input stream
      * @param is The input stream from where to read the explanation
      * @return The explanation that was read
-     * @throws IOException if there was a problem reading the explanation
      * @throws IllegalStateException if the input stream does not appear to contain a serialisation of an explanation.
      */
-    public static Explanation<OWLAxiom> load(InputStream is, Supplier<OWLOntologyManager> m) throws IOException {
+    public static Explanation<OWLAxiom> load(InputStream is, Supplier<OWLOntologyManager> m) {
         try {
             OWLOntology ontology = m.get().loadOntologyFromOntologyDocument(new BufferedInputStream(is));
             OWLDataFactory df = ontology.getOWLOntologyManager().getOWLDataFactory();
             OWLAnnotationProperty entailmentMarkerAnnotationProperty = df.getOWLAnnotationProperty(ENTAILMENT_MARKER_IRI);
-            Set<OWLAxiom> justificationAxioms = new HashSet<OWLAxiom>();
+            Set<OWLAxiom> justificationAxioms = new HashSet<>();
             OWLAxiom entailment = null;
             for(OWLAxiom ax : ontology.getAxioms()) {
                 boolean isEntailmentAxiom = !ax.getAnnotations(entailmentMarkerAnnotationProperty).isEmpty();
@@ -229,7 +230,7 @@ public class Explanation<E> {
             if(entailment == null) {
                 throw new IllegalStateException("Not a serialisation of an Explanation");
             }
-            return new Explanation<OWLAxiom>(entailment, justificationAxioms);
+            return new Explanation<>(entailment, justificationAxioms);
         }
         catch (OWLOntologyCreationException e) {
             throw new RuntimeException(e);

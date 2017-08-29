@@ -49,23 +49,27 @@ public class LaconicExplanationGeneratorFactory<E> implements ExplanationGenerat
         this.m = m;
     }
 
+    @Override
     public ExplanationGenerator<E> createExplanationGenerator(OWLOntology ontology) {
         return createExplanationGenerator(ontology, null);
     }
 
+    @Override
     public ExplanationGenerator<E> createExplanationGenerator(OWLOntology ontology, ExplanationProgressMonitor<E> progressMonitor) {
-        Set<OWLAxiom> axioms = new HashSet<OWLAxiom>(ontology.getLogicalAxiomCount());
+        Set<OWLAxiom> axioms = new HashSet<>(ontology.getLogicalAxiomCount());
         for(OWLOntology ont : ontology.getImportsClosure()) {
             axioms.addAll(ont.getLogicalAxioms());
         }
         return createExplanationGenerator(axioms, progressMonitor);
     }
 
+    @Override
     public ExplanationGenerator<E> createExplanationGenerator(Set<? extends OWLAxiom> axioms) {
         return createExplanationGenerator(axioms, null);
     }
 
+    @Override
     public ExplanationGenerator<E> createExplanationGenerator(Set<? extends OWLAxiom> axioms, ExplanationProgressMonitor<E> progressMonitor) {
-        return new LaconicExplanationGenerator<E>(axioms, explanationGeneratorFactory, progressMonitor, m);
+        return new LaconicExplanationGenerator<>(axioms, explanationGeneratorFactory, progressMonitor, m);
     }
 }

@@ -59,6 +59,7 @@ public class ConsistencyEntailmentCheckerFactory implements EntailmentCheckerFac
         this.m = m;
     }
 
+    @Override
     public EntailmentChecker<OWLAxiom> createEntailementChecker(OWLAxiom entailment) {
         return new ConsistencyEntailmentChecker(reasonerFactory, m, df, timeout);
     }

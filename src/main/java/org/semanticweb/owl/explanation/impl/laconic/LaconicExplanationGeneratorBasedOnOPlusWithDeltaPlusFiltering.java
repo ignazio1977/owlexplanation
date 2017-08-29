@@ -38,7 +38,7 @@ public class LaconicExplanationGeneratorBasedOnOPlusWithDeltaPlusFiltering imple
     private Supplier<OWLOntologyManager> m;
 
     public LaconicExplanationGeneratorBasedOnOPlusWithDeltaPlusFiltering(Set<? extends OWLAxiom> inputAxioms, EntailmentCheckerFactory<OWLAxiom> entailmentCheckerFactory, ExplanationGeneratorFactory<OWLAxiom> delegateFactory, ExplanationProgressMonitor<OWLAxiom> progressMonitor, OPlusSplitting spiltting, ModularityTreatment inputType, Supplier<OWLOntologyManager> m) {
-        this.inputAxioms = new HashSet<OWLAxiom>(inputAxioms);
+        this.inputAxioms = new HashSet<>(inputAxioms);
         this.entailmentCheckerFactory = entailmentCheckerFactory;
         this.delegateFactory = delegateFactory;
         this.progressMonitor = progressMonitor;
@@ -56,6 +56,7 @@ public class LaconicExplanationGeneratorBasedOnOPlusWithDeltaPlusFiltering imple
      * @throws org.semanticweb.owl.explanation.api.ExplanationException
      *          if there was a problem generating the explanation.
      */
+    @Override
     public Set<Explanation<OWLAxiom>> getExplanations(OWLAxiom entailment) throws ExplanationException {
         return getExplanations(entailment, Integer.MAX_VALUE);
     }
@@ -69,6 +70,7 @@ public class LaconicExplanationGeneratorBasedOnOPlusWithDeltaPlusFiltering imple
      * @throws org.semanticweb.owl.explanation.api.ExplanationException
      *          if there was a problem generating the explanation.
      */
+    @Override
     public Set<Explanation<OWLAxiom>> getExplanations(OWLAxiom entailment, int limit) throws ExplanationException {
 
         numberOfOPlusJustificationsFound = 0;
@@ -101,7 +103,7 @@ public class LaconicExplanationGeneratorBasedOnOPlusWithDeltaPlusFiltering imple
                 oplusInput = extractor.extract(entailment.getSignature());
             }
             else {
-                oplusInput = new HashSet<OWLAxiom>(inputAxioms);
+                oplusInput = new HashSet<>(inputAxioms);
             }
 
             transmitter.recordMeasurement(info, "module size", oplusInput.size());
@@ -114,7 +116,7 @@ public class LaconicExplanationGeneratorBasedOnOPlusWithDeltaPlusFiltering imple
 
             transmitter.recordMeasurement(info, "oplus axioms size", oplusAxiomsRaw.size());
 
-            Set<OWLAxiom> oplusAxioms = new HashSet<OWLAxiom>(oplusAxiomsRaw);
+            Set<OWLAxiom> oplusAxioms = new HashSet<>(oplusAxiomsRaw);
 
             ExplanationGenerator<OWLAxiom> gen = delegateFactory.createExplanationGenerator(oplusAxioms, new MediatingProgresssMonitor());
 
@@ -127,7 +129,7 @@ public class LaconicExplanationGeneratorBasedOnOPlusWithDeltaPlusFiltering imple
 
 
             IsLaconicChecker checker = new IsLaconicChecker(dataFactory, entailmentCheckerFactory, LaconicCheckerMode.EARLY_TERMINATING);
-            Set<Explanation<OWLAxiom>> laconicExplanations = new HashSet<Explanation<OWLAxiom>>();
+            Set<Explanation<OWLAxiom>> laconicExplanations = new HashSet<>();
 
             islaconicTimer.start();
             for (Explanation<OWLAxiom> expl : oplusExpls) {
@@ -152,14 +154,14 @@ public class LaconicExplanationGeneratorBasedOnOPlusWithDeltaPlusFiltering imple
             transmitter.recordMeasurement(info, "number of reconstituted justifications", reconstitutedLaconicExpls.size());
 
 
-            preferredLaconicExplanations = new HashSet<Explanation<OWLAxiom>>();
+            preferredLaconicExplanations = new HashSet<>();
 
-            Map<Explanation<OWLAxiom>, Set<OWLAxiom>> oplusCache = new HashMap<Explanation<OWLAxiom>, Set<OWLAxiom>>();
+            Map<Explanation<OWLAxiom>, Set<OWLAxiom>> oplusCache = new HashMap<>();
 
 
             ispreferredCheckTimer.start();
-            Set<Explanation<OWLAxiom>> toFilter = new HashSet<Explanation<OWLAxiom>>();
-            List<Explanation<OWLAxiom>> explsList = new ArrayList<Explanation<OWLAxiom>>(reconstitutedLaconicExpls);
+            Set<Explanation<OWLAxiom>> toFilter = new HashSet<>();
+            List<Explanation<OWLAxiom>> explsList = new ArrayList<>(reconstitutedLaconicExpls);
             for (int i = 0; i < explsList.size(); i++) {
                 for (int j = i + 1; j < explsList.size(); j++) {
                     Explanation<OWLAxiom> explI = explsList.get(i);
@@ -207,6 +209,7 @@ public class LaconicExplanationGeneratorBasedOnOPlusWithDeltaPlusFiltering imple
 
                             private boolean cancelled = false;
 
+                            @Override
                             public void foundExplanation(ExplanationGenerator<OWLAxiom> owlAxiomExplanationGenerator, Explanation<OWLAxiom> owlAxiomExplanation, Set<Explanation<OWLAxiom>> allFoundExplanations) {
                                 if (owlAxiomExplanation.equals(laconicExpl)) {
                                     preferredLaconicExplanations.add(laconicExpl);
@@ -214,6 +217,7 @@ public class LaconicExplanationGeneratorBasedOnOPlusWithDeltaPlusFiltering imple
                                 }
                             }
 
+                            @Override
                             public boolean isCancelled() {
                                 return cancelled;
                             }
@@ -232,7 +236,7 @@ public class LaconicExplanationGeneratorBasedOnOPlusWithDeltaPlusFiltering imple
             }
             ispreferredCheckTimer.stop();
 
-            final Set<Explanation<OWLAxiom>> progressFound = new HashSet<Explanation<OWLAxiom>>();
+            final Set<Explanation<OWLAxiom>> progressFound = new HashSet<>();
             for (Explanation<OWLAxiom> expl : preferredLaconicExplanations) {
                 progressFound.add(expl);
                 progressMonitor.foundExplanation(this, expl, progressFound);
@@ -252,7 +256,7 @@ public class LaconicExplanationGeneratorBasedOnOPlusWithDeltaPlusFiltering imple
     }
 
     private Set<Explanation<OWLAxiom>> getReconstitutedExplanations(OWLDataFactory dataFactory, OPlusGenerator transformation, Set<Explanation<OWLAxiom>> laconicExplanations) {
-        Set<Explanation<OWLAxiom>> reconstitutedLaconicExpls = new HashSet<Explanation<OWLAxiom>>();
+        Set<Explanation<OWLAxiom>> reconstitutedLaconicExpls = new HashSet<>();
         for (Explanation<OWLAxiom> expl : laconicExplanations) {
             reconstitutedLaconicExpls.addAll(getReconstitutedExplanations(expl, transformation, dataFactory));
         }
@@ -261,7 +265,7 @@ public class LaconicExplanationGeneratorBasedOnOPlusWithDeltaPlusFiltering imple
 
 
     private Set<OWLAxiom> getSourceAxioms(Explanation<OWLAxiom> expl, OPlusGenerator oPlusGenerator) {
-        Set<OWLAxiom> result = new HashSet<OWLAxiom>();
+        Set<OWLAxiom> result = new HashSet<>();
         for (OWLAxiom ax : expl.getAxioms()) {
             Set<OWLAxiom> sourceAxioms = oPlusGenerator.getAxiom2SourceMap().get(ax);
             if (sourceAxioms != null) {
@@ -273,15 +277,15 @@ public class LaconicExplanationGeneratorBasedOnOPlusWithDeltaPlusFiltering imple
 
     private Set<Explanation<OWLAxiom>> getReconstitutedExplanations(Explanation<OWLAxiom> expl, OPlusGenerator oPlusGenerator, OWLDataFactory dataFactory) {
         // Axioms that aren't SubClassOf axioms
-        Set<OWLAxiom> nonSubClassOfAxioms = new HashSet<OWLAxiom>();
+        Set<OWLAxiom> nonSubClassOfAxioms = new HashSet<>();
         // SubClassOf axioms that don't share a source axiom with any other axiom
-        Set<OWLSubClassOfAxiom> uniqueSourceSubClassAxioms = new HashSet<OWLSubClassOfAxiom>();
+        Set<OWLSubClassOfAxiom> uniqueSourceSubClassAxioms = new HashSet<>();
         // SubClassOf axioms that were merged
-        Set<OWLSubClassOfAxiom> reconstitutedAxioms = new HashSet<OWLSubClassOfAxiom>();
+        Set<OWLSubClassOfAxiom> reconstitutedAxioms = new HashSet<>();
         // SubClassOf axiom sources that were reconstituted, but have multiple sources
-        Set<OWLAxiom> reconstitutedAxiomSourcesWithMultipleSources = new HashSet<OWLAxiom>();
+        Set<OWLAxiom> reconstitutedAxiomSourcesWithMultipleSources = new HashSet<>();
 
-        Set<OWLAxiom> sameSourceAxiomSources = new HashSet<OWLAxiom>();
+        Set<OWLAxiom> sameSourceAxiomSources = new HashSet<>();
 
         OPlusGenerator strictOPlusGenerator = new OPlusGenerator(dataFactory, OPlusSplitting.NONE);
         Set<OWLAxiom> strictOPlus = strictOPlusGenerator.transform(getSourceAxioms(expl, oPlusGenerator));
@@ -291,8 +295,8 @@ public class LaconicExplanationGeneratorBasedOnOPlusWithDeltaPlusFiltering imple
                 OWLSubClassOfAxiom sca = (OWLSubClassOfAxiom) explAx;
                 Set<OWLAxiom> sameSourceAxioms = oPlusGenerator.getSameSourceAxioms(sca, expl.getAxioms());
                 if (!sameSourceAxioms.isEmpty()) {
-                    Set<OWLClassExpression> superClassConjuncts = new HashSet<OWLClassExpression>();
-                    Set<OWLClassExpression> subClassDisjuncts = new HashSet<OWLClassExpression>();
+                    Set<OWLClassExpression> superClassConjuncts = new HashSet<>();
+                    Set<OWLClassExpression> subClassDisjuncts = new HashSet<>();
                     for (OWLAxiom ax : sameSourceAxioms) {
                         // We only reconstitute SubClassOfAxioms
                         if (ax instanceof OWLSubClassOfAxiom) {
@@ -324,14 +328,14 @@ public class LaconicExplanationGeneratorBasedOnOPlusWithDeltaPlusFiltering imple
             return Collections.singleton(expl);
         }
         else {
-            Set<OWLAxiom> pool = new HashSet<OWLAxiom>();
+            Set<OWLAxiom> pool = new HashSet<>();
             pool.addAll(nonSubClassOfAxioms);
             pool.addAll(uniqueSourceSubClassAxioms);
             pool.addAll(reconstitutedAxioms);
             pool.addAll(reconstitutedAxiomSourcesWithMultipleSources);
             if (reconstitutedAxiomSourcesWithMultipleSources.isEmpty()) {
                 // We safely reconstituted axioms without any ambiguity
-                return Collections.singleton(new Explanation<OWLAxiom>(expl.getEntailment(), pool));
+                return Collections.singleton(new Explanation<>(expl.getEntailment(), pool));
             }
             else {
                 // We need to compute justifications!
@@ -362,6 +366,7 @@ public class LaconicExplanationGeneratorBasedOnOPlusWithDeltaPlusFiltering imple
 
     private class MediatingProgresssMonitor implements ExplanationProgressMonitor<OWLAxiom> {
 
+        @Override
         public void foundExplanation(ExplanationGenerator<OWLAxiom> owlAxiomExplanationGenerator, Explanation<OWLAxiom> owlAxiomExplanation, Set<Explanation<OWLAxiom>> allFoundExplanations) {
             System.out.println("\tFound " + allFoundExplanations.size() + " OPlus Justifications");
             numberOfOPlusJustificationsFound = allFoundExplanations.size();
@@ -371,6 +376,7 @@ public class LaconicExplanationGeneratorBasedOnOPlusWithDeltaPlusFiltering imple
             }
         }
 
+        @Override
         public boolean isCancelled() {
             return progressMonitor.isCancelled();
         }

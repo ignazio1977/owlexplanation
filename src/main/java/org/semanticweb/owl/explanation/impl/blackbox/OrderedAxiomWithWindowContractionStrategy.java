@@ -49,15 +49,16 @@ public class OrderedAxiomWithWindowContractionStrategy implements ContractionStr
 
 
     public OrderedAxiomWithWindowContractionStrategy() {
-        lastJustification = new HashSet<OWLAxiom>();
+        lastJustification = new HashSet<>();
     }
 
+    @Override
     public Set<OWLAxiom> doPruning(Set<OWLAxiom> axioms, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor) {
 
         count = 0;
         int windowSize = 10;
 
-        List<OWLAxiom> orderedAxioms = new ArrayList<OWLAxiom>(axioms);
+        List<OWLAxiom> orderedAxioms = new ArrayList<>(axioms);
         if(lastEntailment != null) {
             if(checker.getEntailment().equals(lastEntailment)) {
 
@@ -70,7 +71,7 @@ public class OrderedAxiomWithWindowContractionStrategy implements ContractionStr
         }
 
         int windowCount = orderedAxioms.size() / windowSize;
-        Set<OWLAxiom> contraction = new HashSet<OWLAxiom>(axioms);
+        Set<OWLAxiom> contraction = new HashSet<>(axioms);
 
         for(int windowIndex = 0; windowIndex < windowCount; windowIndex++) {
             int start = windowIndex * windowSize;
@@ -87,7 +88,7 @@ public class OrderedAxiomWithWindowContractionStrategy implements ContractionStr
 
 
         // Slow
-        Set<OWLAxiom> contractionCopy = new HashSet<OWLAxiom>(contraction);
+        Set<OWLAxiom> contractionCopy = new HashSet<>(contraction);
         for(OWLAxiom ax : contractionCopy) {
             contraction.remove(ax);
             count++;
@@ -104,6 +105,7 @@ public class OrderedAxiomWithWindowContractionStrategy implements ContractionStr
                 return contraction;
     }
 
+    @Override
     public int getNumberOfSteps() {
         return count;
     }

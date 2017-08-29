@@ -38,6 +38,7 @@ public class ExplanationComparator<E> implements Comparator<Explanation<E>> {
     public ExplanationComparator(HittingSetTree<E> hittingSetTree) {
     }
 
+    @Override
     public int compare(Explanation<E> o1, Explanation<E> o2) {
         if(o1.equals(o2)) {
             return 0;

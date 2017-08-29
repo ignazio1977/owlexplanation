@@ -70,7 +70,7 @@ public class BlackBoxExplanationGenerator2<E> implements ExplanationGenerator<E>
      * @param progressMonitor A progress monitor - may be <code>null</code>
      */
     public BlackBoxExplanationGenerator2(Set<? extends OWLAxiom> axioms, EntailmentCheckerFactory<E> checkerFactory, ExpansionStrategy expansionStrategy, ContractionStrategy contractionStrategy, ExplanationProgressMonitor<E> progressMonitor, Supplier<OWLOntologyManager> m) {
-        workingAxioms = new HashSet<OWLAxiom>(axioms);
+        workingAxioms = new HashSet<>(axioms);
         this.checkerFactory = checkerFactory;
         this.expansionStrategy = expansionStrategy;
         this.contractionStrategy = contractionStrategy;
@@ -78,7 +78,7 @@ public class BlackBoxExplanationGenerator2<E> implements ExplanationGenerator<E>
             this.progressMonitor = progressMonitor;
         }
         else {
-            this.progressMonitor = new NullExplanationProgressMonitor<E>();
+            this.progressMonitor = new NullExplanationProgressMonitor<>();
         }
 //        findOneElapsedTimer = new TelemetryTimer();
         this.m = m;
@@ -91,11 +91,13 @@ public class BlackBoxExplanationGenerator2<E> implements ExplanationGenerator<E>
     //////////////////////////////////////////////////////////////////////////////////////////
 
 
+    @Override
     public Set<Explanation<E>> getExplanations(E entailment) throws ExplanationException {
         return getExplanations(entailment, Integer.MAX_VALUE);
     }
 
 
+    @Override
     public Set<Explanation<E>> getExplanations(E entailment, int limit) throws ExplanationException {
         TelemetryInfo justificationsInfo = new DefaultTelemetryInfo("justifications");
         TelemetryTransmitter transmitter = TelemetryTransmitter.getTransmitter();
@@ -113,8 +115,8 @@ public class BlackBoxExplanationGenerator2<E> implements ExplanationGenerator<E>
 
             generatorTimer.reset();
             generatorTimer.start();
-            HittingSetTreeConstructionStrategy<E> strategy = new BreadthFirstStrategy<E>();
-            HittingSetTree<E> hittingSetTree = new HittingSetTree<E>(strategy, progressMonitor);
+            HittingSetTreeConstructionStrategy<E> strategy = new BreadthFirstStrategy<>();
+            HittingSetTree<E> hittingSetTree = new HittingSetTree<>(strategy, progressMonitor);
             hittingSetTree.buildHittingSetTree(entailment, limit, this);
             return hittingSetTree.getExplanations();
         }
@@ -170,9 +172,9 @@ public class BlackBoxExplanationGenerator2<E> implements ExplanationGenerator<E>
             justificationTimer.start();
 
             // Quick get out!
-            if (entailment instanceof OWLAxiom && workingAxioms.contains((OWLAxiom) entailment)) {
+            if (entailment instanceof OWLAxiom && workingAxioms.contains(entailment)) {
                 entailed = true;
-                result = new Explanation<E>(entailment, Collections.singleton((OWLAxiom) entailment));
+                result = new Explanation<>(entailment, Collections.singleton((OWLAxiom) entailment));
             }
             else {
                 if (progressMonitor.isCancelled()) {
@@ -186,7 +188,7 @@ public class BlackBoxExplanationGenerator2<E> implements ExplanationGenerator<E>
                     // Contraction phase
                     Set<OWLAxiom> justificationAxioms = doContraction(checker, expandedAxioms);
 
-                    result = new Explanation<E>(entailment, justificationAxioms);
+                    result = new Explanation<>(entailment, justificationAxioms);
                 }
 
             }
@@ -280,6 +282,7 @@ public class BlackBoxExplanationGenerator2<E> implements ExplanationGenerator<E>
 
     private int cacheHitCounter = 0;
 
+    @Override
     public Explanation<E> generateExplanation(E entailment) {
         for (Explanation<E> expl : cache) {
             if (expl.getEntailment().equals(entailment)) {
@@ -297,11 +300,13 @@ public class BlackBoxExplanationGenerator2<E> implements ExplanationGenerator<E>
         return expl;
     }
 
+    @Override
     public void removeAxiom(OWLAxiom axiom) {
         module.remove(axiom);
         workingAxioms.remove(axiom);
     }
 
+    @Override
     public void addAxiom(OWLAxiom axiom) {
         module.add(axiom);
         workingAxioms.add(axiom);

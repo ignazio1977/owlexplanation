@@ -1,6 +1,5 @@
 package org.semanticweb.owl.explanation.api;
 
-import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLAxiom;
 

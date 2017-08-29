@@ -42,21 +42,21 @@ public class HittingSetTree<E> implements TelemetryObject {
 
     private HittingSetTreeNode<E> root;
 
-    private Set<Set<OWLAxiom>> closedPaths = new HashSet<Set<OWLAxiom>>();
+    private Set<Set<OWLAxiom>> closedPaths = new HashSet<>();
 
-    private Set<OWLAxiom> justificationsUnion = new HashSet<OWLAxiom>();
+    private Set<OWLAxiom> justificationsUnion = new HashSet<>();
 
-    private List<Explanation<E>> explanations = new ArrayList<Explanation<E>>();
+    private List<Explanation<E>> explanations = new ArrayList<>();
 
     private ExplanationProgressMonitor<E> progressMonitor;
 
-    private Set<Set<OWLAxiom>> exploredPaths = new HashSet<Set<OWLAxiom>>();
+    private Set<Set<OWLAxiom>> exploredPaths = new HashSet<>();
 
     private ExplanationComparator<E> explanationComparator = new ExplanationComparator(this);
 
     private int treeSize = 0;
 
-    private HashSet<Explanation<E>> allFoundExplanations = new HashSet<Explanation<E>>();
+    private HashSet<Explanation<E>> allFoundExplanations = new HashSet<>();
 
     private HittingSetTreeConstructionStrategy<E> strategy;
 
@@ -114,7 +114,7 @@ public class HittingSetTree<E> implements TelemetryObject {
 
             numberOfNodesWithCallsToFindOne = 1;
             Explanation<E> firstExplanation = generatorMediator.generateExplanation(entailment);
-            root = new HittingSetTreeNode<E>(this, firstExplanation);
+            root = new HittingSetTreeNode<>(this, firstExplanation);
             treeSize = 1;
             addExplanation(firstExplanation);
             if (explanations.size() >= limit) {
@@ -235,10 +235,12 @@ public class HittingSetTree<E> implements TelemetryObject {
         }
     }
 
+    @Override
     public String getPreferredSerialisedName() {
         return "hst";
     }
 
+    @Override
     public boolean isSerialisedAsXML() {
         return false;
     }
@@ -271,6 +273,7 @@ public class HittingSetTree<E> implements TelemetryObject {
 
 
 
+    @Override
     public void serialise(OutputStream outputStream) {
 //        this.writeTreeML(new PrintWriter(outputStream));
     }

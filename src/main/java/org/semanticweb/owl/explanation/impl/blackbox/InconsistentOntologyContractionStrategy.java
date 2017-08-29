@@ -41,6 +41,7 @@ public class InconsistentOntologyContractionStrategy extends DivideAndConquerCon
     }
 
 
+    @Override
     public Set<OWLAxiom> doPruning(Set<OWLAxiom> axioms, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor) {
         return super.doPruning(axioms, checker, progressMonitor);
     }

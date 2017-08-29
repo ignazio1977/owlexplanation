@@ -69,6 +69,7 @@ public class SatisfiabilityEntailmentCheckerFactory implements EntailmentChecker
         this.m = m;
     }
 
+    @Override
     public EntailmentChecker<OWLAxiom> createEntailementChecker(OWLAxiom entailment) {
         return new SatisfiabilityEntailmentChecker(reasonerFactory, entailment, m, useModularisation, entailmentCheckTimeOutMS);
     }

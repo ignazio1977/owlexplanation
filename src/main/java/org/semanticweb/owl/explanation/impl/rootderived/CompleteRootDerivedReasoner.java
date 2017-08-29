@@ -4,14 +4,9 @@ import org.semanticweb.owl.explanation.api.*;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
-import org.semanticweb.owlapi.io.ToStringRenderer;
-import org.semanticweb.owlapi.util.SimpleRenderer;
-import org.semanticweb.owlapi.util.SimpleShortFormProvider;
-import org.semanticweb.owlapi.util.DefaultPrefixManager;
 
 import java.util.*;
 import java.util.function.Supplier;
-import java.net.URI;
 /*
  * Copyright (C) 2009, University of Manchester
  *
@@ -51,7 +46,7 @@ public class CompleteRootDerivedReasoner implements RootDerivedReasoner {
 
     private Map<OWLClass, Set<Explanation<OWLAxiom>>> cls2JustificationMap;
 
-    private Set<OWLClass> roots = new HashSet<OWLClass>();
+    private Set<OWLClass> roots = new HashSet<>();
 
     private Supplier<OWLOntologyManager> m;
 
@@ -67,11 +62,12 @@ public class CompleteRootDerivedReasoner implements RootDerivedReasoner {
      * Gets the root unsatisfiable classes.
      * @return A set of classes that represent the root unsatisfiable classes
      */
+    @Override
     public Set<OWLClass> getRootUnsatisfiableClasses() throws ExplanationException {
         StructuralRootDerivedReasoner srd = new StructuralRootDerivedReasoner(manager, baseReasoner, reasonerFactory);
         Set<OWLClass> estimatedRoots = srd.getRootUnsatisfiableClasses();
-        cls2JustificationMap = new HashMap<OWLClass, Set<Explanation<OWLAxiom>>>();
-        Set<OWLAxiom> allAxioms = new HashSet<OWLAxiom>();
+        cls2JustificationMap = new HashMap<>();
+        Set<OWLAxiom> allAxioms = new HashSet<>();
         for (OWLOntology ont : baseReasoner.getRootOntology().getImportsClosure()) {
             allAxioms.addAll(ont.getLogicalAxioms());
         }
@@ -134,10 +130,12 @@ public class CompleteRootDerivedReasoner implements RootDerivedReasoner {
     }
 
 
+    @Override
     public Set<OWLClass> getDependentChildClasses(OWLClass cls) {
         return null;
     }
 
+    @Override
     public Set<OWLClass> getDependentDescendantClasses(OWLClass cls) {
         return null;
     }

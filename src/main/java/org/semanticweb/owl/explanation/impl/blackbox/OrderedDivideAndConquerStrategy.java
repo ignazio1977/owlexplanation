@@ -22,6 +22,7 @@ public class OrderedDivideAndConquerStrategy implements ContractionStrategy {
 
     private int count = 0;
 
+    @Override
     public Set<OWLAxiom> doPruning(Set<OWLAxiom> axioms, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor) {
         count = 0;
         LinkedHashSet<OWLAxiom> orderedAxioms = new LinkedHashSet<>();
@@ -36,6 +37,7 @@ public class OrderedDivideAndConquerStrategy implements ContractionStrategy {
         return delegate.doPruning(orderedAxioms, checker, progressMonitor);
     }
 
+    @Override
     public int getNumberOfSteps() {
         return delegate.getNumberOfSteps();
     }
