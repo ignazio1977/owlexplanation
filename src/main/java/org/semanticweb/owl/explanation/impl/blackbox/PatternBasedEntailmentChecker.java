@@ -19,7 +19,7 @@ public class PatternBasedEntailmentChecker {
 
     private OWLClassAssertionAxiom classAssertionEntailment;
 
-    private Set<Explanation<OWLAxiom>> simpleExplanations = new HashSet<Explanation<OWLAxiom>>();
+    private Set<Explanation<OWLAxiom>> simpleExplanations = new HashSet<>();
 
     public PatternBasedEntailmentChecker(OWLAxiom entailment, Set<OWLAxiom> workingAxioms) {
         this.entailment = entailment;
@@ -47,7 +47,7 @@ public class PatternBasedEntailmentChecker {
         for (OWLAxiom ax : axioms) {
             if (entailment.equalsIgnoreAnnotations(ax)) {
                 Set<OWLAxiom> axs = Collections.singleton(ax);
-                simpleExplanations.add(new Explanation<OWLAxiom>(entailment, axs));
+                simpleExplanations.add(new Explanation<>(entailment, axs));
             }
             ax.accept(visitor);
         }
@@ -60,12 +60,14 @@ public class PatternBasedEntailmentChecker {
 
     private class WorkingAxiomVisitor implements OWLAxiomVisitor {
 
-        private Map<OWLObjectPropertyExpression, Set<OWLAxiom>> existentials = new HashMap<OWLObjectPropertyExpression, Set<OWLAxiom>>();
+        private Map<OWLObjectPropertyExpression, Set<OWLAxiom>> existentials = new HashMap<>();
 
 
+        @Override
         public void visit(OWLDeclarationAxiom axiom) {
         }
 
+        @Override
         public void visit(OWLSubClassOfAxiom axiom) {
             if (subClassOfEntailment != null) {
                 Set<OWLClassExpression> superConjuncts = axiom.getSuperClass().asConjunctSet();
@@ -78,78 +80,100 @@ public class PatternBasedEntailmentChecker {
             }
         }
 
+        @Override
         public void visit(OWLNegativeObjectPropertyAssertionAxiom axiom) {
 
         }
 
+        @Override
         public void visit(OWLAsymmetricObjectPropertyAxiom axiom) {
         }
 
+        @Override
         public void visit(OWLReflexiveObjectPropertyAxiom axiom) {
         }
 
+        @Override
         public void visit(OWLDisjointClassesAxiom axiom) {
         }
 
+        @Override
         public void visit(OWLDataPropertyDomainAxiom axiom) {
         }
 
+        @Override
         public void visit(OWLObjectPropertyDomainAxiom axiom) {
         }
 
+        @Override
         public void visit(OWLEquivalentObjectPropertiesAxiom axiom) {
         }
 
+        @Override
         public void visit(OWLNegativeDataPropertyAssertionAxiom axiom) {
         }
 
+        @Override
         public void visit(OWLDifferentIndividualsAxiom axiom) {
         }
 
+        @Override
         public void visit(OWLDisjointDataPropertiesAxiom axiom) {
         }
 
+        @Override
         public void visit(OWLDisjointObjectPropertiesAxiom axiom) {
         }
 
+        @Override
         public void visit(OWLObjectPropertyRangeAxiom axiom) {
         }
 
+        @Override
         public void visit(OWLObjectPropertyAssertionAxiom axiom) {
             OWLObjectPropertyExpression prop = axiom.getProperty().getSimplified();
             Set<OWLAxiom> axioms = existentials.get(prop);
             if (axioms == null) {
-                axioms = new HashSet<OWLAxiom>();
+                axioms = new HashSet<>();
                 existentials.put(prop, axioms);
             }
             axioms.add(axiom);
         }
 
+        @Override
         public void visit(OWLFunctionalObjectPropertyAxiom axiom) {
         }
 
+        @Override
         public void visit(OWLSubObjectPropertyOfAxiom axiom) {
         }
 
+        @Override
         public void visit(OWLDisjointUnionAxiom axiom) {
         }
 
+        @Override
         public void visit(OWLSymmetricObjectPropertyAxiom axiom) {
         }
 
+        @Override
         public void visit(OWLDataPropertyRangeAxiom axiom) {
         }
 
+        @Override
         public void visit(OWLFunctionalDataPropertyAxiom axiom) {
         }
 
+        @Override
         public void visit(OWLEquivalentDataPropertiesAxiom axiom) {
         }
 
+        @Override
         public void visit(OWLClassAssertionAxiom axiom) {
 
         }
 
+        @Override
         public void visit(OWLEquivalentClassesAxiom axiom) {
             // For SubClassOf(C, D)
             // Handle axioms of the form
@@ -185,49 +209,64 @@ public class PatternBasedEntailmentChecker {
             }
         }
 
+        @Override
         public void visit(OWLDataPropertyAssertionAxiom axiom) {
 
         }
 
+        @Override
         public void visit(OWLTransitiveObjectPropertyAxiom axiom) {
         }
 
+        @Override
         public void visit(OWLIrreflexiveObjectPropertyAxiom axiom) {
         }
 
+        @Override
         public void visit(OWLSubDataPropertyOfAxiom axiom) {
         }
 
+        @Override
         public void visit(OWLInverseFunctionalObjectPropertyAxiom axiom) {
         }
 
+        @Override
         public void visit(OWLSameIndividualAxiom axiom) {
         }
 
+        @Override
         public void visit(OWLSubPropertyChainOfAxiom axiom) {
         }
 
+        @Override
         public void visit(OWLInverseObjectPropertiesAxiom axiom) {
         }
 
+        @Override
         public void visit(OWLHasKeyAxiom axiom) {
         }
 
+        @Override
         public void visit(OWLDatatypeDefinitionAxiom axiom) {
         }
 
+        @Override
         public void visit(SWRLRule rule) {
         }
 
+        @Override
         public void visit(OWLAnnotationAssertionAxiom axiom) {
         }
 
+        @Override
         public void visit(OWLSubAnnotationPropertyOfAxiom axiom) {
         }
 
+        @Override
         public void visit(OWLAnnotationPropertyDomainAxiom axiom) {
         }
 
+        @Override
         public void visit(OWLAnnotationPropertyRangeAxiom axiom) {
         }
     }

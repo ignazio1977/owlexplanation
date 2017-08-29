@@ -41,27 +41,30 @@ public class TauGenerator extends BaseDescriptionGenerator {
     }
 
 
+    @Override
     public Set<OWLClassExpression> visit(OWLClass desc) {
-        Set<OWLClassExpression> descs = new HashSet<OWLClassExpression>();
+        Set<OWLClassExpression> descs = new HashSet<>();
         descs.add(desc);
         descs.add(getDataFactory().getOWLThing());
         return descs;
     }
 
 
+    @Override
     public Set<OWLClassExpression> visit(OWLObjectComplementOf desc) {
-        Set<OWLClassExpression> descs = new HashSet<OWLClassExpression>();
+        Set<OWLClassExpression> descs = new HashSet<>();
         for (OWLClassExpression d : computeBeta(desc.getOperand())) {
             descs.add(getDataFactory().getOWLObjectComplementOf(d));
         }
         return descs;
     }
 
+    @Override
     public Set<OWLClassExpression> visit(OWLObjectMaxCardinality desc) {
         // We need to increase the cardinality to some upper bound, but
         // how the hell do we figure out this?
         // Filler gets SMALLER
-        Set<OWLClassExpression> descs = new HashSet<OWLClassExpression>();
+        Set<OWLClassExpression> descs = new HashSet<>();
         for (OWLClassExpression filler : computeBeta(desc.getFiller())) {
             descs.add(getDataFactory().getOWLObjectMaxCardinality(desc.getCardinality(), desc.getProperty(), filler));
         }
@@ -70,12 +73,13 @@ public class TauGenerator extends BaseDescriptionGenerator {
     }
 
 
+    @Override
     public Set<OWLClassExpression> visit(OWLObjectMinCardinality desc) {
         // Weaken by decreasing numbers and weakening fillers for all
         // combinations!
         // Filler gets BIGGER
         Set<OWLClassExpression> weakenedFillers = computeTau(desc.getFiller());
-        Set<OWLClassExpression> result = new HashSet<OWLClassExpression>();
+        Set<OWLClassExpression> result = new HashSet<>();
         // Greater than 0 since min 0 R is TOP
         for (int n = desc.getCardinality(); n > 0; n--) {
             for (OWLClassExpression filler : weakenedFillers) {
@@ -103,11 +107,13 @@ public class TauGenerator extends BaseDescriptionGenerator {
         }
     }
 
+    @Override
     protected OWLClass getLimit() {
         return getDataFactory().getOWLThing();
     }
 
 
+    @Override
     protected OWLDataRange getDataLimit() {
         return getDataFactory().getTopDatatype();
     }

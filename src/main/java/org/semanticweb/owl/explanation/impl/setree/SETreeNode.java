@@ -15,7 +15,7 @@ public class SETreeNode<O> {
 
     private SETreeNode<O> parent;
 
-    private List<SETreeNode> children = new ArrayList<SETreeNode>();
+    private List<SETreeNode> children = new ArrayList<>();
 
     public SETreeNode(List<O> elements) {
         this.elements = elements;

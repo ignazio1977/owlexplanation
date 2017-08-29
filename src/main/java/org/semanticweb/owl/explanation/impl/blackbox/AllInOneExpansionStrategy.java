@@ -38,6 +38,7 @@ import java.util.Collections;
 public class AllInOneExpansionStrategy implements ExpansionStrategy {
 
 
+    @Override
     public Set<OWLAxiom> doExpansion(Set<OWLAxiom> axioms, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor) {
         if(checker.isEntailed(axioms)) {
             return axioms;
@@ -47,6 +48,7 @@ public class AllInOneExpansionStrategy implements ExpansionStrategy {
         }
     }
 
+    @Override
     public int getNumberOfSteps() {
         return 1;
     }

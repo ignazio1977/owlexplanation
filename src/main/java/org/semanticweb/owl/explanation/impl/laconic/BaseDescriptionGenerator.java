@@ -69,14 +69,14 @@ public abstract class BaseDescriptionGenerator implements OWLClassExpressionVisi
     }
 
     private Set<Set<OWLClassExpression>> computeReplacements(Set<OWLClassExpression> operands) {
-        Set<List<OWLClassExpression>> ps = new HashSet<List<OWLClassExpression>>();
+        Set<List<OWLClassExpression>> ps = new HashSet<>();
         ps.add(new ArrayList<OWLClassExpression>());
         for (OWLClassExpression op : operands) {
-            Set<List<OWLClassExpression>> pscopy = new HashSet<List<OWLClassExpression>>(ps);
+            Set<List<OWLClassExpression>> pscopy = new HashSet<>(ps);
 
             for (OWLClassExpression opEx : op.accept(this)) {
                 for (List<OWLClassExpression> pselement : pscopy) {
-                    ArrayList<OWLClassExpression> union = new ArrayList<OWLClassExpression>();
+                    ArrayList<OWLClassExpression> union = new ArrayList<>();
 
                     union.addAll(pselement);
                     union.add(opEx);
@@ -85,17 +85,18 @@ public abstract class BaseDescriptionGenerator implements OWLClassExpressionVisi
                 }
             }
         }
-        Set<Set<OWLClassExpression>> result = new HashSet<Set<OWLClassExpression>>();
+        Set<Set<OWLClassExpression>> result = new HashSet<>();
         for(List<OWLClassExpression> desc : ps) {
-            result.add(new HashSet<OWLClassExpression>(desc));
+            result.add(new HashSet<>(desc));
         }
         return result;
     }
 
 
 
+    @Override
     public Set<OWLClassExpression> visit(OWLObjectIntersectionOf desc) {
-        Set<OWLClassExpression> descs = new HashSet<OWLClassExpression>();
+        Set<OWLClassExpression> descs = new HashSet<>();
         Set<Set<OWLClassExpression>> conjunctions = computeReplacements(desc.getOperands());
         for (Set<OWLClassExpression> conjuncts : conjunctions) {
             for(Iterator<OWLClassExpression> it = conjuncts.iterator(); it.hasNext(); ) {
@@ -119,8 +120,9 @@ public abstract class BaseDescriptionGenerator implements OWLClassExpressionVisi
     }
 
 
+    @Override
     public Set<OWLClassExpression> visit(OWLObjectUnionOf desc) {
-        Set<OWLClassExpression> descs = new HashSet<OWLClassExpression>();
+        Set<OWLClassExpression> descs = new HashSet<>();
         Set<Set<OWLClassExpression>> disjunctions = computeReplacements(desc.getOperands());
         for (Set<OWLClassExpression> disjuncts : disjunctions) {
             for(Iterator<OWLClassExpression> it = disjuncts.iterator(); it.hasNext(); ) {
@@ -140,8 +142,9 @@ public abstract class BaseDescriptionGenerator implements OWLClassExpressionVisi
     }
 
 
+    @Override
     public Set<OWLClassExpression> visit(OWLObjectSomeValuesFrom desc) {
-        Set<OWLClassExpression> descs = new HashSet<OWLClassExpression>();
+        Set<OWLClassExpression> descs = new HashSet<>();
         descs.add(desc);
         for (OWLClassExpression filler : desc.getFiller().accept(this)) {
             if (!isNothing(filler)) {
@@ -153,8 +156,9 @@ public abstract class BaseDescriptionGenerator implements OWLClassExpressionVisi
     }
 
 
+    @Override
     public Set<OWLClassExpression> visit(OWLObjectAllValuesFrom desc) {
-        Set<OWLClassExpression> descs = new HashSet<OWLClassExpression>();
+        Set<OWLClassExpression> descs = new HashSet<>();
         for (OWLClassExpression filler : desc.getFiller().accept(this)) {
             if (!isThing(filler)) {
                 descs.add(factory.getOWLObjectAllValuesFrom(desc.getProperty(), filler));
@@ -165,8 +169,9 @@ public abstract class BaseDescriptionGenerator implements OWLClassExpressionVisi
     }
 
 
+    @Override
     public Set<OWLClassExpression> visit(OWLObjectHasValue desc) {
-        Set<OWLClassExpression> descs = new HashSet<OWLClassExpression>();
+        Set<OWLClassExpression> descs = new HashSet<>();
         descs.add(desc);
 //        for (OWLClassExpression filler : factory.getOWLObjectOneOf(desc.getValue()).accept(this)) {
 //            descs.add(factory.getOWLObjectSomeValuesFrom(desc.getProperty(), filler));
@@ -176,9 +181,10 @@ public abstract class BaseDescriptionGenerator implements OWLClassExpressionVisi
         return descs;
     }
 
+    @Override
     public Set<OWLClassExpression> visit(OWLObjectExactCardinality desc) {
         // Syntactic for min and max
-        Set<OWLClassExpression> result = new HashSet<OWLClassExpression>();
+        Set<OWLClassExpression> result = new HashSet<>();
         OWLClassExpression min = getDataFactory().getOWLObjectMinCardinality(desc.getCardinality(), desc.getProperty(), desc.getFiller());
         result.addAll(min.accept(this));
         OWLClassExpression max = getDataFactory().getOWLObjectMaxCardinality(desc.getCardinality(), desc.getProperty(), desc.getFiller());
@@ -187,16 +193,18 @@ public abstract class BaseDescriptionGenerator implements OWLClassExpressionVisi
         return result;
     }
 
+    @Override
     public Set<OWLClassExpression> visit(OWLObjectHasSelf desc) {
-        Set<OWLClassExpression> descs = new HashSet<OWLClassExpression>();
+        Set<OWLClassExpression> descs = new HashSet<>();
         descs.add(desc);
         descs.add(getLimit());
         return descs;
     }
 
 
+    @Override
     public Set<OWLClassExpression> visit(OWLObjectOneOf desc) {
-        Set<OWLClassExpression> ops = new HashSet<OWLClassExpression>();
+        Set<OWLClassExpression> ops = new HashSet<>();
         if(desc.getIndividuals().size() == 1) {
             ops.add(desc);
             ops.add(getLimit());
@@ -213,6 +221,7 @@ public abstract class BaseDescriptionGenerator implements OWLClassExpressionVisi
 
     protected abstract OWLDataRange getDataLimit();
 
+    @Override
     public Set<OWLClassExpression> visit(OWLDataSomeValuesFrom desc) {
 //        Set<OWLClassExpression> result = new HashSet<OWLClassExpression>();
 //        result.add(desc);
@@ -222,11 +231,13 @@ public abstract class BaseDescriptionGenerator implements OWLClassExpressionVisi
     }
 
 
+    @Override
     public Set<OWLClassExpression> visit(OWLDataAllValuesFrom desc) {
         return Collections.singleton((OWLClassExpression) desc);
     }
 
 
+    @Override
     public Set<OWLClassExpression> visit(OWLDataHasValue desc) {
 //        Set<OWLClassExpression> result = new HashSet<OWLClassExpression>(2);
 //        result.add(desc);
@@ -236,16 +247,19 @@ public abstract class BaseDescriptionGenerator implements OWLClassExpressionVisi
     }
 
 
+    @Override
     public Set<OWLClassExpression> visit(OWLDataMinCardinality desc) {
         return Collections.singleton((OWLClassExpression) desc);
     }
 
 
+    @Override
     public Set<OWLClassExpression> visit(OWLDataExactCardinality desc) {
         return Collections.singleton((OWLClassExpression) desc);
     }
 
 
+    @Override
     public Set<OWLClassExpression> visit(OWLDataMaxCardinality desc) {
         return Collections.singleton((OWLClassExpression) desc);
     }

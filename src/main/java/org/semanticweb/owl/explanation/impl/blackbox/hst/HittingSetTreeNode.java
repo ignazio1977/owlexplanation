@@ -42,9 +42,9 @@ public class HittingSetTreeNode<E> {
 
     private Explanation<E> explanation;
 
-    private List<HittingSetTreeNode<E>> children = new ArrayList<HittingSetTreeNode<E>>();
+    private List<HittingSetTreeNode<E>> children = new ArrayList<>();
 
-    private List<OWLAxiom> edgeLabels = new ArrayList<OWLAxiom>();
+    private List<OWLAxiom> edgeLabels = new ArrayList<>();
 
 //    private HittingSetTree<E> tree;
 
@@ -93,7 +93,7 @@ public class HittingSetTreeNode<E> {
 
 
     public List<OWLAxiom> getPathToRoot() {
-        List<OWLAxiom> path = new ArrayList<OWLAxiom>();
+        List<OWLAxiom> path = new ArrayList<>();
         getPathToRoot(this, path);
         return path;
     }

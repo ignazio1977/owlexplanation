@@ -14,7 +14,6 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import org.semanticweb.owlapi.reasoner.TimeOutException;
 /*
  * Copyright (C) 2008, University of Manchester
  *
@@ -69,31 +68,38 @@ public class ConsistencyEntailmentChecker implements org.semanticweb.owl.explana
 
 
 
+    @Override
     public int getCounter() {
         return counter;
     }
 
+    @Override
     public void resetCounter() {
         counter = 0;
     }
 
+    @Override
     public OWLAxiom getEntailment() {
         return entailment;
     }
 
 
+    @Override
     public Set<OWLAxiom> getModule(Set<OWLAxiom> axioms) {
         return axioms;
     }
 
+    @Override
     public Set<OWLEntity> getEntailmentSignature() {
         return Collections.emptySet();
     }
 
+    @Override
     public Set<OWLEntity> getSeedSignature() {
         return Collections.emptySet();
     }
 
+    @Override
     public boolean isEntailed(final Set<OWLAxiom> axiom) {
 
         TelemetryTimer timer = new TelemetryTimer();
@@ -133,14 +139,17 @@ public class ConsistencyEntailmentChecker implements org.semanticweb.owl.explana
         }
     }
 
+    @Override
     public String getModularisationTypeDescription() {
         return "none";
     }
 
+    @Override
     public boolean isUseModularisation() {
         return false;
     }
 
+    @Override
     public Set<OWLAxiom> getEntailingAxioms(Set<OWLAxiom> axioms) {
         return null;
     }

@@ -28,6 +28,7 @@ public class PatternBasedConsistencyEntailmentCheckerFactory implements Entailme
         this.m = m;
     }
 
+    @Override
     public EntailmentChecker<OWLAxiom> createEntailementChecker(OWLAxiom entailment) {
         return new PatternBasedConsistencyEntailmentChecker(rf, m, m.get().getOWLDataFactory(), timeout);
     }

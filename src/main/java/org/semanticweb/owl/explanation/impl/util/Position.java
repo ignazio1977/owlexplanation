@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class Position {
 
-    private List<Integer> positionList = new ArrayList<Integer>();
+    private List<Integer> positionList = new ArrayList<>();
 
     public Position(Integer ... position) {
         positionList.addAll(Arrays.<Integer>asList(position));

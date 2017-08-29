@@ -3,7 +3,6 @@ package org.semanticweb.owl.explanation.impl.blackbox;
 import org.semanticweb.owl.explanation.api.ExplanationProgressMonitor;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owl.explanation.impl.blackbox.checker.ConsistencyEntailmentChecker;
 
 import java.util.Set;
 /*
@@ -50,10 +49,12 @@ public class InconsistentOntologyClashExpansionStrategy implements ExpansionStra
         this.m = m;
         this.strategy=new StructuralTypePriorityExpansionStrategy(null, m);
     }
+    @Override
     public Set<OWLAxiom> doExpansion(Set<OWLAxiom> axioms, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor) {
         return defaultStrategy.doExpansion(axioms, checker, progressMonitor);
     }
 
+    @Override
     public int getNumberOfSteps() {
         return 1;
     }

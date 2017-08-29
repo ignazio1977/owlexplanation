@@ -31,11 +31,13 @@ public class ConsoleExplanationProgressMonitor<E> implements ExplanationProgress
 
     private boolean cancel;
 
+    @Override
     public void foundExplanation(ExplanationGenerator<E> explanationGenerator, Explanation<E> explanation, Set<Explanation<E>> allExplanations) {
         System.out.println("Found explanation " + allExplanations.size() + ": ");
         System.out.println(explanation);
     }
 
+    @Override
     public boolean isCancelled() {
         return cancel;
     }

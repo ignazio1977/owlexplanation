@@ -54,6 +54,7 @@ public class MaskingDetectorDeltaImpl implements MaskingDetector {
         this.expGenFac = expGenFac;
     }
 
+    @Override
     public boolean isMaskingPresent(Explanation<OWLAxiom> explanation) {
         OWLDataFactory dataFactory = manager.getOWLDataFactory();
         StructuralTransformation st = new StructuralTransformation(dataFactory);

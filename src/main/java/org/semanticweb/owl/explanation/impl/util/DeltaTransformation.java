@@ -1,7 +1,6 @@
 package org.semanticweb.owl.explanation.impl.util;
 
 import org.semanticweb.owlapi.model.*;
-import org.semanticweb.owlapi.util.DefaultPrefixManager;
 
 import java.util.*;
 
@@ -17,15 +16,15 @@ public class DeltaTransformation implements AxiomTransformation {
 
     private OWLDataFactory dataFactory;
 
-    private Set<OWLEntity> freshEntities = new HashSet<OWLEntity>();
+    private Set<OWLEntity> freshEntities = new HashSet<>();
 
-    private Set<OWLAxiom> transformedAxioms = new HashSet<OWLAxiom>();
+    private Set<OWLAxiom> transformedAxioms = new HashSet<>();
 
 //    private OWLAnnotation currentAxiomAnnotation;
 
     private int currentAxiomCount = 0;
 
-    private Map<OWLAxiom, Integer> namingAxiom2ModalDepth = new HashMap<OWLAxiom, Integer>();
+    private Map<OWLAxiom, Integer> namingAxiom2ModalDepth = new HashMap<>();
 
     private int modalDepth = 0;
 
@@ -60,6 +59,7 @@ public class DeltaTransformation implements AxiomTransformation {
         return IRI.create("http://owlapi.sourceforge.net/transform/flattening#X" + freshIRICounter);
     }
 
+    @Override
     public Set<OWLAxiom> transform(Set<OWLAxiom> axioms) {
         transformedAxioms.clear();
         namingAxiom2ModalDepth.clear();
@@ -100,7 +100,7 @@ public class DeltaTransformation implements AxiomTransformation {
 
     private OWLNamedIndividual assignName(OWLIndividual individual) {
         OWLNamedIndividual freshIndividual = getFreshIndividual();
-        Set<OWLIndividual> individuals = new HashSet<OWLIndividual>();
+        Set<OWLIndividual> individuals = new HashSet<>();
         individuals.add(individual);
         individuals.add(freshIndividual);
 //        Set<OWLAnnotation> axiomId = Collections.singleton(currentAxiomAnnotation);
@@ -181,13 +181,14 @@ public class DeltaTransformation implements AxiomTransformation {
         private ClassExpressionTransformer negativeTransformer = new ClassExpressionTransformer(Polarity.NEGATIVE);
 
         private Set<OWLAxiom> visit(Collection<? extends OWLAxiom> axioms) {
-            Set<OWLAxiom> result = new HashSet<OWLAxiom>();
+            Set<OWLAxiom> result = new HashSet<>();
             for (OWLAxiom ax : axioms) {
                 result.addAll(ax.accept(this));
             }
             return result;
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLSubClassOfAxiom axiom) {
 //            if(!axiom.getSubClass().isAnonymous() && !axiom.getSuperClass().isAnonymous()) {
 //                return Collections.<OWLAxiom>singleton(axiom);
@@ -210,26 +211,30 @@ public class DeltaTransformation implements AxiomTransformation {
 //                freshSuper = axiom.getSuperClass().asOWLClass();
 //            }
 
-            Set<OWLAxiom> result = new HashSet<OWLAxiom>();
+            Set<OWLAxiom> result = new HashSet<>();
             result.add(dataFactory.getOWLSubClassOfAxiom(freshSub, freshSuper));
             return result;
 
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLNegativeObjectPropertyAssertionAxiom axiom) {
             return axiom.asOWLSubClassOfAxiom().accept(this);
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLAsymmetricObjectPropertyAxiom axiom) {
             return Collections.<OWLAxiom>singleton(axiom);
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLReflexiveObjectPropertyAxiom axiom) {
             return Collections.<OWLAxiom>singleton(axiom);
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLDisjointClassesAxiom axiom) {
-            Set<OWLAxiom> result = new HashSet<OWLAxiom>();
+            Set<OWLAxiom> result = new HashSet<>();
             // TODO: FIX!
 //            for(OWLAxiom ax : axiom.asOWLSubClassOfAxioms()) {
 //                result.addAll(ax.accept(this));
@@ -249,40 +254,48 @@ public class DeltaTransformation implements AxiomTransformation {
 //            }
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLDataPropertyDomainAxiom axiom) {
             return axiom.asOWLSubClassOfAxiom().accept(this);
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLObjectPropertyDomainAxiom axiom) {
             OWLClassExpression renamedDomain = axiom.getDomain().accept(positiveTransformer);
             OWLAxiom transformed = dataFactory.getOWLObjectPropertyDomainAxiom(axiom.getProperty(), renamedDomain);
             return Collections.singleton(transformed);
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLEquivalentObjectPropertiesAxiom axiom) {
             return visit(axiom.asSubObjectPropertyOfAxioms());
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLNegativeDataPropertyAssertionAxiom axiom) {
             return axiom.asOWLSubClassOfAxiom().accept(this);
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLDifferentIndividualsAxiom axiom) {
-            Set<OWLIndividual> renamed = new HashSet<OWLIndividual>();
+            Set<OWLIndividual> renamed = new HashSet<>();
             for(OWLIndividual ind : axiom.getIndividuals()) {
                 renamed.add(assignName(ind));
             }
             return Collections.<OWLAxiom>singleton(dataFactory.getOWLDifferentIndividualsAxiom(renamed));
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLDisjointDataPropertiesAxiom axiom) {
             return Collections.<OWLAxiom>singleton(axiom);
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLDisjointObjectPropertiesAxiom axiom) {
             return Collections.<OWLAxiom>singleton(axiom);
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLObjectPropertyRangeAxiom axiom) {
             modalDepth++;
             OWLClassExpression renamedRange = axiom.getRange().accept(positiveTransformer);
@@ -291,6 +304,7 @@ public class DeltaTransformation implements AxiomTransformation {
             return Collections.singleton(transformed);
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLObjectPropertyAssertionAxiom axiom) {
             OWLNamedIndividual renamedSubject = assignName(axiom.getSubject());
             OWLNamedIndividual renamedObject = assignName(axiom.getObject());
@@ -298,45 +312,55 @@ public class DeltaTransformation implements AxiomTransformation {
             return Collections.<OWLAxiom>singleton(flattendAx);
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLFunctionalObjectPropertyAxiom axiom) {
             return Collections.<OWLAxiom>singleton(axiom);
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLSubObjectPropertyOfAxiom axiom) {
             return Collections.<OWLAxiom>singleton(axiom);
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLDisjointUnionAxiom axiom) {
-            Set<OWLAxiom> result = new HashSet<OWLAxiom>();
+            Set<OWLAxiom> result = new HashSet<>();
             result.addAll(axiom.getOWLDisjointClassesAxiom().accept(this));
             result.addAll(axiom.getOWLEquivalentClassesAxiom().accept(this));
             return result;
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLDeclarationAxiom axiom) {
             return Collections.<OWLAxiom>singleton(axiom);
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLAnnotationAssertionAxiom axiom) {
             return Collections.<OWLAxiom>singleton(axiom);
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLSymmetricObjectPropertyAxiom axiom) {
             return Collections.<OWLAxiom>singleton(axiom);
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLDataPropertyRangeAxiom axiom) {
             return Collections.<OWLAxiom>singleton(axiom);
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLFunctionalDataPropertyAxiom axiom) {
             return Collections.<OWLAxiom>singleton(axiom);
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLEquivalentDataPropertiesAxiom axiom) {
             return visit(axiom.asSubDataPropertyOfAxioms());
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLClassAssertionAxiom axiom) {
             OWLClass renamedCls = assignName(axiom.getClassExpression(), Polarity.POSITIVE);
             OWLNamedIndividual renamedInd = assignName(axiom.getIndividual());
@@ -344,32 +368,39 @@ public class DeltaTransformation implements AxiomTransformation {
             return Collections.<OWLAxiom>singleton(flattenedAx);
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLEquivalentClassesAxiom axiom) {
             return visit(axiom.asOWLSubClassOfAxioms());
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLDataPropertyAssertionAxiom axiom) {
             return axiom.asOWLSubClassOfAxiom().accept(this);
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLTransitiveObjectPropertyAxiom axiom) {
             return Collections.<OWLAxiom>singleton(axiom);
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLIrreflexiveObjectPropertyAxiom axiom) {
             return Collections.<OWLAxiom>singleton(axiom);
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLSubDataPropertyOfAxiom axiom) {
             return Collections.<OWLAxiom>singleton(axiom);
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLInverseFunctionalObjectPropertyAxiom axiom) {
             return Collections.<OWLAxiom>singleton(axiom);
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLSameIndividualAxiom axiom) {
-            Set<OWLNamedIndividual> renamed = new HashSet<OWLNamedIndividual>();
+            Set<OWLNamedIndividual> renamed = new HashSet<>();
             for(OWLIndividual ind : axiom.getIndividuals()) {
                 renamed.add(assignName(ind));
             }
@@ -377,34 +408,42 @@ public class DeltaTransformation implements AxiomTransformation {
 
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLSubPropertyChainOfAxiom axiom) {
             return Collections.<OWLAxiom>singleton(axiom);
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLInverseObjectPropertiesAxiom axiom) {
             return visit(axiom.asSubObjectPropertyOfAxioms());
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLHasKeyAxiom axiom) {
             return Collections.<OWLAxiom>singleton(axiom);
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLDatatypeDefinitionAxiom axiom) {
             return Collections.<OWLAxiom>singleton(axiom);
         }
 
+        @Override
         public Set<OWLAxiom> visit(SWRLRule rule) {
             return Collections.<OWLAxiom>singleton(rule);
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLSubAnnotationPropertyOfAxiom axiom) {
             return Collections.<OWLAxiom>singleton(axiom);
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLAnnotationPropertyDomainAxiom axiom) {
             return Collections.<OWLAxiom>singleton(axiom);
         }
 
+        @Override
         public Set<OWLAxiom> visit(OWLAnnotationPropertyRangeAxiom axiom) {
             return Collections.<OWLAxiom>singleton(axiom);
         }
@@ -422,7 +461,7 @@ public class DeltaTransformation implements AxiomTransformation {
         }
 
         private Set<OWLClassExpression> getRenamedClasses(Set<OWLClassExpression> classes, boolean useSameName) {
-            Set<OWLClassExpression> result = new HashSet<OWLClassExpression>();
+            Set<OWLClassExpression> result = new HashSet<>();
             if(useSameName) {
                 OWLClass name = getFreshClass();
                 for(OWLClassExpression ce : classes) {
@@ -451,10 +490,12 @@ public class DeltaTransformation implements AxiomTransformation {
             return result;
         }
 
+        @Override
         public OWLClass visit(OWLClass ce) {
             return ce;
         }
 
+        @Override
         public OWLClassExpression visit(OWLObjectIntersectionOf ce) {
             Set<OWLClassExpression> renamedOperands = getRenamedClasses(ce.getOperands(), polarity.isPositive());
             if (renamedOperands.size() == 1) {
@@ -465,6 +506,7 @@ public class DeltaTransformation implements AxiomTransformation {
             }
         }
 
+        @Override
         public OWLClassExpression visit(OWLObjectUnionOf ce) {
             Set<OWLClassExpression> renamedOperands = getRenamedClasses(ce.getOperands(), !polarity.isPositive());
             if(renamedOperands.size() == 1) {
@@ -475,6 +517,7 @@ public class DeltaTransformation implements AxiomTransformation {
             }
         }
 
+        @Override
         public OWLClassExpression visit(OWLObjectComplementOf ce) {
             polarity = polarity.getReversePolarity();
             OWLClassExpression renamedComplement = assignName(ce.getOperand().accept(this), polarity);
@@ -482,6 +525,7 @@ public class DeltaTransformation implements AxiomTransformation {
             return dataFactory.getOWLObjectComplementOf(renamedComplement);
         }
 
+        @Override
         public OWLClassExpression visit(OWLObjectSomeValuesFrom ce) {
             modalDepth++;
             OWLClassExpression renamedFiller = assignName(ce.getFiller().accept(this), polarity);
@@ -490,6 +534,7 @@ public class DeltaTransformation implements AxiomTransformation {
             return dataFactory.getOWLObjectSomeValuesFrom(property, renamedFiller);
         }
 
+        @Override
         public OWLClassExpression visit(OWLObjectAllValuesFrom ce) {
             modalDepth++;
             OWLClassExpression renamedFiller = assignName(ce.getFiller().accept(this), polarity);
@@ -498,6 +543,7 @@ public class DeltaTransformation implements AxiomTransformation {
             return dataFactory.getOWLObjectAllValuesFrom(property, renamedFiller);
         }
 
+        @Override
         public OWLClassExpression visit(OWLObjectHasValue ce) {
             modalDepth++;
             OWLNamedIndividual renamedInd = assignName(ce.getValue());
@@ -505,6 +551,7 @@ public class DeltaTransformation implements AxiomTransformation {
             return dataFactory.getOWLObjectHasValue(ce.getProperty(), renamedInd);
         }
 
+        @Override
         public OWLClassExpression visit(OWLObjectMinCardinality ce) {
             modalDepth++;
             OWLClassExpression renamedFiller = assignName(ce.getFiller().accept(this), polarity);
@@ -514,10 +561,12 @@ public class DeltaTransformation implements AxiomTransformation {
             return dataFactory.getOWLObjectMinCardinality(cardi, prop, renamedFiller);
         }
 
+        @Override
         public OWLClassExpression visit(OWLObjectExactCardinality ce) {
             return ce.asIntersectionOfMinMax().accept(this);
         }
 
+        @Override
         public OWLClassExpression visit(OWLObjectMaxCardinality ce) {
             polarity = polarity.getReversePolarity();
             modalDepth++;
@@ -529,18 +578,21 @@ public class DeltaTransformation implements AxiomTransformation {
             return dataFactory.getOWLObjectMaxCardinality(cardi, prop, renamedFiller);
         }
 
+        @Override
         public OWLClassExpression visit(OWLObjectHasSelf ce) {
             return ce;
         }
 
+        @Override
         public OWLClassExpression visit(OWLObjectOneOf ce) {
-            Set<OWLNamedIndividual> renamed = new HashSet<OWLNamedIndividual>();
+            Set<OWLNamedIndividual> renamed = new HashSet<>();
             for(OWLIndividual ind : ce.getIndividuals()) {
                 renamed.add(assignName(ind));
             }
             return dataFactory.getOWLObjectOneOf(renamed);
         }
 
+        @Override
         public OWLClassExpression visit(OWLDataSomeValuesFrom ce) {
 //            modalDepth++;
 //            OWLDatatype renamedFiller = assignName(ce.getFiller().accept(this), polarity);
@@ -549,22 +601,27 @@ public class DeltaTransformation implements AxiomTransformation {
             return ce;
         }
 
+        @Override
         public OWLClassExpression visit(OWLDataAllValuesFrom ce) {
             return ce;
         }
 
+        @Override
         public OWLClassExpression visit(OWLDataHasValue ce) {
             return ce;
         }
 
+        @Override
         public OWLClassExpression visit(OWLDataMinCardinality ce) {
             return ce;
         }
 
+        @Override
         public OWLClassExpression visit(OWLDataExactCardinality ce) {
             return ce;
         }
 
+        @Override
         public OWLClassExpression visit(OWLDataMaxCardinality ce) {
             return ce;
         }

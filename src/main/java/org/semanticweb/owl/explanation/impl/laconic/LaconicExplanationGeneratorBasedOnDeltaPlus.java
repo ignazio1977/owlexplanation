@@ -32,7 +32,7 @@ public class LaconicExplanationGeneratorBasedOnDeltaPlus implements ExplanationG
     private Supplier<OWLOntologyManager> m;
 
     public LaconicExplanationGeneratorBasedOnDeltaPlus(Set<? extends OWLAxiom> inputAxioms, EntailmentCheckerFactory<OWLAxiom> entailmentCheckerFactory, ExplanationGeneratorFactory<OWLAxiom> delegateFactory, ExplanationProgressMonitor<OWLAxiom> progressMonitor, Supplier<OWLOntologyManager> m) {
-        this.inputAxioms = new HashSet<OWLAxiom>(inputAxioms);
+        this.inputAxioms = new HashSet<>(inputAxioms);
         this.entailmentCheckerFactory = entailmentCheckerFactory;
         this.delegateFactory = delegateFactory;
         this.progressMonitor = progressMonitor;
@@ -46,6 +46,7 @@ public class LaconicExplanationGeneratorBasedOnDeltaPlus implements ExplanationG
      * @throws org.semanticweb.owl.explanation.api.ExplanationException
      *          if there was a problem generating the explanation.
      */
+    @Override
     public Set<Explanation<OWLAxiom>> getExplanations(OWLAxiom entailment) throws ExplanationException {
         return getExplanations(entailment, Integer.MAX_VALUE);
     }
@@ -59,8 +60,9 @@ public class LaconicExplanationGeneratorBasedOnDeltaPlus implements ExplanationG
      * @throws org.semanticweb.owl.explanation.api.ExplanationException
      *          if there was a problem generating the explanation.
      */
+    @Override
     public Set<Explanation<OWLAxiom>> getExplanations(OWLAxiom entailment, int limit) throws ExplanationException {
-        final Set<OWLEntity> signature = new HashSet<OWLEntity>();
+        final Set<OWLEntity> signature = new HashSet<>();
         for(OWLAxiom ax : inputAxioms) {
             signature.addAll(ax.getSignature());
         }
@@ -96,16 +98,16 @@ public class LaconicExplanationGeneratorBasedOnDeltaPlus implements ExplanationG
 //        }
 
         IsLaconicChecker checker = new IsLaconicChecker(dataFactory, entailmentCheckerFactory, LaconicCheckerMode.EARLY_TERMINATING);
-        Set<Explanation<OWLAxiom>> laconicExplanations = new HashSet<Explanation<OWLAxiom>>();
-        Set<Explanation<OWLAxiom>> nonLaconicExplanations = new HashSet<Explanation<OWLAxiom>>();
+        Set<Explanation<OWLAxiom>> laconicExplanations = new HashSet<>();
+        Set<Explanation<OWLAxiom>> nonLaconicExplanations = new HashSet<>();
         for(Explanation<OWLAxiom> expl : expls) {
             DeltaTransformationUnfolder unfolder = new DeltaTransformationUnfolder(dataFactory);
             Set<OWLAxiom> unfoldedAxioms = unfolder.getUnfolded(expl.getAxioms(), signature);
-            Explanation<OWLAxiom> unfoldedExpl = new Explanation<OWLAxiom>(entailment, unfoldedAxioms);
+            Explanation<OWLAxiom> unfoldedExpl = new Explanation<>(entailment, unfoldedAxioms);
             if(checker.isLaconic(unfoldedExpl)) {
                 boolean added = laconicExplanations.add(unfoldedExpl);
                 if (added) {
-                    progressMonitor.foundExplanation(this, unfoldedExpl, new HashSet<Explanation<OWLAxiom>>(laconicExplanations));
+                    progressMonitor.foundExplanation(this, unfoldedExpl, new HashSet<>(laconicExplanations));
                 }
             }
             else {

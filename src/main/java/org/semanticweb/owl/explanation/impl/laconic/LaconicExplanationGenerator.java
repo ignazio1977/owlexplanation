@@ -67,9 +67,9 @@ public class LaconicExplanationGenerator<E> implements ExplanationGenerator<E>, 
             this.progressMonitor = progressMonitor;
         }
         else {
-            this.progressMonitor = new NullExplanationProgressMonitor<E>();
+            this.progressMonitor = new NullExplanationProgressMonitor<>();
         }
-        this.foundLaconicJustifications = new HashSet<Explanation<E>>();
+        this.foundLaconicJustifications = new HashSet<>();
         try {
             this.ont = man.createOntology(Collections.unmodifiableSet(axioms));
         }
@@ -79,13 +79,13 @@ public class LaconicExplanationGenerator<E> implements ExplanationGenerator<E>, 
         catch (OWLOntologyChangeException e) {
             e.printStackTrace();
         }
-        lastRegularJusts = new HashSet<Explanation<E>>();
+        lastRegularJusts = new HashSet<>();
     }
 
 
     public Set<OWLAxiom> computeOPlus(Set<OWLAxiom> axioms) {
         OPlusGenerator oPlusGenerator = new OPlusGenerator(man.getOWLDataFactory(), OPlusSplitting.TOP_LEVEL);
-        Set<OWLAxiom> oPlus = new HashSet<OWLAxiom>();
+        Set<OWLAxiom> oPlus = new HashSet<>();
         for (OWLAxiom ax : axioms) {
             Set<? extends OWLAxiom> weakenedAxioms = ax.accept(oPlusGenerator);
             oPlus.addAll(weakenedAxioms);
@@ -142,6 +142,7 @@ public class LaconicExplanationGenerator<E> implements ExplanationGenerator<E>, 
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    @Override
     public void foundExplanation(ExplanationGenerator<E> explanationGenerator, Explanation<E> explanation, Set<Explanation<E>> allFoundExplanations) {
         notifyLaconicExplanationGeneratorProgressMonitor(explanation);
     }
@@ -152,6 +153,7 @@ public class LaconicExplanationGenerator<E> implements ExplanationGenerator<E>, 
      * found enough justifications up to the limit.
      * @return <code>true</code> if cancelled or <code>false</code> if not cancelled
      */
+    @Override
     public boolean isCancelled() {
         return isAtFoundLaconicJustificationsLimit() || progressMonitor.isCancelled();
     }
@@ -178,7 +180,7 @@ public class LaconicExplanationGenerator<E> implements ExplanationGenerator<E>, 
     // END of progress monitor implementation
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public Set<Explanation<E>> computePreciseJustsOptimised(E entailment, int limit) throws OWLException {
+    public Set<Explanation<E>> computePreciseJustsOptimised(E entailment, int limit) {
         this.limit = limit;
         foundLaconicJustifications.clear();
         ExplanationGenerator<E> gen = explanationGeneratorFactory.createExplanationGenerator(axioms, this);
@@ -196,13 +198,13 @@ public class LaconicExplanationGenerator<E> implements ExplanationGenerator<E>, 
         lastRegularJusts.clear();
 
         // Initialise the current set of justifications with the regular justifications.
-        allPreviouslyFoundJustifications = new HashSet<Explanation<E>>();
+        allPreviouslyFoundJustifications = new HashSet<>();
         allPreviouslyFoundJustifications.addAll(regularJusts);
 
 //        Set<Explanation<E>> nonLaconicJusts = new HashSet<Explanation<E>>();
 //        Set<Explanation<E>> laconicJusts = new HashSet<Explanation<E>>();
 
-        Set<OWLAxiom> axiomsInPreviousOntology = new HashSet<OWLAxiom>();
+        Set<OWLAxiom> axiomsInPreviousOntology = new HashSet<>();
 
         // We compute justifications until we can't find anymore
         while (true) {
@@ -213,14 +215,14 @@ public class LaconicExplanationGenerator<E> implements ExplanationGenerator<E>, 
             // Now we take the union of our current set of justifications and compute
             // O+ from this set.
 
-            Set<OWLAxiom> unionOfAllJustifications = new HashSet<OWLAxiom>();
+            Set<OWLAxiom> unionOfAllJustifications = new HashSet<>();
             for (Explanation<E> exp : allPreviouslyFoundJustifications) {
                 unionOfAllJustifications.addAll(exp.getAxioms());
             }
             Set<OWLAxiom> oPlus = computeOPlus(unionOfAllJustifications);
 
             // Create our new ontology.
-            Set<OWLAxiom> augmentedAxioms = new HashSet<OWLAxiom>(oPlus);
+            Set<OWLAxiom> augmentedAxioms = new HashSet<>(oPlus);
 
             ///////////////////////////////////////////////////////////////////////////
             // OPTIMISATION
@@ -258,7 +260,7 @@ public class LaconicExplanationGenerator<E> implements ExplanationGenerator<E>, 
             axiomsInPreviousOntology.clear();
             axiomsInPreviousOntology.addAll(augmentedAxioms);
 
-            Set<Explanation> allPrevJustsCopy = new HashSet<Explanation>(allPreviouslyFoundJustifications);
+            Set<Explanation> allPrevJustsCopy = new HashSet<>(allPreviouslyFoundJustifications);
 
             // Create a generator that gets ALL explanations from OPlus
             Set<Explanation<E>> currentJustifications = null;
@@ -348,7 +350,7 @@ public class LaconicExplanationGenerator<E> implements ExplanationGenerator<E>, 
         // We merge axioms that have the same LHS and same source checker.  Although the
         // explanations that we operate on are already laconic, we end up producing explanations
         // that will be closer to the asserted axioms
-        Map<OWLAxiom, Set<OWLAxiom>> sourceAxioms2OPlus = new HashMap<OWLAxiom, Set<OWLAxiom>>();
+        Map<OWLAxiom, Set<OWLAxiom>> sourceAxioms2OPlus = new HashMap<>();
 
         for (Explanation<E> exp : allPreviouslyFoundJustifications) {
             for (OWLAxiom ax : exp.getAxioms()) {
@@ -358,12 +360,12 @@ public class LaconicExplanationGenerator<E> implements ExplanationGenerator<E>, 
             }
         }
 
-        Set<Explanation<E>> reconstituedExplanations = new HashSet<Explanation<E>>();
+        Set<Explanation<E>> reconstituedExplanations = new HashSet<>();
         for (Explanation<E> laconicExp : foundLaconicJustifications) {
             // SubClass -> Source Axiom -> SubClass Axiom
-            Map<OWLClass, Map<OWLAxiom, Set<OWLSubClassOfAxiom>>> lhs2SubClassAxiom = new HashMap<OWLClass, Map<OWLAxiom, Set<OWLSubClassOfAxiom>>>();
+            Map<OWLClass, Map<OWLAxiom, Set<OWLSubClassOfAxiom>>> lhs2SubClassAxiom = new HashMap<>();
 
-            Set<OWLAxiom> reconstituedAxioms = new HashSet<OWLAxiom>();
+            Set<OWLAxiom> reconstituedAxioms = new HashSet<>();
             for (OWLAxiom laconicAx : laconicExp.getAxioms()) {
                 if (laconicAx instanceof OWLSubClassOfAxiom) {
                     OWLSubClassOfAxiom sca = (OWLSubClassOfAxiom) laconicAx;
@@ -374,14 +376,14 @@ public class LaconicExplanationGenerator<E> implements ExplanationGenerator<E>, 
                     }
                     Map<OWLAxiom, Set<OWLSubClassOfAxiom>> source2AxiomMap = lhs2SubClassAxiom.get(sca.getSubClass().asOWLClass());
                     if (source2AxiomMap == null) {
-                        source2AxiomMap = new HashMap<OWLAxiom, Set<OWLSubClassOfAxiom>>();
+                        source2AxiomMap = new HashMap<>();
                         lhs2SubClassAxiom.put(sca.getSubClass().asOWLClass(), source2AxiomMap);
                     }
                     for (OWLAxiom sourceAx : sourceAxioms2OPlus.keySet()) {
                         if (sourceAxioms2OPlus.get(sourceAx).contains(sca)) {
                             Set<OWLSubClassOfAxiom> subClassAxioms = source2AxiomMap.get(sourceAx);
                             if (subClassAxioms == null) {
-                                subClassAxioms = new HashSet<OWLSubClassOfAxiom>();
+                                subClassAxioms = new HashSet<>();
                                 source2AxiomMap.put(sourceAx, subClassAxioms);
                             }
                             subClassAxioms.add(sca);
@@ -393,11 +395,11 @@ public class LaconicExplanationGenerator<E> implements ExplanationGenerator<E>, 
                 }
             }
             // Right, now we have sorted everything, we merge axioms that have a common LHS and common source
-            Set<OWLSubClassOfAxiom> consumedAxioms = new HashSet<OWLSubClassOfAxiom>();
+            Set<OWLSubClassOfAxiom> consumedAxioms = new HashSet<>();
             for (OWLClass lhs : lhs2SubClassAxiom.keySet()) {
                 Map<OWLAxiom, Set<OWLSubClassOfAxiom>> source2SubClassAxiom = lhs2SubClassAxiom.get(lhs);
                 for (OWLAxiom source : source2SubClassAxiom.keySet()) {
-                    Set<OWLClassExpression> rightHandSides = new HashSet<OWLClassExpression>();
+                    Set<OWLClassExpression> rightHandSides = new HashSet<>();
                     for (OWLSubClassOfAxiom subClassAx : source2SubClassAxiom.get(source)) {
                         if (!consumedAxioms.contains(subClassAx)) {
                             rightHandSides.add(subClassAx.getSuperClass());
@@ -413,7 +415,7 @@ public class LaconicExplanationGenerator<E> implements ExplanationGenerator<E>, 
                     }
                 }
             }
-            Explanation<E> explanation = new Explanation<E>(laconicExp.getEntailment(), reconstituedAxioms);
+            Explanation<E> explanation = new Explanation<>(laconicExp.getEntailment(), reconstituedAxioms);
             reconstituedExplanations.add(explanation);
 
         }
@@ -427,23 +429,15 @@ public class LaconicExplanationGenerator<E> implements ExplanationGenerator<E>, 
     ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+    @Override
     public Set<Explanation<E>> getExplanations(E entailment) throws ExplanationException {
-        try {
-            return computePreciseJustsOptimised(entailment, Integer.MAX_VALUE);
-        }
-        catch (OWLException e) {
-            throw new ExplanationException(e);
-        }
+        return computePreciseJustsOptimised(entailment, Integer.MAX_VALUE);
     }
 
 
+    @Override
     public Set<Explanation<E>> getExplanations(E entailment, int limit) throws ExplanationException {
-        try {
-            return computePreciseJustsOptimised(entailment, limit);
-        }
-        catch (OWLException e) {
-            throw new ExplanationException(e);
-        }
+        return computePreciseJustsOptimised(entailment, limit);
     }
 
 

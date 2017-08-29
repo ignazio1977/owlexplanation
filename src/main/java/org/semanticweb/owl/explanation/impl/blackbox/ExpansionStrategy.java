@@ -2,7 +2,6 @@ package org.semanticweb.owl.explanation.impl.blackbox;
 
 import org.semanticweb.owl.explanation.api.ExplanationProgressMonitor;
 import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLException;
 
 import java.util.Set;
 

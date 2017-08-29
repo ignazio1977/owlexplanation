@@ -1,7 +1,5 @@
 package org.semanticweb.owl.explanation.impl.setree;
 
-import org.semanticweb.owlapi.model.OWLAxiom;
-
 import java.util.*;
 
 /**
@@ -12,9 +10,9 @@ import java.util.*;
  */
 public class SETreeBuilder<O> {
 
-    private List<O> elements = new ArrayList<O>();
+    private List<O> elements = new ArrayList<>();
 
-    private Map<O, Integer> indexMap = new HashMap<O, Integer>();
+    private Map<O, Integer> indexMap = new HashMap<>();
 
     public SETreeBuilder(List<O> axioms) {
         this.elements = axioms;
@@ -26,7 +24,7 @@ public class SETreeBuilder<O> {
     }
 
     public SETreeNode buildTree() {
-        SETreeNode<O> root = new SETreeNode<O>(Collections.<O>emptyList());
+        SETreeNode<O> root = new SETreeNode<>(Collections.<O>emptyList());
         extendNode(root);
         return root;
     }
@@ -34,9 +32,9 @@ public class SETreeBuilder<O> {
     private void extendNode(SETreeNode<O> node) {
         int maxIndex = getMaxIndex(node);
         for(int i = maxIndex; i < elements.size(); i++) {
-            List<O> nodeElements = new ArrayList<O>(node.getElements());
+            List<O> nodeElements = new ArrayList<>(node.getElements());
             nodeElements.add(elements.get(i));
-            SETreeNode<O> child = new SETreeNode<O>(nodeElements);
+            SETreeNode<O> child = new SETreeNode<>(nodeElements);
             node.addChild(child);
             extendNode(child);
         }
@@ -71,7 +69,7 @@ public class SETreeBuilder<O> {
 
     public static void main(String[] args) {
         List<Integer> list = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21);
-        SETreeBuilder<Integer> builder = new SETreeBuilder<Integer>(list);
+        SETreeBuilder<Integer> builder = new SETreeBuilder<>(list);
         SETreeNode root = builder.buildTree();
 //        builder.dump(root);
     }

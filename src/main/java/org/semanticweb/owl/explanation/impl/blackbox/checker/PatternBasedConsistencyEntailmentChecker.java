@@ -26,29 +26,35 @@ public class PatternBasedConsistencyEntailmentChecker implements EntailmentCheck
 
     private int counter = 0;
     
+    @Override
     public int getCounter() {
         return counter;
     }
 
+    @Override
     public void resetCounter() {
         counter = 0;
     }
 
+    @Override
     public OWLAxiom getEntailment() {
         return delegate.getEntailment();
     }
 
+    @Override
     public Set<OWLEntity> getEntailmentSignature() {
         return delegate.getEntailmentSignature();
     }
 
+    @Override
     public Set<OWLEntity> getSeedSignature() {
         return Collections.emptySet();
     }
 
+    @Override
     public boolean isEntailed(Set<OWLAxiom> axioms) {
        
-        Map<OWLIndividual, Map<OWLDataPropertyExpression, Set<OWLLiteral>>> subjPredObjectMap = new HashMap<OWLIndividual, Map<OWLDataPropertyExpression, Set<OWLLiteral>>>();
+        Map<OWLIndividual, Map<OWLDataPropertyExpression, Set<OWLLiteral>>> subjPredObjectMap = new HashMap<>();
         for(OWLAxiom ax : axioms) {
             if(ax instanceof OWLDataPropertyAssertionAxiom) {
                 OWLDataPropertyExpression prop = ((OWLDataPropertyAssertionAxiom) ax).getProperty();
@@ -57,18 +63,18 @@ public class PatternBasedConsistencyEntailmentChecker implements EntailmentCheck
                     OWLIndividual subject = ((OWLDataPropertyAssertionAxiom) ax).getSubject();
                     Map<OWLDataPropertyExpression, Set<OWLLiteral>> propObjectMap = subjPredObjectMap.get(subject);
                     if(propObjectMap == null) {
-                        propObjectMap = new HashMap<OWLDataPropertyExpression, Set<OWLLiteral>>();
+                        propObjectMap = new HashMap<>();
                         subjPredObjectMap.put(subject, propObjectMap);
                     }
                     Set<OWLLiteral> objects = propObjectMap.get(prop);
                     if(objects == null) {
-                        objects = new HashSet<OWLLiteral>();
+                        objects = new HashSet<>();
                         propObjectMap.put(prop, objects);
                     }
                     OWLLiteral object = ((OWLDataPropertyAssertionAxiom) ax).getObject();
                     objects.add(object);
                     if(objects.size() > 1) {
-                        Set<OWLAxiom> candidateJustification = new HashSet<OWLAxiom>(3);
+                        Set<OWLAxiom> candidateJustification = new HashSet<>(3);
                         candidateJustification.add(funcAx);
                         for(OWLLiteral lit : objects) {
                             candidateJustification.add(df.getOWLDataPropertyAssertionAxiom(prop, subject, lit));
@@ -84,19 +90,23 @@ public class PatternBasedConsistencyEntailmentChecker implements EntailmentCheck
         return delegate.isEntailed(axioms);
     }
 
+    @Override
     public Set<OWLAxiom> getModule(Set<OWLAxiom> axioms) {
         return delegate.getModule(axioms);
     }
 
 
+    @Override
     public String getModularisationTypeDescription() {
         return delegate.getModularisationTypeDescription();
     }
 
+    @Override
     public boolean isUseModularisation() {
         return delegate.isUseModularisation();
     }
 
+    @Override
     public Set<OWLAxiom> getEntailingAxioms(Set<OWLAxiom> axioms) {
         return delegate.getEntailingAxioms(axioms);
     }

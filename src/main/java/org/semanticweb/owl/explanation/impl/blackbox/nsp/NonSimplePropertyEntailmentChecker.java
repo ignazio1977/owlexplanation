@@ -49,28 +49,34 @@ public class NonSimplePropertyEntailmentChecker implements EntailmentChecker<OWL
     }
 
 
+    @Override
     public int getCounter() {
         return counter;
     }
 
+    @Override
     public void resetCounter() {
         counter = 0;
     }
 
+    @Override
     public Set<OWLEntity> getSeedSignature() {
         return prop.getSignature();
     }
 
+    @Override
     public OWLObjectPropertyExpression getEntailment() {
         return prop;
     }
 
 
+    @Override
     public Set<OWLEntity> getEntailmentSignature() {
         return prop.getSignature();
     }
 
 
+    @Override
     public boolean isEntailed(Set<OWLAxiom> axioms) {
         try {
             counter++;
@@ -83,12 +89,14 @@ public class NonSimplePropertyEntailmentChecker implements EntailmentChecker<OWL
         }
     }
 
+    @Override
     public Set<OWLAxiom> getEntailingAxioms(Set<OWLAxiom> axioms) {
         return axioms;
     }
 
+    @Override
     public Set<OWLAxiom> getModule(Set<OWLAxiom> axioms) {
-        Set<OWLAxiom> module = new HashSet<OWLAxiom>(axioms.size());
+        Set<OWLAxiom> module = new HashSet<>(axioms.size());
         for(OWLAxiom ax : axioms) {
             if(ax instanceof OWLSubPropertyAxiom) {
                 module.add(ax);
@@ -109,10 +117,12 @@ public class NonSimplePropertyEntailmentChecker implements EntailmentChecker<OWL
         return module;
     }
 
+    @Override
     public String getModularisationTypeDescription() {
         return "SubPropertyOf axioms only";
     }
 
+    @Override
     public boolean isUseModularisation() {
         return true;
     }

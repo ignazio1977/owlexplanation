@@ -33,9 +33,11 @@ import java.util.Set;/*
 public class NullExplanationProgressMonitor<E> implements ExplanationProgressMonitor<E> {
 
 
+    @Override
     public void foundExplanation(ExplanationGenerator<E> explanationGenerator, Explanation<E> eExplanation, Set<Explanation<E>> allFoundExplanations) {
     }
 
+    @Override
     public boolean isCancelled() {
         return false;
     }

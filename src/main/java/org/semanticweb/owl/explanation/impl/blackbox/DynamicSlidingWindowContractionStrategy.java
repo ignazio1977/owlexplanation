@@ -47,11 +47,12 @@ public class DynamicSlidingWindowContractionStrategy implements ContractionStrat
 
 
 
+    @Override
     public Set<OWLAxiom> doPruning(Set<OWLAxiom> axioms, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor) {
         count = 0;
 
 
-        Set<OWLAxiom> contraction = new HashSet<OWLAxiom>(axioms);
+        Set<OWLAxiom> contraction = new HashSet<>(axioms);
 
         int lastContractionSize = -1;
         while (true) {
@@ -73,7 +74,7 @@ public class DynamicSlidingWindowContractionStrategy implements ContractionStrat
 
 
         // Slow
-        Set<OWLAxiom> contractionCopy = new HashSet<OWLAxiom>(contraction);
+        Set<OWLAxiom> contractionCopy = new HashSet<>(contraction);
         for(OWLAxiom ax : contractionCopy) {
             contraction.remove(ax);
             count++;
@@ -85,6 +86,7 @@ public class DynamicSlidingWindowContractionStrategy implements ContractionStrat
         return contraction;
     }
 
+    @Override
     public int getNumberOfSteps() {
         return count;
     }
@@ -92,7 +94,7 @@ public class DynamicSlidingWindowContractionStrategy implements ContractionStrat
     private void doFastPruning(EntailmentChecker checker,
                                Set<OWLAxiom> contraction,
                                int roundWindowSize) {
-        List<OWLAxiom> axiomList = new ArrayList<OWLAxiom>(contraction);
+        List<OWLAxiom> axiomList = new ArrayList<>(contraction);
         int windowCount = axiomList.size() / roundWindowSize;
         for(int windowIndex = 0; windowIndex < windowCount; windowIndex++) {
             int start = windowIndex * roundWindowSize;

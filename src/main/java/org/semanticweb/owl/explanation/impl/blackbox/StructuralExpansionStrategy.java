@@ -44,17 +44,18 @@ public class StructuralExpansionStrategy implements ExpansionStrategy {
         this.m = m;
     }
 
+    @Override
     public Set<OWLAxiom> doExpansion(final Set<OWLAxiom> axioms, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor) {
 
         count = 0;
         try {
             OWLOntology ont = m.get().createOntology(axioms);
 
-            Set<OWLEntity> entailmentSignature = new HashSet<OWLEntity>();
+            Set<OWLEntity> entailmentSignature = new HashSet<>();
             entailmentSignature.addAll(checker.getEntailmentSignature());
 
 
-            Set<OWLAxiom> expansion = new HashSet<OWLAxiom>();
+            Set<OWLAxiom> expansion = new HashSet<>();
             for (OWLEntity ent : entailmentSignature) {
                 expansion.addAll(ont.getReferencingAxioms(ent));
             }
@@ -69,7 +70,7 @@ public class StructuralExpansionStrategy implements ExpansionStrategy {
                 }
 
                 // Add some more
-                for (OWLAxiom ax : new HashSet<OWLAxiom>(expansion)) {
+                for (OWLAxiom ax : new HashSet<>(expansion)) {
                     for (OWLEntity ent : ax.getSignature()) {
                         Set<OWLAxiom> owlAxioms = ont.getReferencingAxioms(ent);
                         expansion.addAll(owlAxioms);
@@ -82,6 +83,7 @@ public class StructuralExpansionStrategy implements ExpansionStrategy {
         }
     }
 
+    @Override
     public int getNumberOfSteps() {
         return count;
     }

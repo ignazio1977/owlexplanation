@@ -63,7 +63,7 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
 
     private ExplanationProgressMonitor<E> progressMonitor;
 
-    private List<Integer> prunningDifferences = new ArrayList<Integer>();
+    private List<Integer> prunningDifferences = new ArrayList<>();
 
     private int hittingSetTreeOperationsCount = 0;
     
@@ -80,14 +80,14 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
      * @param progressMonitor     A progress monitor - may be <code>null</code>
      */
     public BlackBoxExplanationGenerator(Set<? extends OWLAxiom> axioms, EntailmentCheckerFactory<E> checkerFactory, ExpansionStrategy expansionStrategy, ContractionStrategy contractionStrategy, ExplanationProgressMonitor<E> progressMonitor) {
-        workingAxioms = new HashSet<OWLAxiom>(axioms);
+        workingAxioms = new HashSet<>(axioms);
         this.checkerFactory = checkerFactory;
         this.expansionStrategy = expansionStrategy;
         this.contractionStrategy = contractionStrategy;
         if (progressMonitor != null) {
             this.progressMonitor = progressMonitor;
         } else {
-            this.progressMonitor = new NullExplanationProgressMonitor<E>();
+            this.progressMonitor = new NullExplanationProgressMonitor<>();
         }
     }
 
@@ -107,24 +107,26 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
     //////////////////////////////////////////////////////////////////////////////////////////
 
 
+    @Override
     public Set<Explanation<E>> getExplanations(E entailment) throws ExplanationException {
         return getExplanations(entailment, Integer.MAX_VALUE);
     }
 
 
+    @Override
     public Set<Explanation<E>> getExplanations(E entailment, int limit) throws ExplanationException {
         try {
             module = extractModule(workingAxioms, checkerFactory.createEntailementChecker(entailment));
             hittingSetTreeOperationsCount = 0;
             prunningDifferences.clear();
-            Set<Explanation<E>> explanations = new HashSet<Explanation<E>>();
+            Set<Explanation<E>> explanations = new HashSet<>();
             Explanation<E> expl = computeExplanation(entailment);
             explanations.add(expl);
             progressMonitor.foundExplanation(this, expl, Collections.unmodifiableSet(explanations));
             if (progressMonitor.isCancelled()) {
                 return Collections.singleton(expl);
             }
-            hst = new MutableTree<Explanation>(expl);
+            hst = new MutableTree<>(expl);
             if (expl.isEmpty()) {
                 return Collections.emptySet();
             }
@@ -164,9 +166,9 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
 //
 //
     private void dumpHSTStats() {
-        Map<OWLAxiom, Integer> map = new HashMap<OWLAxiom, Integer>();
+        Map<OWLAxiom, Integer> map = new HashMap<>();
         collectEmptyNodes(hst, map);
-        TreeMap<Integer, OWLAxiom> orderedMap = new TreeMap<Integer, OWLAxiom>();
+        TreeMap<Integer, OWLAxiom> orderedMap = new TreeMap<>();
         for (OWLAxiom ax : map.keySet()) {
             orderedMap.put(map.get(ax), ax);
         }
@@ -245,7 +247,7 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
         prunningDifferences.add(prunningDifference);
 
 
-        Explanation<E> expl = new Explanation<E>(entailment, justification);
+        Explanation<E> expl = new Explanation<>(entailment, justification);
 
 
         handlePostContraction(checker, expandedAxioms, justification);
@@ -255,7 +257,6 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
 
 
     protected Set<OWLAxiom> extractModule(Set<OWLAxiom> axioms, EntailmentChecker<E> checker) throws
-            OWLOntologyCreationException,
             OWLOntologyChangeException {
         return checker.getModule(axioms);
     }
@@ -277,6 +278,7 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
      */
     private static <E> List<OWLAxiom> getOrderedJustifications(List<OWLAxiom> mups, final Set<Explanation<E>> allJustifications) {
         Comparator<OWLAxiom> mupsComparator = new Comparator<OWLAxiom>() {
+            @Override
             public int compare(OWLAxiom o1, OWLAxiom o2) {
                 // The checker that appears in most MUPS has the lowest index
                 // in the list
@@ -308,7 +310,7 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
         return count;
     }
 
-    private Map<OWLAxiom, Integer> axiom2LeafCount = new HashMap<OWLAxiom, Integer>();
+    private Map<OWLAxiom, Integer> axiom2LeafCount = new HashMap<>();
 
 
 
@@ -332,7 +334,7 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
 //        dumpHSTNodeDiagnostics(entailment, justification, allJustifications, currentPathContents);
         // We go through the current justifications, checker by checker, and extend the tree
         // with edges for each checker
-        List<OWLAxiom> orderedJustification = getOrderedJustifications(new ArrayList<OWLAxiom>(justification.getAxioms()), allJustifications);
+        List<OWLAxiom> orderedJustification = getOrderedJustifications(new ArrayList<>(justification.getAxioms()), allJustifications);
 
         while (!orderedJustification.isEmpty()) {
             OWLAxiom axiom = orderedJustification.get(0);
@@ -360,7 +362,7 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
             if (!earlyTermination) {
                 Explanation<E> newJustification = null;
                 for (Explanation<E> foundJustification : allJustifications) {
-                    Set<OWLAxiom> foundMUPSCopy = new HashSet<OWLAxiom>(foundJustification.getAxioms());
+                    Set<OWLAxiom> foundMUPSCopy = new HashSet<>(foundJustification.getAxioms());
                     foundMUPSCopy.retainAll(currentPathContents);
                     if (foundMUPSCopy.isEmpty()) {
                         // Justification reuse
@@ -404,9 +406,9 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
                     orderedJustification = getOrderedJustifications(orderedJustification, allJustifications);
                 } else {
                     // End of current path - add it to the list of paths
-                    satPaths.add(new HashSet<OWLAxiom>(currentPathContents));
-                    Explanation exp = new Explanation<E>(entailment, new HashSet<OWLAxiom>(0));
-                    MutableTree<Explanation> node = new MutableTree<Explanation>(exp);
+                    satPaths.add(new HashSet<>(currentPathContents));
+                    Explanation exp = new Explanation<>(entailment, new HashSet<OWLAxiom>(0));
+                    MutableTree<Explanation> node = new MutableTree<>(exp);
 //                    currentNode.addChild(node, checker);
 //                    increment(checker);
                 }
@@ -486,6 +488,7 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
             sb.append("----------------------------\n");
 
             tree.setNodeRenderer(new NodeRenderer<OWLAxiom>() {
+                @Override
                 public String render(Tree<OWLAxiom> node) {
                     if (justification.contains(node.getUserObject())) {
                         return "*\t" + node;

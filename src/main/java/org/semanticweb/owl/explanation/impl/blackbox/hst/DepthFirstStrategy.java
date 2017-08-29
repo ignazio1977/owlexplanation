@@ -40,6 +40,7 @@ public class DepthFirstStrategy<E> implements HittingSetTreeConstructionStrategy
     public void start(HittingSetTree<E> hittingSetTree) {
     }
 
+    @Override
     public void constructTree(HittingSetTree<E> hittingSetTree, int limit, ExplanationGeneratorMediator<E> handler) {
         buildHittingSetTree(hittingSetTree, limit, handler, hittingSetTree.getRoot());
     }
@@ -47,7 +48,7 @@ public class DepthFirstStrategy<E> implements HittingSetTreeConstructionStrategy
     public void buildHittingSetTree(HittingSetTree<E> hittingSetTree, int limit, ExplanationGeneratorMediator<E> handler, HittingSetTreeNode<E> currentNode) {
         for (OWLAxiom ax : currentNode.getExplanation().getAxioms()) {
             handler.removeAxiom(ax);
-            Set<OWLAxiom> pathContents = new HashSet<OWLAxiom>(currentNode.getPathToRoot());
+            Set<OWLAxiom> pathContents = new HashSet<>(currentNode.getPathToRoot());
             pathContents.add(ax);
             if (hittingSetTree.addExploredPath(pathContents)) {
                 // Look to reuse a justification
@@ -62,12 +63,12 @@ public class DepthFirstStrategy<E> implements HittingSetTreeConstructionStrategy
                     }
                 }
                 if (!expl.isEmpty()) {
-                    HittingSetTreeNode<E> hittingSetTreeNode = new HittingSetTreeNode<E>(hittingSetTree, ax, currentNode, expl, reuse);
+                    HittingSetTreeNode<E> hittingSetTreeNode = new HittingSetTreeNode<>(hittingSetTree, ax, currentNode, expl, reuse);
                     currentNode.addChild(ax, hittingSetTreeNode);
                     buildHittingSetTree(hittingSetTree, limit, handler, hittingSetTreeNode);
                 }
                 else {
-                  hittingSetTree.addClosedPath(new HashSet<OWLAxiom>(pathContents));
+                  hittingSetTree.addClosedPath(new HashSet<>(pathContents));
                 }
             }handler.addAxiom(ax);
         }

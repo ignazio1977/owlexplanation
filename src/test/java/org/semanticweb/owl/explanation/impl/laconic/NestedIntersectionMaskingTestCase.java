@@ -1,20 +1,20 @@
 package org.semanticweb.owl.explanation.impl.laconic;
 
-import static org.semanticweb.owlapi.apibinding.OWLFunctionalSyntaxFactory.*;
-
-import org.semanticweb.owl.explanation.api.Explanation;
-import org.semanticweb.owl.explanation.api.ExplanationGenerator;
-import org.semanticweb.owl.explanation.api.ExplanationGeneratorFactory;
-import org.semanticweb.owl.explanation.api.ExplanationManager;
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
-import org.semanticweb.owlapi.util.DefaultPrefixManager;
-
-import java.util.HashSet;
-import java.util.Set;
+//import static org.semanticweb.owlapi.apibinding.OWLFunctionalSyntaxFactory.*;
+//
+//import org.semanticweb.owl.explanation.api.Explanation;
+//import org.semanticweb.owl.explanation.api.ExplanationGenerator;
+//import org.semanticweb.owl.explanation.api.ExplanationGeneratorFactory;
+//import org.semanticweb.owl.explanation.api.ExplanationManager;
+//import org.semanticweb.owlapi.apibinding.OWLManager;
+//import org.semanticweb.owlapi.model.OWLAxiom;
+//import org.semanticweb.owlapi.model.OWLClass;
+//import org.semanticweb.owlapi.model.OWLOntologyManager;
+//import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
+//import org.semanticweb.owlapi.util.DefaultPrefixManager;
+//
+//import java.util.HashSet;
+//import java.util.Set;
 /*
  * Copyright (C) 2010, University of Manchester
  *

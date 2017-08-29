@@ -4,7 +4,6 @@ import org.semanticweb.owl.explanation.telemetry.TelemetryObject;
 import org.semanticweb.owlapi.model.*;
 
 import java.io.*;
-import java.util.Collections;
 import java.util.function.Supplier;
 
 /**
@@ -23,14 +22,17 @@ public class ExplanationTelemetryWrapper implements TelemetryObject {
         this.m = m;
     }
 
+    @Override
     public String getPreferredSerialisedName() {
         return "justification.owl.xml";
     }
 
+    @Override
     public boolean isSerialisedAsXML() {
         return true;
     }
 
+    @Override
     public void serialise(OutputStream outputStream) throws IOException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         Explanation.store(explanation, bos, m);

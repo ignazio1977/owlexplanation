@@ -41,9 +41,10 @@ public class SimpleExpansionStrategy<E> implements ExpansionStrategy {
 
     private int count = 0;
 
+    @Override
     public Set<OWLAxiom> doExpansion(Set<OWLAxiom> axioms, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor) {
         count = 0;
-        Set<OWLAxiom> expansion = new HashSet<OWLAxiom>();
+        Set<OWLAxiom> expansion = new HashSet<>();
         for(OWLAxiom ax : axioms) {
             expansion.add(ax);
             count++;
@@ -54,6 +55,7 @@ public class SimpleExpansionStrategy<E> implements ExpansionStrategy {
         return Collections.emptySet();
     }
 
+    @Override
     public int getNumberOfSteps() {
         return count;
     }
