@@ -54,15 +54,4 @@ public class SETreeBuilder<O> {
     public int getIndexOf(O element) {
         return indexMap.get(element);
     }
-
-    private void dump(SETreeNode<O> tree) {
-        int depth = tree.getDepth();
-        for(int i = 0; i < depth; i++) {
-            System.out.print("    ");
-        }
-        System.out.println(tree);
-        for(SETreeNode<O> child : tree.getChildren()) {
-            dump(child);
-        }
-    }
 }

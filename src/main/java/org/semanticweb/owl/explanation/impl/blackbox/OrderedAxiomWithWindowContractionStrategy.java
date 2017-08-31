@@ -37,12 +37,6 @@ public class OrderedAxiomWithWindowContractionStrategy<E> implements Contraction
 
     private Object lastEntailment;
 
-    private int cumulativeExpansionSize;
-
-    private int cumulativeJustificationSize;
-
-    private double justificationToExpansionRatio;
-
     private Set<OWLAxiom> lastJustification;
 
     private int count = 0;
@@ -59,15 +53,8 @@ public class OrderedAxiomWithWindowContractionStrategy<E> implements Contraction
         int windowSize = 10;
 
         List<OWLAxiom> orderedAxioms = new ArrayList<>(axioms);
-        if(lastEntailment != null) {
-            if(checker.getEntailment().equals(lastEntailment)) {
-
-             if(!lastJustification.isEmpty()) {
-             }
-        }
-            else {
-                lastJustification.clear();
-            }
+        if(!checker.getEntailment().equals(lastEntailment)) {
+            lastJustification.clear();
         }
 
         int windowCount = orderedAxioms.size() / windowSize;
@@ -98,11 +85,8 @@ public class OrderedAxiomWithWindowContractionStrategy<E> implements Contraction
         }
 
         lastEntailment = checker.getEntailment();
-        cumulativeJustificationSize += contraction.size();
-        cumulativeExpansionSize += axioms.size();
-        justificationToExpansionRatio = (1.0 * cumulativeJustificationSize) / (1.0 * cumulativeExpansionSize);
         lastJustification.clear();
-                return contraction;
+        return contraction;
     }
 
     @Override

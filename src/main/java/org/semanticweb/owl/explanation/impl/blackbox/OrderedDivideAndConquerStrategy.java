@@ -20,11 +20,8 @@ public class OrderedDivideAndConquerStrategy<E> implements ContractionStrategy<E
 
     private DivideAndConquerContractionStrategy<E> delegate = new DivideAndConquerContractionStrategy<>();
 
-    private int count = 0;
-
     @Override
     public Set<OWLAxiom> doPruning(Set<OWLAxiom> axioms, EntailmentChecker<E> checker, ExplanationProgressMonitor<?> progressMonitor) {
-        count = 0;
         LinkedHashSet<OWLAxiom> orderedAxioms = new LinkedHashSet<>();
         Map<OWLObject, Set<OWLAxiom>> axiomsBySubject = new HashMap<>();
         for(OWLAxiom ax : axioms) {

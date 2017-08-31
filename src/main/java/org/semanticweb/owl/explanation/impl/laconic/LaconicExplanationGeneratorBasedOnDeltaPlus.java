@@ -74,31 +74,10 @@ public class LaconicExplanationGeneratorBasedOnDeltaPlus implements ExplanationG
         AxiomTransformation transformation = new DeltaPlusTransformation(dataFactory);
         SyntacticLocalityModuleExtractor extractor = new SyntacticLocalityModuleExtractor(man, inputAxioms.stream(), ModuleType.STAR);
         Set<OWLAxiom> moduleAxioms = extractor.extract(asSet(entailment.signature()));
-//
-//        ExplanationGenerator<OWLAxiom> regGen = delegateFactory.createExplanationGenerator(inputAxioms, new NullExplanationProgressMonitor<OWLAxiom>());
-//        Set<Explanation<OWLAxiom>> regexpls = regGen.getExplanations(entailment);
-//        System.out.println(".........................................................");
 
         Set<OWLAxiom> flattenedAxioms = transformation.transform(moduleAxioms);
         ExplanationGenerator<OWLAxiom> gen = delegateFactory.createExplanationGenerator(flattenedAxioms);
         Set<Explanation<OWLAxiom>> expls = gen.getExplanations(entailment);
-//        System.out.println("Found " + expls.size() + " regular expls");
-//        for(Explanation<OWLAxiom> expl : expls) {
-//            System.out.println(expl);
-//        }
-//        if(expls.isEmpty()) {
-//        {
-//            System.out.println("Not found any delta plus justifications!");
-//            for(OWLAxiom ax : flattenedAxioms) {
-//                System.out.println(ax);
-//            }
-//            System.out.println("........................................................");
-//            DeltaTransformationUnfolder unfolder = new DeltaTransformationUnfolder(dataFactory);
-//            Set<OWLAxiom> unfoldedAxioms = unfolder.getUnfolded(flattenedAxioms, signature);
-//            for(OWLAxiom ax : unfoldedAxioms) {
-//                System.out.println(ax);
-//            }
-//        }
 
         IsLaconicChecker checker = new IsLaconicChecker(dataFactory, entailmentCheckerFactory, LaconicCheckerMode.EARLY_TERMINATING);
         Set<Explanation<OWLAxiom>> laconicExplanations = new HashSet<>();

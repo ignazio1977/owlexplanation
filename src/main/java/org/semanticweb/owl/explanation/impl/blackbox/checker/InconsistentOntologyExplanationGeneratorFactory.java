@@ -60,7 +60,6 @@ public class InconsistentOntologyExplanationGeneratorFactory implements Explanat
 
     public InconsistentOntologyExplanationGeneratorFactory(OWLReasonerFactory reasonerFactory, OWLDataFactory df, Supplier<OWLOntologyManager> m, long entailmentCheckingTimeout) {
         expansionStrategy = new InconsistentOntologyExpansionStrategy<>();
-//        expansionStrategy = new InconsistentOntologyClashExpansionStrategy();
         contractionStrategy = new InconsistentOntologyContractionStrategy<>();
         this.m = m;
         consistencyEntailmentCheckerFactory = new ConsistencyEntailmentCheckerFactory(reasonerFactory, m, df, entailmentCheckingTimeout);

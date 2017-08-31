@@ -4,7 +4,6 @@ import java.util.function.Supplier;
 
 import org.semanticweb.owl.explanation.impl.blackbox.Configuration;
 import org.semanticweb.owl.explanation.impl.blackbox.ContractionStrategy;
-import org.semanticweb.owl.explanation.impl.blackbox.EntailmentCheckerFactory;
 import org.semanticweb.owl.explanation.impl.blackbox.ExpansionStrategy;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.model.OWLAxiom;

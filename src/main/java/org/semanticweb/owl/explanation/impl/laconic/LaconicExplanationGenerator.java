@@ -98,26 +98,12 @@ public class LaconicExplanationGenerator<E> implements ExplanationGenerator<E>, 
                 }
             }
         }
-//        try {
-//            OWLOntologyManager man = OWLManager.createOWLOntologyManager();
-//            OWLOntology onto = man.createOntology(oPlus);
-//            man.saveOntology(onto, URI.create("file:/tmp/oplus" + System.currentTimeMillis() + ".owl"));
-//        }
-//        catch (OWLOntologyCreationException e) {
-//            e.printStackTrace();
-//        }
-//        catch (OWLOntologyChangeException e) {
-//            e.printStackTrace();
-//        }
-//        catch (OWLOntologyStorageException e) {
-//            e.printStackTrace();
-//        }
         return oPlus;
     }
 
 
     public List<Integer> getPruningDifferences() {
-        return null;
+        return Collections.emptyList();
     }
 
     public MutableTree<Explanation<E>> getHst() {
@@ -164,11 +150,9 @@ public class LaconicExplanationGenerator<E> implements ExplanationGenerator<E>, 
 
     private void notifyLaconicExplanationGeneratorProgressMonitor(Explanation<E> explanation) {
         try {
-            if (isLaconic(explanation)) {
-                if (!foundLaconicJustifications.contains(explanation)) {
-                    foundLaconicJustifications.add(explanation);
-                    progressMonitor.foundExplanation(this, explanation, foundLaconicJustifications);
-                }
+            if (isLaconic(explanation) && !foundLaconicJustifications.contains(explanation)) {
+                foundLaconicJustifications.add(explanation);
+                progressMonitor.foundExplanation(this, explanation, foundLaconicJustifications);
             }
         }
         catch (ExplanationException e) {
@@ -200,9 +184,6 @@ public class LaconicExplanationGenerator<E> implements ExplanationGenerator<E>, 
         // Initialise the current set of justifications with the regular justifications.
         allPreviouslyFoundJustifications = new HashSet<>();
         allPreviouslyFoundJustifications.addAll(regularJusts);
-
-//        Set<Explanation<E>> nonLaconicJusts = new HashSet<Explanation<E>>();
-//        Set<Explanation<E>> laconicJusts = new HashSet<Explanation<E>>();
 
         Set<OWLAxiom> axiomsInPreviousOntology = new HashSet<>();
 
@@ -278,43 +259,7 @@ public class LaconicExplanationGenerator<E> implements ExplanationGenerator<E>, 
             if (allPreviouslyFoundJustifications.equals(allPrevJustsCopy)) {
                 break;
             }
-            // The following code used to check if we had found enough laconic justifcations.  We don't need this
-            // anymore - I don't think
-//            for (Explanation<E> e : currentJustifications) {
-//                if (nonLaconicJusts.contains(e)) {
-//                    continue;
-//                }
-//                if (laconicJusts.contains(e)) {
-//                    continue;
-//                }
-//                if (isLaconic(e)) {
-//                    laconicJusts.add(e);
-//                }
-//                else {
-//                    nonLaconicJusts.add(e);
-//                }
-//                if (laconicJusts.size() == limit) {
-//                    return getReconstitutedLaconicJustifications(laconicJusts);
-//                }
-//            }
         }
-
-//        Set<Explanation<E>> laconicJustifications = new HashSet<Explanation<E>>();
-//
-//        // We should now have our justifications that contain the set of precise justifications.
-//        // We just need to know which ones are the precise justifications.
-//        for (Explanation<E> justification : allPreviouslyFoundJustifications) {
-//            if (nonLaconicJusts.contains(justification)) {
-//                continue;
-//            }
-//            if (laconicJusts.contains(justification)) {
-//                laconicJustifications.add(justification);
-//            } else {
-//                if (isLaconic(justification)) {
-//                    laconicJustifications.add(justification);
-//                }
-//            }
-//        }
 
         return getReconstitutedLaconicJustifications();
     }

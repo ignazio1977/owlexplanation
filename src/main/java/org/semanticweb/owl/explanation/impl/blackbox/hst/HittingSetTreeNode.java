@@ -46,25 +46,20 @@ public class HittingSetTreeNode<E> {
 
     private List<OWLAxiom> edgeLabels = new ArrayList<>();
 
-//    private HittingSetTree<E> tree;
-
     private boolean reuse;
 
-    public HittingSetTreeNode(HittingSetTree<E> tree, OWLAxiom parentEdgeLabel, HittingSetTreeNode<E> parentNode, Explanation<E> explanation, boolean reuse) {
-//        this.tree = tree;
+    public HittingSetTreeNode(OWLAxiom parentEdgeLabel, HittingSetTreeNode<E> parentNode, Explanation<E> explanation, boolean reuse) {
         this.parentEdgeLabel = parentEdgeLabel;
         this.parentNode = parentNode;
         this.explanation = explanation;
         this.reuse = reuse;
     }
 
-    public HittingSetTreeNode(HittingSetTree<E> tree, Explanation<E> explanation) {
-//        this.tree = tree;
+    public HittingSetTreeNode(Explanation<E> explanation) {
         this.explanation = explanation;
     }
 
-    public HittingSetTreeNode(HittingSetTree<E> tree, OWLAxiom parentEdgeLabel, HittingSetTreeNode<E> parentNode, boolean reuse) {
-//        this.tree = tree;
+    public HittingSetTreeNode(OWLAxiom parentEdgeLabel, HittingSetTreeNode<E> parentNode, boolean reuse) {
         this.parentEdgeLabel = parentEdgeLabel;
         this.parentNode = parentNode;
         this.reuse = reuse;
@@ -80,14 +75,11 @@ public class HittingSetTreeNode<E> {
 
     public List<HittingSetTreeNode<E>> getChildren() {
         return children;
-//        throw new RuntimeException();
     }
 
     public void addChild(OWLAxiom edgeLabel, HittingSetTreeNode<E> node) {
         edgeLabels.add(edgeLabel);
         children.add(node);
-//        tree.incrementSize();
-//        System.out.println("Tree size: " + tree.getTreeSize());
     }
 
 

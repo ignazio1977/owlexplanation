@@ -56,7 +56,6 @@ public class BlackBoxExplanationGenerator2<E> implements ExplanationGenerator<E>
     private Set<Explanation<E>> cache = new HashSet<>();
 
     private TelemetryTimer generatorTimer = new TelemetryTimer();
-//    private TelemetryTimer findOneElapsedTimer;
 
     private Supplier<OWLOntologyManager> m;
 
@@ -80,7 +79,6 @@ public class BlackBoxExplanationGenerator2<E> implements ExplanationGenerator<E>
         else {
             this.progressMonitor = new NullExplanationProgressMonitor<>();
         }
-//        findOneElapsedTimer = new TelemetryTimer();
         this.m = m;
     }
 
@@ -223,13 +221,11 @@ public class BlackBoxExplanationGenerator2<E> implements ExplanationGenerator<E>
 
     private void recordJustification(E entailment, TelemetryInfo findOneInfo, Explanation<E> result) {
         TelemetryTransmitter transmitter = TelemetryTransmitter.getTransmitter();
-        if (!result.isEmpty()) {
-            if (entailment instanceof OWLAxiom) {
-                @SuppressWarnings("unchecked")
-                Explanation<OWLAxiom> result2 = (Explanation<OWLAxiom>) result;
-                ExplanationTelemetryWrapper telemetryObject = new ExplanationTelemetryWrapper(result2, m);
-                transmitter.recordObject(findOneInfo, "justification", ".owl.xml", telemetryObject);
-            }
+        if (!result.isEmpty() && entailment instanceof OWLAxiom) {
+            @SuppressWarnings("unchecked")
+            Explanation<OWLAxiom> result2 = (Explanation<OWLAxiom>) result;
+            ExplanationTelemetryWrapper telemetryObject = new ExplanationTelemetryWrapper(result2, m);
+            transmitter.recordObject(findOneInfo, "justification", ".owl.xml", telemetryObject);
         }
     }
 
@@ -287,11 +283,9 @@ public class BlackBoxExplanationGenerator2<E> implements ExplanationGenerator<E>
     @Override
     public Explanation<E> generateExplanation(E entailment) {
         for (Explanation<E> expl : cache) {
-            if (expl.getEntailment().equals(entailment)) {
-                if (module.containsAll(expl.getAxioms())) {
-                    cacheHitCounter++;
-                    return expl;
-                }
+            if (expl.getEntailment().equals(entailment) && module.containsAll(expl.getAxioms())) {
+                cacheHitCounter++;
+                return expl;
             }
         }
 

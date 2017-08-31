@@ -66,15 +66,12 @@ public class StructuralTypePriorityExpansionStrategy<E> implements ExpansionStra
             }
 
             count++;
-            if (initialEntailmentCheckStrategy.equals(InitialEntailmentCheckStrategy.PERFORM)) {
-                if(!checker.isEntailed(axioms)) {
-                    return Collections.emptySet();
-                }
+            if (initialEntailmentCheckStrategy.equals(InitialEntailmentCheckStrategy.PERFORM)
+                    && !checker.isEntailed(axioms)) {
+                return Collections.emptySet();
             }
 
             OWLOntology ont = m.get().createOntology(axioms);
-//            createOntology(axioms, checker);
-
 
             expansion = new HashSet<>();
             Set<OWLEntity> entailmentSignature = checker.getEntailmentSignature();
@@ -201,21 +198,6 @@ public class StructuralTypePriorityExpansionStrategy<E> implements ExpansionStra
         public Stream<OWLClassAxiom> visit(OWLClass cls) {
             // Return axioms that define the class
             return theOnt.axioms(cls);
-//            for(OWLAxiom ax : theOnt.getReferencingAxioms(cls)) {
-//                if (axioms.contains(ax)) {
-//                    if(ax.getAxiomType().equals(AxiomType.EQUIVALENT_CLASSES)) {
-//                        OWLEquivalentClassesAxiom eqClsesAx = (OWLEquivalentClassesAxiom) ax;
-//                        for(OWLClassExpression desc : eqClsesAx.getClassExpressions()) {
-//                            if(desc instanceof OWLObjectUnionOf) {
-//                                if(((OWLObjectUnionOf) desc).getOperands().contains(cls)) {
-//                                    axioms.add(ax);
-//                                    break;
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
         }
 
 

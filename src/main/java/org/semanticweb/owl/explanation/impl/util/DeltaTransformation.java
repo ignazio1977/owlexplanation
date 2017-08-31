@@ -23,10 +23,6 @@ public class DeltaTransformation implements AxiomTransformation {
 
     private Set<OWLAxiom> transformedAxioms = new HashSet<>();
 
-//    private OWLAnnotation currentAxiomAnnotation;
-
-    private int currentAxiomCount = 0;
-
     private Map<OWLAxiom, Integer> namingAxiom2ModalDepth = new HashMap<>();
 
     protected int modalDepth = 0;
@@ -43,12 +39,6 @@ public class DeltaTransformation implements AxiomTransformation {
         OWLClass freshClass = dataFactory.getOWLClass(getNextFreshIRI());
         freshEntities.add(freshClass);
         return freshClass;
-    }
-
-    private OWLDatatype getFreshDatatype() {
-        OWLDatatype freshDatatype = dataFactory.getOWLDatatype(getNextFreshIRI());
-        freshEntities.add(freshDatatype);
-        return freshDatatype;
     }
 
     private OWLNamedIndividual getFreshIndividual() {
@@ -68,8 +58,6 @@ public class DeltaTransformation implements AxiomTransformation {
         namingAxiom2ModalDepth.clear();
         AxiomTransformer transformer = new AxiomTransformer();
         for (OWLAxiom ax : axioms) {
-            currentAxiomCount++;
-//            currentAxiomAnnotation = getCurrentAxiomAnnotation();
             transformedAxioms.addAll(ax.accept(transformer));
         }
         return transformedAxioms;
@@ -80,28 +68,15 @@ public class DeltaTransformation implements AxiomTransformation {
     }
 
 
-//    private OWLAnnotation getCurrentAxiomAnnotation() {
-//        OWLLiteral annoValue = dataFactory.getOWLLiteral(currentAxiomCount);
-//        IRI iri = IRI.create("http://owl.cs.manchester.ac.uk/explanation/vocabulary#axiomId");
-//        OWLAnnotationProperty property = dataFactory.getOWLAnnotationProperty(iri);
-//        return dataFactory.getOWLAnnotation(property, annoValue);
-//    }
-
     private boolean isFreshClass(OWLClassExpression ce) {
         return !ce.isAnonymous() && freshEntities.contains(ce.asOWLClass());
     }
-
-//    private boolean isFreshDataRange(OWLDataRange dr) {
-//        return dr.isDatatype() && freshEntities.contains(dr.asOWLDatatype());
-//    }
 
     protected OWLNamedIndividual assignName(OWLIndividual individual) {
         OWLNamedIndividual freshIndividual = getFreshIndividual();
         Set<OWLIndividual> individuals = new HashSet<>();
         individuals.add(individual);
         individuals.add(freshIndividual);
-//        Set<OWLAnnotation> axiomId = Collections.singleton(currentAxiomAnnotation);
-//        OWLSameIndividualAxiom namingAxiom = dataFactory.getOWLSameIndividualAxiom(individuals, axiomId);
         OWLSameIndividualAxiom namingAxiom = dataFactory.getOWLSameIndividualAxiom(individuals);
         namingAxiom2ModalDepth.put(namingAxiom, modalDepth);
         transformedAxioms.add(namingAxiom);
@@ -125,33 +100,6 @@ public class DeltaTransformation implements AxiomTransformation {
         OWLClass freshClass = getFreshClass();
         return assignName(classExpression, polarity, freshClass);
     }
-
-//    private OWLDatatype assignName(OWLDataRange dr, Polarity polarity) {
-//        if(polarity.isPositive()) {
-//            if(dr.isTopDatatype()) {
-//                return dr.asOWLDatatype();
-//            }
-//        }
-//        if(isFreshDataRange(dr)) {
-//            return dr.asOWLDatatype();
-//        }
-//        OWLDatatype freshDatatype = getFreshDatatype();
-//        return assignName(dr, polarity, freshDatatype);
-//    }
-//
-//    private OWLDatatype assignName(OWLDataRange dr, Polarity polarity, OWLDatatype freshDatatype) {
-//        OWLDatatypeDefinitionAxiom namingAxiom;
-//        Set<OWLAnnotation> axiomId = Collections.emptySet();
-//        if (polarity.isPositive()) {
-//            namingAxiom = dataFactory.getOWLDatatypeDefinitionAxiom(freshDatatype, dr);
-//        }
-//        else {
-//            namingAxiom = dataFactory.getOWLDatatypeDefinitionAxiom(freshDatatype, dr);
-//        }
-//        namingAxiom2ModalDepth.put(namingAxiom, modalDepth);
-//        transformedAxioms.add(namingAxiom);
-//        return freshDatatype;
-//    }
 
     protected OWLClass assignName(OWLClassExpression classExpression, Polarity polarity, OWLClass freshClass) {
         OWLSubClassOfAxiom namingAxiom;
@@ -189,26 +137,11 @@ public class DeltaTransformation implements AxiomTransformation {
 
         @Override
         public Set<OWLAxiom> visit(OWLSubClassOfAxiom axiom) {
-//            if(!axiom.getSubClass().isAnonymous() && !axiom.getSuperClass().isAnonymous()) {
-//                return Collections.<OWLAxiom>singleton(axiom);
-//            }
-            OWLClass freshSub;
-//            if (axiom.getSubClass().isAnonymous()) {
-                OWLClassExpression subClass = axiom.getSubClass().accept(negativeTransformer);
-                freshSub = assignName(subClass, Polarity.NEGATIVE);
-//            }
-//            else {
-//                freshSub = axiom.getSubClass().asOWLClass();
-//            }
+            OWLClassExpression subClass = axiom.getSubClass().accept(negativeTransformer);
+            OWLClass freshSub = assignName(subClass, Polarity.NEGATIVE);
 
-            OWLClass freshSuper;
-//            if (axiom.getSuperClass().isAnonymous()) {
-                OWLClassExpression superClass = axiom.getSuperClass().accept(positiveTransformer);
-                freshSuper = assignName(superClass, Polarity.POSITIVE);
-//            }
-//            else {
-//                freshSuper = axiom.getSuperClass().asOWLClass();
-//            }
+            OWLClassExpression superClass = axiom.getSuperClass().accept(positiveTransformer);
+            OWLClass freshSuper = assignName(superClass, Polarity.POSITIVE);
 
             Set<OWLAxiom> result = new HashSet<>();
             result.add(dataFactory.getOWLSubClassOfAxiom(freshSub, freshSuper));
@@ -233,24 +166,11 @@ public class DeltaTransformation implements AxiomTransformation {
 
         @Override
         public Set<OWLAxiom> visit(OWLDisjointClassesAxiom axiom) {
-            Set<OWLAxiom> result = new HashSet<>();
             // TODO: FIX!
 //            for(OWLAxiom ax : axiom.asOWLSubClassOfAxioms()) {
 //                result.addAll(ax.accept(this));
 //            }
             return Collections.<OWLAxiom>singleton(axiom);
-//            if (axiom.getClassExpressions().size() > 2) {
-//                return visit(axiom.asPairwiseAxioms());
-//            }
-//            else if(axiom.getClassExpressions().size() == 2) {
-//                List<OWLClassExpression> ops = new ArrayList<OWLClassExpression>(axiom.getClassExpressions());
-//                OWLClassExpression first = assignName(ops.get(0), Polarity.POSITIVE);
-//                OWLClassExpression second = assignName(ops.get(1), Polarity.NEGATIVE);
-//                return Collections.<OWLAxiom>singleton(dataFactory.getOWLSubClassOfAxiom(first, second));
-//            }
-//            else {
-//                return Collections.<OWLAxiom>singleton(axiom);
-//            }
         }
 
         @Override
@@ -580,10 +500,6 @@ public class DeltaTransformation implements AxiomTransformation {
 
         @Override
         public OWLClassExpression visit(OWLDataSomeValuesFrom ce) {
-//            modalDepth++;
-//            OWLDatatype renamedFiller = assignName(ce.getFiller().accept(this), polarity);
-//            modalDepth--;
-//            return dataFactory.getOWLDataSomeValuesFrom(ce.getProperty(), renamedFiller);
             return ce;
         }
 
@@ -610,30 +526,6 @@ public class DeltaTransformation implements AxiomTransformation {
         @Override
         public OWLClassExpression visit(OWLDataMaxCardinality ce) {
             return ce;
-        }
-
-        public OWLDataRange visit(OWLDatatype node) {
-            return node;
-        }
-
-        public OWLDataRange visit(OWLDataOneOf node) {
-            return node;
-        }
-
-        public OWLDataRange visit(OWLDataComplementOf node) {
-            return node;
-        }
-
-        public OWLDataRange visit(OWLDataIntersectionOf node) {
-            return node;
-        }
-
-        public OWLDataRange visit(OWLDataUnionOf node) {
-            return node;
-        }
-
-        public OWLDataRange visit(OWLDatatypeRestriction node) {
-            return node;
         }
     }
 }

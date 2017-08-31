@@ -61,12 +61,10 @@ public class DynamicSlidingWindowContractionStrategy<E> implements ContractionSt
                 break;
             }
             if(lastContractionSize == contraction.size()) {
-//                System.out.println("Contraction not succeeded: Contraction: " + contraction.size() + "    Window size: " + roundWindowSize);
                 roundWindowSize = contraction.size() / 40;
             }
             lastContractionSize = contraction.size();
             doFastPruning(checker, contraction, roundWindowSize);
-//            System.out.println("Contraction: " + contraction.size());
         }
 
         // Repeat fast pruning
@@ -104,10 +102,6 @@ public class DynamicSlidingWindowContractionStrategy<E> implements ContractionSt
             count++;
             if(!checker.isEntailed(contraction)) {
                 contraction.addAll(cur);
-//                System.out.println("    Failed on window size of " + roundWindowSize + " on " + contraction.size());
-            }
-            else {
-//                System.out.println("    Removed");
             }
         }
     }

@@ -19,8 +19,6 @@ public class PatternBasedEntailmentChecker {
 
     protected OWLSubClassOfAxiom subClassOfEntailment;
 
-    private OWLClassAssertionAxiom classAssertionEntailment;
-
     private Set<Explanation<OWLAxiom>> simpleExplanations = new HashSet<>();
 
     public PatternBasedEntailmentChecker(OWLAxiom entailment, Set<OWLAxiom> workingAxioms) {
@@ -30,12 +28,6 @@ public class PatternBasedEntailmentChecker {
         }
         else {
             subClassOfEntailment = null;
-        }
-        if (entailment instanceof OWLClassAssertionAxiom) {
-            classAssertionEntailment = (OWLClassAssertionAxiom) entailment;
-        }
-        else {
-            classAssertionEntailment = null;
         }
         processAxioms(workingAxioms);
     }
@@ -75,10 +67,8 @@ public class PatternBasedEntailmentChecker {
             if (subClassOfEntailment != null) {
                 Set<OWLClassExpression> superConjuncts = axiom.getSuperClass().asConjunctSet();
                 Set<OWLClassExpression> subDisjuncts = axiom.getSubClass().asDisjunctSet();
-                if (superConjuncts.contains(axiom.getSuperClass())) {
-                    if (subDisjuncts.contains(axiom.getSubClass())) {
-                        addExplanation(axiom);
-                    }
+                if (superConjuncts.contains(axiom.getSuperClass()) && subDisjuncts.contains(axiom.getSubClass())) {
+                    addExplanation(axiom);
                 }
             }
         }
@@ -192,21 +182,17 @@ public class PatternBasedEntailmentChecker {
                 }
                 else if (axiom.contains(subClass)) {
                     for (OWLClassExpression ce : asList) {
-                        if (!ce.equals(subClass)) {
-                            if (ce.asConjunctSet().contains(superClass)) {
-                                addExplanation(axiom);
-                                break;
-                            }
+                        if (!ce.equals(subClass) && ce.asConjunctSet().contains(superClass)) {
+                            addExplanation(axiom);
+                            break;
                         }
                     }
                 }
                 else if (axiom.contains(superClass)) {
                     for (OWLClassExpression ce : asList) {
-                        if (!ce.equals(superClass)) {
-                            if (ce.asDisjunctSet().contains(subClass)) {
-                                addExplanation(axiom);
-                                break;
-                            }
+                        if (!ce.equals(superClass) && ce.asDisjunctSet().contains(subClass)) {
+                            addExplanation(axiom);
+                            break;
                         }
                     }
                 }
