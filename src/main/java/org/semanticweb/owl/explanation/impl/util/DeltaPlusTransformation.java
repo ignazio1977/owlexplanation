@@ -2,6 +2,8 @@ package org.semanticweb.owl.explanation.impl.util;
 
 import org.semanticweb.owlapi.model.*;
 
+import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.asList;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,7 +16,7 @@ import java.util.Set;
  */
 public class DeltaPlusTransformation implements AxiomTransformation {
 
-    private OWLDataFactory dataFactory;
+    protected OWLDataFactory dataFactory;
 
     private int cardinalityBound;
 
@@ -43,7 +45,7 @@ public class DeltaPlusTransformation implements AxiomTransformation {
     
     
     private class DeltaAxiomVisitor implements OWLAxiomVisitorEx<Set<OWLAxiom>> {
-
+        public DeltaAxiomVisitor() {}
         @Override
         public Set<OWLAxiom> visit(OWLSubClassOfAxiom axiom) {
             Set<OWLClassExpression> superClses = new HashSet<>();
@@ -55,7 +57,7 @@ public class DeltaPlusTransformation implements AxiomTransformation {
             Set<OWLAxiom> result = new HashSet<>();
             for(OWLClassExpression superCls : superClses) {
                 for(OWLClassExpression subCls : subClses) {
-                    OWLSubClassOfAxiom ax = dataFactory.getOWLSubClassOfAxiom(subCls, superCls, axiom.getAnnotations());
+                    OWLSubClassOfAxiom ax = dataFactory.getOWLSubClassOfAxiom(subCls, superCls, asList(axiom.annotations()));
                     result.add(ax);
                 }
             }
@@ -255,6 +257,7 @@ public class DeltaPlusTransformation implements AxiomTransformation {
     
     
     private class PositiveClassExpressionWeakener implements OWLClassExpressionVisitorEx<Set<OWLClassExpression>> {
+        public PositiveClassExpressionWeakener() {}
 
         @Override
         public Set<OWLClassExpression> visit(OWLClass ce) {
@@ -368,6 +371,7 @@ public class DeltaPlusTransformation implements AxiomTransformation {
 
 
     private class NegativeClassExpressionWeakener implements OWLClassExpressionVisitorEx<Set<OWLClassExpression>> {
+        public NegativeClassExpressionWeakener() {}
 
         @Override
         public Set<OWLClassExpression> visit(OWLClass ce) {

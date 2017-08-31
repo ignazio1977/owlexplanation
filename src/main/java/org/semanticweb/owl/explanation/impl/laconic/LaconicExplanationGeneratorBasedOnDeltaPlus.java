@@ -9,6 +9,9 @@ import org.semanticweb.owlapi.model.*;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 
+import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.add;
+import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.asSet;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -64,13 +67,13 @@ public class LaconicExplanationGeneratorBasedOnDeltaPlus implements ExplanationG
     public Set<Explanation<OWLAxiom>> getExplanations(OWLAxiom entailment, int limit) throws ExplanationException {
         final Set<OWLEntity> signature = new HashSet<>();
         for(OWLAxiom ax : inputAxioms) {
-            signature.addAll(ax.getSignature());
+            add(signature, ax.signature());
         }
         OWLOntologyManager man = m.get();
         final OWLDataFactory dataFactory = man.getOWLDataFactory();
         AxiomTransformation transformation = new DeltaPlusTransformation(dataFactory);
         SyntacticLocalityModuleExtractor extractor = new SyntacticLocalityModuleExtractor(man, inputAxioms.stream(), ModuleType.STAR);
-        Set<OWLAxiom> moduleAxioms = extractor.extract(entailment.getSignature());
+        Set<OWLAxiom> moduleAxioms = extractor.extract(asSet(entailment.signature()));
 //
 //        ExplanationGenerator<OWLAxiom> regGen = delegateFactory.createExplanationGenerator(inputAxioms, new NullExplanationProgressMonitor<OWLAxiom>());
 //        Set<Explanation<OWLAxiom>> regexpls = regGen.getExplanations(entailment);

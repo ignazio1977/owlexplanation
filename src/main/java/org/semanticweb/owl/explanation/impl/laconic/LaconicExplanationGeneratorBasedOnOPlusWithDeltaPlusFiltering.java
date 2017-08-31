@@ -10,6 +10,8 @@ import org.semanticweb.owlapi.model.*;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 
+import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.asSet;
+
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -100,7 +102,7 @@ public class LaconicExplanationGeneratorBasedOnOPlusWithDeltaPlusFiltering imple
             Set<OWLAxiom> oplusInput;
             if (modularityTreatment.equals(ModularityTreatment.MODULE)) {
                 SyntacticLocalityModuleExtractor extractor = new SyntacticLocalityModuleExtractor(man, inputAxioms.stream(), ModuleType.STAR);
-                oplusInput = extractor.extract(entailment.getSignature());
+                oplusInput = extractor.extract(asSet(entailment.signature()));
             }
             else {
                 oplusInput = new HashSet<>(inputAxioms);

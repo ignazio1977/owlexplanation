@@ -25,6 +25,7 @@ import java.util.*;
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+import java.util.stream.Stream;
 
 
 /**
@@ -68,23 +69,10 @@ public abstract class BaseDescriptionGenerator implements OWLClassExpressionVisi
         return desc.accept(gen);
     }
 
-    private Set<Set<OWLClassExpression>> computeReplacements(Set<OWLClassExpression> operands) {
+    private Set<Set<OWLClassExpression>> computeReplacements(Stream<OWLClassExpression> operands) {
         Set<List<OWLClassExpression>> ps = new HashSet<>();
         ps.add(new ArrayList<OWLClassExpression>());
-        for (OWLClassExpression op : operands) {
-            Set<List<OWLClassExpression>> pscopy = new HashSet<>(ps);
-
-            for (OWLClassExpression opEx : op.accept(this)) {
-                for (List<OWLClassExpression> pselement : pscopy) {
-                    ArrayList<OWLClassExpression> union = new ArrayList<>();
-
-                    union.addAll(pselement);
-                    union.add(opEx);
-                    ps.remove(pselement);
-                    ps.add(union);
-                }
-            }
-        }
+        operands.forEach(op -> updateUnion(ps, op));
         Set<Set<OWLClassExpression>> result = new HashSet<>();
         for(List<OWLClassExpression> desc : ps) {
             result.add(new HashSet<>(desc));
@@ -92,12 +80,27 @@ public abstract class BaseDescriptionGenerator implements OWLClassExpressionVisi
         return result;
     }
 
+    protected void updateUnion(Set<List<OWLClassExpression>> ps, OWLClassExpression op) {
+        Set<List<OWLClassExpression>> pscopy = new HashSet<>(ps);
+
+        for (OWLClassExpression opEx : op.accept(this)) {
+            for (List<OWLClassExpression> pselement : pscopy) {
+                ArrayList<OWLClassExpression> union = new ArrayList<>();
+
+                union.addAll(pselement);
+                union.add(opEx);
+                ps.remove(pselement);
+                ps.add(union);
+            }
+        }
+    }
+
 
 
     @Override
     public Set<OWLClassExpression> visit(OWLObjectIntersectionOf desc) {
         Set<OWLClassExpression> descs = new HashSet<>();
-        Set<Set<OWLClassExpression>> conjunctions = computeReplacements(desc.getOperands());
+        Set<Set<OWLClassExpression>> conjunctions = computeReplacements(desc.operands());
         for (Set<OWLClassExpression> conjuncts : conjunctions) {
             for(Iterator<OWLClassExpression> it = conjuncts.iterator(); it.hasNext(); ) {
                 if(isThing(it.next())) {
@@ -123,7 +126,7 @@ public abstract class BaseDescriptionGenerator implements OWLClassExpressionVisi
     @Override
     public Set<OWLClassExpression> visit(OWLObjectUnionOf desc) {
         Set<OWLClassExpression> descs = new HashSet<>();
-        Set<Set<OWLClassExpression>> disjunctions = computeReplacements(desc.getOperands());
+        Set<Set<OWLClassExpression>> disjunctions = computeReplacements(desc.operands());
         for (Set<OWLClassExpression> disjuncts : disjunctions) {
             for(Iterator<OWLClassExpression> it = disjuncts.iterator(); it.hasNext(); ) {
                 if(isNothing(it.next())) {
@@ -204,16 +207,13 @@ public abstract class BaseDescriptionGenerator implements OWLClassExpressionVisi
 
     @Override
     public Set<OWLClassExpression> visit(OWLObjectOneOf desc) {
-        Set<OWLClassExpression> ops = new HashSet<>();
-        if(desc.getIndividuals().size() == 1) {
+        if(desc.individuals().count() == 1) {
+            Set<OWLClassExpression> ops = new HashSet<>();
             ops.add(desc);
             ops.add(getLimit());
             return ops;
         }
-        for (OWLIndividual ind : desc.getIndividuals()) {
-            ops.add(factory.getOWLObjectOneOf(ind));
-        }
-        OWLClassExpression rewrite = factory.getOWLObjectUnionOf(ops);
+        OWLClassExpression rewrite = factory.getOWLObjectUnionOf(desc.individuals().map(ind -> factory.getOWLObjectOneOf(ind)));
         return rewrite.accept(this);
     }
 

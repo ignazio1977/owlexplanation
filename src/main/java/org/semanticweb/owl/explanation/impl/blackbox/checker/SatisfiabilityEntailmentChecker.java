@@ -12,11 +12,17 @@ import org.semanticweb.owlapi.reasoner.*;
 import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 
+import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.add;
+import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.asList;
+import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.asSet;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 /*
  * Copyright (C) 2008, University of Manchester
@@ -49,15 +55,15 @@ import java.util.function.Supplier;
  */
 public class SatisfiabilityEntailmentChecker implements EntailmentChecker<OWLAxiom> {
 
-    private OWLOntologyManager man;
+    protected OWLOntologyManager man;
     
     private Supplier<OWLOntologyManager> m;
 
-    private OWLAxiom axiom;
+    protected OWLAxiom axiom;
 
     private OWLClassExpression unsatDesc;
 
-    private Set<OWLEntity> freshEntities;
+    protected Set<OWLEntity> freshEntities;
 
     private OWLReasonerFactory reasonerFactory;
 
@@ -126,7 +132,7 @@ public class SatisfiabilityEntailmentChecker implements EntailmentChecker<OWLAxi
 
     @Override
     public Set<OWLEntity> getEntailmentSignature() {
-        return axiom.getSignature();
+        return asSet(axiom.signature());
     }
 
 
@@ -143,10 +149,10 @@ public class SatisfiabilityEntailmentChecker implements EntailmentChecker<OWLAxi
     @Override
     public Set<OWLEntity> getSeedSignature() {
         if (axiom instanceof OWLSubClassOfAxiom) {
-            return ((OWLSubClassOfAxiom) axiom).getSubClass().getSignature();
+            return asSet(((OWLSubClassOfAxiom) axiom).getSubClass().signature());
         }
         else {
-            return axiom.getSignature();
+            return asSet(axiom.signature());
         }
     }
 
@@ -176,13 +182,8 @@ public class SatisfiabilityEntailmentChecker implements EntailmentChecker<OWLAxi
     }
 
     private boolean containsNominals(OWLAxiom axiom) {
-            for(OWLClassExpression ce : axiom.getNestedClassExpressions()) {
-                if(ce instanceof OWLObjectOneOf) {
-                    return true;
-                }
-            }
-            return false;
-        }
+        return axiom.nestedClassExpressions().anyMatch(ce->ce instanceof OWLObjectOneOf);
+    }
 
     @Override
     public boolean isEntailed(Set<OWLAxiom> axioms) {
@@ -195,7 +196,7 @@ public class SatisfiabilityEntailmentChecker implements EntailmentChecker<OWLAxi
 
         transmitter.beginTransmission(info);
         boolean entailed = true;
-        OWLOntology ont = null;
+        OWLOntology toSave = null;
         try {
 //            transmitter.recordObject(info, "entailment", "", getEntailment());
             transmitter.recordMeasurement(info, "input size", axioms.size());
@@ -212,20 +213,19 @@ public class SatisfiabilityEntailmentChecker implements EntailmentChecker<OWLAxi
 
 
 
-            ont = man.createOntology(axioms);
+            OWLOntology ont = man.createOntology(axioms);
+            toSave = ont;
             // Previously, I had coded the checker so that we broke out if the
             // signature of the unsatDesc was not totally contained in set of axioms.
             // However, if a GCI was in the set of axioms, for example an object
             // property domain checker, then this could cause erronous results.  We
             // now add in the signature using declaration axioms.
 
-            for (OWLEntity ent : unsatDesc.getSignature()) {
-                if (!ent.isBuiltIn()) {
-                    if (!ont.containsEntityInSignature(ent)) {
-                        man.addAxiom(ont, man.getOWLDataFactory().getOWLDeclarationAxiom(ent));
-                    }
-                }
-            }
+            OWLDataFactory df=man.getOWLDataFactory();
+            unsatDesc.signature()
+                .filter(ent->!ent.isBuiltIn() && !ont.containsEntityInSignature(ent))
+                .forEach(ent -> ont.add(df.getOWLDeclarationAxiom(ent)));
+
             String clsName = "Entailment" + System.currentTimeMillis();
             OWLClass namingCls = man.getOWLDataFactory().getOWLClass(IRI.create(clsName));
             OWLAxiom namingAxiom = man.getOWLDataFactory().getOWLSubClassOfAxiom(namingCls, unsatDesc);
@@ -246,7 +246,7 @@ public class SatisfiabilityEntailmentChecker implements EntailmentChecker<OWLAxi
             man.removeOntology(ont);
             if (entailed) {
                 lastEntailingAxioms.remove(namingAxiom);
-                lastEntailingAxioms.addAll(ont.getLogicalAxioms());
+                add(lastEntailingAxioms, ont.logicalAxioms());
             }
             return entailed;
         }
@@ -262,16 +262,14 @@ public class SatisfiabilityEntailmentChecker implements EntailmentChecker<OWLAxi
             throw e;
         }
         catch (RuntimeException e) {
-            try {
-                if (ont != null) {
-                    ont.getOWLOntologyManager().saveOntology(ont, new FileOutputStream(new File("/tmp/lasterror.owl")));
+            if (toSave != null) {
+                try (FileOutputStream out = new FileOutputStream(new File("/tmp/lasterror.owl"))) {
+                    toSave.saveOntology(out);
+                } catch (OWLOntologyStorageException e1) {
+                    e1.printStackTrace();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
                 }
-            }
-            catch (OWLOntologyStorageException e1) {
-                e1.printStackTrace();
-            }
-            catch (FileNotFoundException e1) {
-                e1.printStackTrace();
             }
             transmitter.recordException(info, e);
             throw e;
@@ -573,7 +571,7 @@ public class SatisfiabilityEntailmentChecker implements EntailmentChecker<OWLAxi
 
         @Override
         public OWLClassExpression visit(OWLDisjointClassesAxiom axiom) {
-            return df.getOWLObjectIntersectionOf(axiom.getClassExpressions());
+            return df.getOWLObjectIntersectionOf(axiom.classExpressions());
         }
 
 
@@ -603,13 +601,13 @@ public class SatisfiabilityEntailmentChecker implements EntailmentChecker<OWLAxi
 
         @Override
         public OWLClassExpression visit(OWLEquivalentClassesAxiom axiom) {
-            if (axiom.getClassExpressions().size() != 2) {
+            List<OWLClassExpression> expressions=asList(axiom.classExpressions());
+            if (expressions.size() != 2) {
                 throw new UnsupportedAxiomTypeException(axiom);
             }
 
-            OWLClassExpression[] descs = axiom.getClassExpressions().toArray(new OWLClassExpression[2]);
-            OWLClassExpression d1 = descs[0];
-            OWLClassExpression d2 = descs[1];
+            OWLClassExpression d1 = expressions.get(0);
+            OWLClassExpression d2 = expressions.get(1);
 
             if (d1.isOWLNothing()) {
                 return d2;

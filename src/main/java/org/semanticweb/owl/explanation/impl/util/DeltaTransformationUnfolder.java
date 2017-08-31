@@ -2,10 +2,13 @@ package org.semanticweb.owl.explanation.impl.util;
 
 import org.semanticweb.owlapi.model.*;
 
+import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.asSet;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * Author: Matthew Horridge<br>
@@ -15,7 +18,7 @@ import java.util.Set;
  */
 public class DeltaTransformationUnfolder {
 
-    private OWLDataFactory dataFactory;
+    protected OWLDataFactory dataFactory;
 
     private Map<OWLClass, Set<OWLClassExpression>> posName2ClassExpressionMap = new HashMap<>();
 
@@ -87,16 +90,16 @@ public class DeltaTransformationUnfolder {
             return ce.accept(classExpressionUnfolder);
         }
 
-        private Set<OWLClassExpression> unfold(Set<OWLClassExpression> classExpressions, Polarity polarity) {
+        private Set<OWLClassExpression> unfold(Stream<OWLClassExpression> classExpressions, Polarity polarity) {
             Set<OWLClassExpression> unfolded = new HashSet<>();
-            for(OWLClassExpression ce : classExpressions) {
+            classExpressions.forEach(ce-> {
                 if (polarity.isPositive()) {
                     unfolded.add(ce.accept(positiveClassExpressionUnfolder));
                 }
                 else {
                     unfolded.add(ce.accept(negativeClassExpressionUnfolder));
                 }
-            }
+            });
             return unfolded;
         }
 
@@ -123,7 +126,7 @@ public class DeltaTransformationUnfolder {
 
         @Override
         public OWLAxiom visit(OWLDisjointClassesAxiom owlDisjointClassesAxiom) {
-            return dataFactory.getOWLDisjointClassesAxiom(unfold(owlDisjointClassesAxiom.getClassExpressions(), Polarity.POSITIVE));
+            return dataFactory.getOWLDisjointClassesAxiom(unfold(owlDisjointClassesAxiom.classExpressions(), Polarity.POSITIVE));
         }
 
         @Override
@@ -223,7 +226,7 @@ public class DeltaTransformationUnfolder {
 
         @Override
         public OWLAxiom visit(OWLEquivalentClassesAxiom owlEquivalentClassesAxiom) {
-            return dataFactory.getOWLEquivalentClassesAxiom(unfold(owlEquivalentClassesAxiom.getClassExpressions(), Polarity.POSITIVE));
+            return dataFactory.getOWLEquivalentClassesAxiom(unfold(owlEquivalentClassesAxiom.classExpressions(), Polarity.POSITIVE));
         }
 
         @Override
@@ -347,23 +350,19 @@ public class DeltaTransformationUnfolder {
             }
         }
 
-        private Set<OWLClassExpression> getUnfoldedExpressions(Set<OWLClassExpression> classExpressionSet) {
-            Set<OWLClassExpression> unfolded = new HashSet<>();
-            for(OWLClassExpression ce : classExpressionSet) {
-                unfolded.add(ce.accept(this));
-            }
-            return unfolded;
+        private Stream<OWLClassExpression> getUnfoldedExpressions(Stream<OWLClassExpression> classExpressionSet) {
+            return classExpressionSet.map(ce->ce.accept(this));
         }
 
 
         @Override
         public OWLClassExpression visit(OWLObjectIntersectionOf owlObjectIntersectionOf) {
-            return dataFactory.getOWLObjectIntersectionOf(getUnfoldedExpressions(owlObjectIntersectionOf.getOperands()));
+            return dataFactory.getOWLObjectIntersectionOf(getUnfoldedExpressions(owlObjectIntersectionOf.operands()));
         }
 
         @Override
         public OWLClassExpression visit(OWLObjectUnionOf owlObjectUnionOf) {
-            return dataFactory.getOWLObjectUnionOf(getUnfoldedExpressions(owlObjectUnionOf.getOperands()));
+            return dataFactory.getOWLObjectUnionOf(getUnfoldedExpressions(owlObjectUnionOf.operands()));
         }
 
         @Override

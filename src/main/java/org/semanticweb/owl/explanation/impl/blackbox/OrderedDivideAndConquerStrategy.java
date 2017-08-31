@@ -29,7 +29,6 @@ public class OrderedDivideAndConquerStrategy implements ContractionStrategy {
         AxiomSubjectProviderEx subjectProvider = new AxiomSubjectProviderEx();
         Map<OWLObject, Set<OWLAxiom>> axiomsBySubject = new HashMap<>();
         for(OWLAxiom ax : axioms) {
-            ax.getClassesInSignature();
             OWLObject object = subjectProvider.getSubject(ax);
             Set<OWLAxiom> axiomsSet = axiomsBySubject.get(object);
             axiomsBySubject.put(object, axiomsSet);

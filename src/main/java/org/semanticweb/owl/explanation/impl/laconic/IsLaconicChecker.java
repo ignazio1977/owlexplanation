@@ -9,6 +9,8 @@ import org.semanticweb.owl.explanation.telemetry.TelemetryInfo;
 import org.semanticweb.owl.explanation.telemetry.TelemetryTransmitter;
 import org.semanticweb.owlapi.model.*;
 
+import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.add;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -133,7 +135,7 @@ public class IsLaconicChecker {
 
     private void recordNonLaconicity(TelemetryInfo info, OWLAxiom curAxiom) {
         TelemetryTransmitter transmitter = TelemetryTransmitter.getTransmitter();
-        nonLaconicSourceAxioms.addAll(curAxiom.getAnnotations());
+        add(nonLaconicSourceAxioms, curAxiom.annotations());
         int modalDepth = deltaTransformation.getModalDepth(curAxiom);
         transmitter.recordMeasurement(info, "superfluity depth", modalDepth);
     }

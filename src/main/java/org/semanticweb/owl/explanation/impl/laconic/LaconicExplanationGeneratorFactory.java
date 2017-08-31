@@ -7,6 +7,8 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
+import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.add;
+
 import java.util.HashSet;
 import java.util.Set;
 /*
@@ -57,9 +59,8 @@ public class LaconicExplanationGeneratorFactory<E> implements ExplanationGenerat
     @Override
     public ExplanationGenerator<E> createExplanationGenerator(OWLOntology ontology, ExplanationProgressMonitor<E> progressMonitor) {
         Set<OWLAxiom> axioms = new HashSet<>(ontology.getLogicalAxiomCount());
-        for(OWLOntology ont : ontology.getImportsClosure()) {
-            axioms.addAll(ont.getLogicalAxioms());
-        }
+        ontology.importsClosure()
+            .forEach(ont->add(axioms, ont.logicalAxioms()));
         return createExplanationGenerator(axioms, progressMonitor);
     }
 

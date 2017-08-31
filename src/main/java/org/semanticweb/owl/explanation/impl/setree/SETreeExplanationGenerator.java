@@ -10,6 +10,9 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 
+import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.add;
+import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.asSet;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -66,7 +69,7 @@ public class SETreeExplanationGenerator implements ExplanationGenerator<OWLAxiom
     public Set<Explanation<OWLAxiom>> getExplanations(OWLAxiom entailment, int limit) throws ExplanationException {
         OWLOntologyManager manager = m.get();
         SyntacticLocalityModuleExtractor extractor = new SyntacticLocalityModuleExtractor(manager, workingAxioms.stream(), ModuleType.STAR);
-        module = extractor.extract(entailment.getSignature());
+        module = extractor.extract(asSet(entailment.signature()));
         BlackBoxExplanationGenerator2<OWLAxiom> gen = new BlackBoxExplanationGenerator2<>(module, entailmentCheckerFactory, new StructuralTypePriorityExpansionStrategy(null, m), new DivideAndConquerContractionStrategy(), new NullExplanationProgressMonitor<OWLAxiom>(), m);
         Set<Explanation<OWLAxiom>> expls = gen.getExplanations(entailment, 1);
         Explanation<OWLAxiom> expl = expls.iterator().next();
@@ -83,23 +86,16 @@ public class SETreeExplanationGenerator implements ExplanationGenerator<OWLAxiom
         Set<OWLEntity> commonAxiomsSig = new HashSet<>();
         for(OWLAxiom ax : commonAxioms) {
             System.out.println("\t" + ax);
-            commonAxiomsSig.addAll(ax.getSignature());
+            add(commonAxiomsSig, ax.signature());
         }
 
         Set<OWLAxiom> expansionCandidates = new HashSet<>();
         Set<OWLAxiom> directExpansionCandidates = new HashSet<>();
         for(OWLAxiom ax : module) {
             if (!commonAxioms.contains(ax)) {
-                for(OWLEntity ent : ax.getSignature()) {
-                    if(commonAxiomsSig.contains(ent)) {
-                        expansionCandidates.add(ax);
-                        for(OWLEntity entailmentEnt : entailment.getSignature()) {
-                            if(ax.getSignature().contains(entailmentEnt)) {
-                                directExpansionCandidates.add(ax);
-                            }
-                        }
-                    }
-                }
+                ax.signature()
+                    .filter(commonAxiomsSig::contains)
+                    .forEach(ent -> extendCandidates(entailment, expansionCandidates, directExpansionCandidates, ax));
             }
         }
         System.out.println("There are " + directExpansionCandidates.size() + " direct expansion candidates");
@@ -114,6 +110,14 @@ public class SETreeExplanationGenerator implements ExplanationGenerator<OWLAxiom
 
 
         return Collections.emptySet();
+    }
+
+    protected void extendCandidates(OWLAxiom entailment, Set<OWLAxiom> expansionCandidates,
+        Set<OWLAxiom> directExpansionCandidates, OWLAxiom ax) {
+        expansionCandidates.add(ax);
+        entailment.signature()
+            .filter(entailmentEnt->ax.containsEntityInSignature(entailmentEnt))
+            .forEach(entailmentEnt->directExpansionCandidates.add(ax));
     }
 
 
