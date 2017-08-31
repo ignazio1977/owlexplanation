@@ -33,12 +33,12 @@ import java.util.Set;
  * Author: Matthew Horridge<br> The University Of Manchester<br> Information Management Group<br> Date:
  * 03-Sep-2008<br><br>
  */
-public class SimpleContractionStrategy implements ContractionStrategy {
+public class SimpleContractionStrategy<E> implements ContractionStrategy<E> {
 
     private int count = 0;
 
     @Override
-    public Set<OWLAxiom> doPruning(Set<OWLAxiom> axioms, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor) {
+    public Set<OWLAxiom> doPruning(Set<OWLAxiom> axioms, EntailmentChecker<E> checker, ExplanationProgressMonitor<?> progressMonitor) {
         count = 0;
         Set<OWLAxiom> contraction = new HashSet<>(axioms);
         for(OWLAxiom ax : axioms) {

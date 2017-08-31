@@ -15,7 +15,7 @@ public class SETreeNode<O> {
 
     private SETreeNode<O> parent;
 
-    private List<SETreeNode> children = new ArrayList<>();
+    private List<SETreeNode<O>> children = new ArrayList<>();
 
     public SETreeNode(List<O> elements) {
         this.elements = elements;
@@ -25,12 +25,12 @@ public class SETreeNode<O> {
         return elements;
     }
 
-    public void addChild(SETreeNode node) {
+    public void addChild(SETreeNode<O> node) {
         children.add(node);
         node.parent = this;
     }
 
-    public List<SETreeNode> getChildren() {
+    public List<SETreeNode<O>> getChildren() {
         return children;
     }
 

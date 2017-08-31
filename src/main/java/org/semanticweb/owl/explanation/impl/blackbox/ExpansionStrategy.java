@@ -33,7 +33,7 @@ import java.util.Set;
  * Author: Matthew Horridge<br> The University Of Manchester<br> Information Management Group<br> Date:
  * 03-Sep-2008<br><br>
  */
-public interface ExpansionStrategy {
+public interface ExpansionStrategy<E> {
 
     /**
      * Given an input set of axioms, returns a subset of axioms in which the entailment holds, or the empty set
@@ -45,7 +45,7 @@ public interface ExpansionStrategy {
      * @return A set of axioms that the entailment holds in, or the empty set if the entailment does not hold in the
      * input set.
      */
-    Set<OWLAxiom> doExpansion(Set<OWLAxiom> axioms, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor);
+    Set<OWLAxiom> doExpansion(Set<OWLAxiom> axioms, EntailmentChecker<E> checker, ExplanationProgressMonitor<?> progressMonitor);
 
     int getNumberOfSteps();
 }

@@ -33,7 +33,7 @@ import java.util.Set;/*
  * Author: Matthew Horridge<br> The University of Manchester<br> Information Management Group<br>
  * Date: 27-Nov-2008
  */
-public class OrderedAxiomWithWindowContractionStrategy implements ContractionStrategy {
+public class OrderedAxiomWithWindowContractionStrategy<E> implements ContractionStrategy<E> {
 
     private Object lastEntailment;
 
@@ -53,7 +53,7 @@ public class OrderedAxiomWithWindowContractionStrategy implements ContractionStr
     }
 
     @Override
-    public Set<OWLAxiom> doPruning(Set<OWLAxiom> axioms, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor) {
+    public Set<OWLAxiom> doPruning(Set<OWLAxiom> axioms, EntailmentChecker<E> checker, ExplanationProgressMonitor<?> progressMonitor) {
 
         count = 0;
         int windowSize = 10;

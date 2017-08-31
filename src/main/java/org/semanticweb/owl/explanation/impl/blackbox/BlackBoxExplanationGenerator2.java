@@ -41,9 +41,9 @@ import java.util.function.Supplier;
 public class BlackBoxExplanationGenerator2<E> implements ExplanationGenerator<E>, ExplanationGeneratorMediator<E> {
 
 
-    private ExpansionStrategy expansionStrategy;
+    private ExpansionStrategy<E> expansionStrategy;
 
-    private ContractionStrategy contractionStrategy;
+    private ContractionStrategy<E> contractionStrategy;
 
     private EntailmentCheckerFactory<E> checkerFactory;
 
@@ -69,7 +69,7 @@ public class BlackBoxExplanationGenerator2<E> implements ExplanationGenerator<E>
      * @param contractionStrategy The strategy to be used during the contraction phase
      * @param progressMonitor A progress monitor - may be <code>null</code>
      */
-    public BlackBoxExplanationGenerator2(Set<? extends OWLAxiom> axioms, EntailmentCheckerFactory<E> checkerFactory, ExpansionStrategy expansionStrategy, ContractionStrategy contractionStrategy, ExplanationProgressMonitor<E> progressMonitor, Supplier<OWLOntologyManager> m) {
+    public BlackBoxExplanationGenerator2(Set<? extends OWLAxiom> axioms, EntailmentCheckerFactory<E> checkerFactory, ExpansionStrategy<E> expansionStrategy, ContractionStrategy<E> contractionStrategy, ExplanationProgressMonitor<E> progressMonitor, Supplier<OWLOntologyManager> m) {
         workingAxioms = new HashSet<>(axioms);
         this.checkerFactory = checkerFactory;
         this.expansionStrategy = expansionStrategy;
@@ -225,7 +225,9 @@ public class BlackBoxExplanationGenerator2<E> implements ExplanationGenerator<E>
         TelemetryTransmitter transmitter = TelemetryTransmitter.getTransmitter();
         if (!result.isEmpty()) {
             if (entailment instanceof OWLAxiom) {
-                ExplanationTelemetryWrapper telemetryObject = new ExplanationTelemetryWrapper((Explanation<OWLAxiom>) result, m);
+                @SuppressWarnings("unchecked")
+                Explanation<OWLAxiom> result2 = (Explanation<OWLAxiom>) result;
+                ExplanationTelemetryWrapper telemetryObject = new ExplanationTelemetryWrapper(result2, m);
                 transmitter.recordObject(findOneInfo, "justification", ".owl.xml", telemetryObject);
             }
         }

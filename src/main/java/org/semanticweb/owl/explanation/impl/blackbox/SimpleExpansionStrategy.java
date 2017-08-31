@@ -37,12 +37,12 @@ import java.util.Set;
  * A very simple (inefficient, so used mainly for testing purposes) expansion strategy.  One checker is
  * added at a time.
  */
-public class SimpleExpansionStrategy<E> implements ExpansionStrategy {
+public class SimpleExpansionStrategy<E> implements ExpansionStrategy<E> {
 
     private int count = 0;
 
     @Override
-    public Set<OWLAxiom> doExpansion(Set<OWLAxiom> axioms, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor) {
+    public Set<OWLAxiom> doExpansion(Set<OWLAxiom> axioms, EntailmentChecker<E> checker, ExplanationProgressMonitor<?> progressMonitor) {
         count = 0;
         Set<OWLAxiom> expansion = new HashSet<>();
         for(OWLAxiom ax : axioms) {

@@ -35,11 +35,11 @@ import java.util.Collections;
  *
  * An expansion strategy used for testing.  All of the axioms are added in one go.
  */
-public class AllInOneExpansionStrategy implements ExpansionStrategy {
+public class AllInOneExpansionStrategy<E> implements ExpansionStrategy<E> {
 
 
     @Override
-    public Set<OWLAxiom> doExpansion(Set<OWLAxiom> axioms, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor) {
+    public Set<OWLAxiom> doExpansion(Set<OWLAxiom> axioms, EntailmentChecker<E> checker, ExplanationProgressMonitor<?> progressMonitor) {
         if(checker.isEntailed(axioms)) {
             return axioms;
         }

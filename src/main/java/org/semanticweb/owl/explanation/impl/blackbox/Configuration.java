@@ -40,18 +40,18 @@ public class Configuration<E> {
 
     private EntailmentCheckerFactory<E> checkerFactory;
 
-    private ExpansionStrategy expansionStrategy;
+    private ExpansionStrategy<E> expansionStrategy;
 
-    private ContractionStrategy contractionStrategy;
+    private ContractionStrategy<E> contractionStrategy;
 
     private final Supplier<OWLOntologyManager> m;
 
-    public Configuration(EntailmentCheckerFactory<E> checkerFactory, ExpansionStrategy expansionStrategy, ContractionStrategy contractionStrategy, Supplier<OWLOntologyManager> m) {
+    public Configuration(EntailmentCheckerFactory<E> checkerFactory, ExpansionStrategy<E> expansionStrategy, ContractionStrategy<E> contractionStrategy, Supplier<OWLOntologyManager> m) {
         this(checkerFactory, expansionStrategy, contractionStrategy, null, m);
     }
 
 
-    public Configuration(EntailmentCheckerFactory<E> checkerFactory, ExpansionStrategy expansionStrategy, ContractionStrategy contractionStrategy, ExplanationProgressMonitor<E> progressMonitor, Supplier<OWLOntologyManager> m) {
+    public Configuration(EntailmentCheckerFactory<E> checkerFactory, ExpansionStrategy<E> expansionStrategy, ContractionStrategy<E> contractionStrategy, ExplanationProgressMonitor<E> progressMonitor, Supplier<OWLOntologyManager> m) {
         this.checkerFactory = checkerFactory;
         this.contractionStrategy = contractionStrategy;
         this.expansionStrategy = expansionStrategy;
@@ -60,12 +60,12 @@ public class Configuration<E> {
 
 
     public Configuration(EntailmentCheckerFactory<E> checkerFactory, Supplier<OWLOntologyManager> m) {
-        this(checkerFactory, new StructuralTypePriorityExpansionStrategy(null, m), new DivideAndConquerContractionStrategy(), m);
+        this(checkerFactory, new StructuralTypePriorityExpansionStrategy<E>(null, m), new DivideAndConquerContractionStrategy<E>(), m);
     }
 
 
     public Configuration(EntailmentCheckerFactory<E> checkerFactory, ExplanationProgressMonitor<E> progressMonitor, Supplier<OWLOntologyManager> m) {
-        this(checkerFactory, new StructuralTypePriorityExpansionStrategy(null, m), new DivideAndConquerContractionStrategy(), progressMonitor, m);
+        this(checkerFactory, new StructuralTypePriorityExpansionStrategy<E>(null, m), new DivideAndConquerContractionStrategy<E>(), progressMonitor, m);
     }
 
 
@@ -74,12 +74,12 @@ public class Configuration<E> {
     }
 
 
-    public ContractionStrategy getContractionStrategy() {
+    public ContractionStrategy<E> getContractionStrategy() {
         return contractionStrategy;
     }
 
 
-    public ExpansionStrategy getExpansionStrategy() {
+    public ExpansionStrategy<E> getExpansionStrategy() {
         return expansionStrategy;
     }
 

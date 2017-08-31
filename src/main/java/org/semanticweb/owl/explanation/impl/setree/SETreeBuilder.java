@@ -23,7 +23,7 @@ public class SETreeBuilder<O> {
         }
     }
 
-    public SETreeNode buildTree() {
+    public SETreeNode<O> buildTree() {
         SETreeNode<O> root = new SETreeNode<>(Collections.<O>emptyList());
         extendNode(root);
         return root;
@@ -70,7 +70,7 @@ public class SETreeBuilder<O> {
     public static void main(String[] args) {
         List<Integer> list = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21);
         SETreeBuilder<Integer> builder = new SETreeBuilder<>(list);
-        SETreeNode root = builder.buildTree();
+        SETreeNode<Integer> root = builder.buildTree();
 //        builder.dump(root);
     }
 

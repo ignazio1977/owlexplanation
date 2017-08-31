@@ -1,7 +1,5 @@
 package org.semanticweb.owl.explanation.impl.laconic;
 
-import java.util.concurrent.CountDownLatch;
-
 /**
  * Author: Matthew Horridge<br>
  * The University of Manchester<br>

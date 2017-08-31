@@ -33,7 +33,7 @@ import java.util.*;
  * Information Management Group<br>
  * Date: 06-May-2009
  */
-public class DynamicSlidingWindowContractionStrategy implements ContractionStrategy {
+public class DynamicSlidingWindowContractionStrategy<E> implements ContractionStrategy<E> {
 
     final private int windowSize;
 
@@ -48,7 +48,7 @@ public class DynamicSlidingWindowContractionStrategy implements ContractionStrat
 
 
     @Override
-    public Set<OWLAxiom> doPruning(Set<OWLAxiom> axioms, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor) {
+    public Set<OWLAxiom> doPruning(Set<OWLAxiom> axioms, EntailmentChecker<E> checker, ExplanationProgressMonitor<?> progressMonitor) {
         count = 0;
 
 
@@ -91,7 +91,7 @@ public class DynamicSlidingWindowContractionStrategy implements ContractionStrat
         return count;
     }
 
-    private void doFastPruning(EntailmentChecker checker,
+    private void doFastPruning(EntailmentChecker<E> checker,
                                Set<OWLAxiom> contraction,
                                int roundWindowSize) {
         List<OWLAxiom> axiomList = new ArrayList<>(contraction);

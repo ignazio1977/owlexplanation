@@ -120,11 +120,11 @@ public class LaconicExplanationGenerator<E> implements ExplanationGenerator<E>, 
         return null;
     }
 
-    public MutableTree<Explanation> getHst() {
+    public MutableTree<Explanation<E>> getHst() {
         return null;
     }
 
-    public Set<Explanation<E>> computePreciseJusts(E entailment, int l) throws OWLException {
+    public Set<Explanation<E>> computePreciseJusts(E entailment, int l) {
         return computePreciseJustsOptimised(entailment, l);
     }
 
@@ -261,7 +261,7 @@ public class LaconicExplanationGenerator<E> implements ExplanationGenerator<E>, 
             axiomsInPreviousOntology.clear();
             axiomsInPreviousOntology.addAll(augmentedAxioms);
 
-            Set<Explanation> allPrevJustsCopy = new HashSet<>(allPreviouslyFoundJustifications);
+            Set<Explanation<E>> allPrevJustsCopy = new HashSet<>(allPreviouslyFoundJustifications);
 
             // Create a generator that gets ALL explanations from OPlus
             Set<Explanation<E>> currentJustifications = null;

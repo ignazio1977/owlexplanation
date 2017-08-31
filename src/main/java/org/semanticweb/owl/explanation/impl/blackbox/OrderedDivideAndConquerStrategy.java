@@ -16,20 +16,19 @@ import java.util.Set;
  * Bio-Health Informatics Group<br>
  * Date: 13/01/2011
  */
-public class OrderedDivideAndConquerStrategy implements ContractionStrategy {
+public class OrderedDivideAndConquerStrategy<E> implements ContractionStrategy<E> {
 
-    private DivideAndConquerContractionStrategy delegate = new DivideAndConquerContractionStrategy();
+    private DivideAndConquerContractionStrategy<E> delegate = new DivideAndConquerContractionStrategy<>();
 
     private int count = 0;
 
     @Override
-    public Set<OWLAxiom> doPruning(Set<OWLAxiom> axioms, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor) {
+    public Set<OWLAxiom> doPruning(Set<OWLAxiom> axioms, EntailmentChecker<E> checker, ExplanationProgressMonitor<?> progressMonitor) {
         count = 0;
         LinkedHashSet<OWLAxiom> orderedAxioms = new LinkedHashSet<>();
-        AxiomSubjectProviderEx subjectProvider = new AxiomSubjectProviderEx();
         Map<OWLObject, Set<OWLAxiom>> axiomsBySubject = new HashMap<>();
         for(OWLAxiom ax : axioms) {
-            OWLObject object = subjectProvider.getSubject(ax);
+            OWLObject object = AxiomSubjectProviderEx.getSubject(ax);
             Set<OWLAxiom> axiomsSet = axiomsBySubject.get(object);
             axiomsBySubject.put(object, axiomsSet);
         }

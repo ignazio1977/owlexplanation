@@ -50,18 +50,18 @@ import java.util.HashSet;
 public class InconsistentOntologyExplanationGeneratorFactory implements ExplanationGeneratorFactory<OWLAxiom> {
 
 
-    private InconsistentOntologyContractionStrategy contractionStrategy;
+    private InconsistentOntologyContractionStrategy<OWLAxiom> contractionStrategy;
 
-    private ExpansionStrategy expansionStrategy;
+    private ExpansionStrategy<OWLAxiom> expansionStrategy;
 
     private ConsistencyEntailmentCheckerFactory consistencyEntailmentCheckerFactory;
 
     private Supplier<OWLOntologyManager> m;
 
     public InconsistentOntologyExplanationGeneratorFactory(OWLReasonerFactory reasonerFactory, OWLDataFactory df, Supplier<OWLOntologyManager> m, long entailmentCheckingTimeout) {
-        expansionStrategy = new InconsistentOntologyExpansionStrategy();
+        expansionStrategy = new InconsistentOntologyExpansionStrategy<>();
 //        expansionStrategy = new InconsistentOntologyClashExpansionStrategy();
-        contractionStrategy = new InconsistentOntologyContractionStrategy();
+        contractionStrategy = new InconsistentOntologyContractionStrategy<>();
         this.m = m;
         consistencyEntailmentCheckerFactory = new ConsistencyEntailmentCheckerFactory(reasonerFactory, m, df, entailmentCheckingTimeout);
     }

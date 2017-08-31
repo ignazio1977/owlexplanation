@@ -37,11 +37,11 @@ public class NonSimplePropertyConfiguration extends Configuration<OWLObjectPrope
 
 
     public NonSimplePropertyConfiguration(Supplier<OWLOntologyManager> m) {
-        super(new NSPEntailmentCheckerFactory(m), new StructuralExpansionStrategy(m), new SlidingWindowContractionStrategy(), m);
+        super(new NSPEntailmentCheckerFactory(m), new StructuralExpansionStrategy<OWLObjectPropertyExpression>(m), new SlidingWindowContractionStrategy<OWLObjectPropertyExpression>(), m);
     }
 
 
-    public NonSimplePropertyConfiguration(ExpansionStrategy expansionStrategy, ContractionStrategy contractionStrategy, Supplier<OWLOntologyManager> m) {
+    public NonSimplePropertyConfiguration(ExpansionStrategy<OWLObjectPropertyExpression> expansionStrategy, ContractionStrategy<OWLObjectPropertyExpression> contractionStrategy, Supplier<OWLOntologyManager> m) {
         super(new NSPEntailmentCheckerFactory(m), expansionStrategy, contractionStrategy, m);
     }
 }

@@ -49,9 +49,9 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
 
     public static Level LEVEL = Level.FINEST;
 
-    private ExpansionStrategy expansionStrategy;
+    private ExpansionStrategy<E> expansionStrategy;
 
-    private ContractionStrategy contractionStrategy;
+    private ContractionStrategy<E> contractionStrategy;
 
     private EntailmentCheckerFactory<E> checkerFactory;
 
@@ -59,7 +59,7 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
 
     private Set<OWLAxiom> module = null;
 
-    private MutableTree<Explanation> hst;
+    private MutableTree<Explanation<E>> hst;
 
     private ExplanationProgressMonitor<E> progressMonitor;
 
@@ -79,7 +79,7 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
      * @param contractionStrategy The strategy to be used during the contraction phase
      * @param progressMonitor     A progress monitor - may be <code>null</code>
      */
-    public BlackBoxExplanationGenerator(Set<? extends OWLAxiom> axioms, EntailmentCheckerFactory<E> checkerFactory, ExpansionStrategy expansionStrategy, ContractionStrategy contractionStrategy, ExplanationProgressMonitor<E> progressMonitor) {
+    public BlackBoxExplanationGenerator(Set<? extends OWLAxiom> axioms, EntailmentCheckerFactory<E> checkerFactory, ExpansionStrategy<E> expansionStrategy, ContractionStrategy<E> contractionStrategy, ExplanationProgressMonitor<E> progressMonitor) {
         workingAxioms = new HashSet<>(axioms);
         this.checkerFactory = checkerFactory;
         this.expansionStrategy = expansionStrategy;
@@ -177,9 +177,9 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
         }
     }
 
-    private void collectEmptyNodes(Tree<Explanation> exp, Map<OWLAxiom, Integer> axs) {
-        for (Tree<Explanation> child : exp.getChildren()) {
-            Explanation userObject = child.getUserObject();
+    private void collectEmptyNodes(Tree<Explanation<E>> exp, Map<OWLAxiom, Integer> axs) {
+        for (Tree<Explanation<E>> child : exp.getChildren()) {
+            Explanation<E> userObject = child.getUserObject();
             if (userObject!=null) {
                 if (userObject.getAxioms().isEmpty()) {
                     OWLAxiom label = (OWLAxiom) exp.getEdge(child);
@@ -209,7 +209,7 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
      * @return The justification or an empty set if the entailment does not hold.
      * @throws org.semanticweb.owlapi.model.OWLException if there was a problem.
      */
-    protected Explanation<E> computeExplanation(E entailment) throws OWLException {
+    protected Explanation<E> computeExplanation(E entailment) {
         if (isLoggable()) {
             log("Computing explanation");
         }
@@ -410,8 +410,8 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
                 } else {
                     // End of current path - add it to the list of paths
                     satPaths.add(new HashSet<>(currentPathContents));
-                    Explanation exp = new Explanation<>(entailment, new HashSet<OWLAxiom>(0));
-                    MutableTree<Explanation> node = new MutableTree<>(exp);
+                    Explanation<E> exp = new Explanation<>(entailment, new HashSet<OWLAxiom>(0));
+                    MutableTree<Explanation<E>> node = new MutableTree<>(exp);
 //                    currentNode.addChild(node, checker);
 //                    increment(checker);
                 }

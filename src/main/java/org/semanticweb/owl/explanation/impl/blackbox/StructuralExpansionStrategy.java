@@ -38,7 +38,7 @@ import java.util.function.Supplier;
  * Author: Matthew Horridge<br> The University Of Manchester<br> Information Management Group<br> Date:
  * 03-Sep-2008<br><br>
  */
-public class StructuralExpansionStrategy implements ExpansionStrategy {
+public class StructuralExpansionStrategy<E> implements ExpansionStrategy<E> {
 
     private int count = 0;
     private Supplier<OWLOntologyManager> m;
@@ -48,7 +48,7 @@ public class StructuralExpansionStrategy implements ExpansionStrategy {
     }
 
     @Override
-    public Set<OWLAxiom> doExpansion(final Set<OWLAxiom> axioms, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor) {
+    public Set<OWLAxiom> doExpansion(final Set<OWLAxiom> axioms, EntailmentChecker<E> checker, ExplanationProgressMonitor<?> progressMonitor) {
 
         count = 0;
         try {

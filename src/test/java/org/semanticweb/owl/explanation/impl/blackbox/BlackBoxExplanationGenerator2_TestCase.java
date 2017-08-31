@@ -64,8 +64,8 @@ public class BlackBoxExplanationGenerator2_TestCase {
         generator = new BlackBoxExplanationGenerator2<>(
                 Sets.newHashSet(ASubClassOfB, BSubClassOfC),
                 new SatisfiabilityEntailmentCheckerFactory(reasonerFactory, m),
-                new StructuralExpansionStrategy(m),
-                new SimpleContractionStrategy(),
+                new StructuralExpansionStrategy<>(m),
+                new SimpleContractionStrategy<>(),
                 new NullExplanationProgressMonitor<OWLAxiom>(),
                 m
         );
