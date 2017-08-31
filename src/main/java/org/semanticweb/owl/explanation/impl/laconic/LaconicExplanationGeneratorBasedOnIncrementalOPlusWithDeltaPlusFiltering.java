@@ -200,7 +200,7 @@ public class LaconicExplanationGeneratorBasedOnIncrementalOPlusWithDeltaPlusFilt
             }
 
             reconstituteTimer.start();
-            Set<Explanation<OWLAxiom>> reconstitutedLaconicExpls = getReconstitutedExplanations(dataFactory, transformation, laconicExplanations);
+            Set<Explanation<OWLAxiom>> reconstitutedLaconicExpls = getReconstitutedExplanations(transformation, laconicExplanations);
             reconstituteTimer.stop();
             transmitter.recordTiming(info, "time to reconstitute justifications", reconstituteTimer);
 
@@ -325,10 +325,10 @@ public class LaconicExplanationGeneratorBasedOnIncrementalOPlusWithDeltaPlusFilt
 
     }
 
-    private Set<Explanation<OWLAxiom>> getReconstitutedExplanations(OWLDataFactory dataFactory, OPlusGenerator transformation, Set<Explanation<OWLAxiom>> laconicExplanations) {
+    private Set<Explanation<OWLAxiom>> getReconstitutedExplanations(OPlusGenerator transformation, Set<Explanation<OWLAxiom>> laconicExplanations) {
         Set<Explanation<OWLAxiom>> reconstitutedLaconicExpls = new HashSet<>();
         for (Explanation<OWLAxiom> expl : laconicExplanations) {
-            reconstitutedLaconicExpls.addAll(getReconstitutedExplanations(expl, transformation, dataFactory));
+            reconstitutedLaconicExpls.addAll(getReconstitutedExplanations(expl, transformation));
         }
         return reconstitutedLaconicExpls;
     }
@@ -345,7 +345,7 @@ public class LaconicExplanationGeneratorBasedOnIncrementalOPlusWithDeltaPlusFilt
         return result;
     }
 
-    private Set<Explanation<OWLAxiom>> getReconstitutedExplanations(Explanation<OWLAxiom> expl, OPlusGenerator oPlusGenerator, OWLDataFactory dataFactory) {
+    private Set<Explanation<OWLAxiom>> getReconstitutedExplanations(Explanation<OWLAxiom> expl, OPlusGenerator oPlusGenerator) {
         // Axioms that aren't SubClassOf axioms
         Set<OWLAxiom> nonSubClassOfAxioms = new HashSet<>();
         // SubClassOf axioms that don't share a source axiom with any other axiom
@@ -380,7 +380,7 @@ public class LaconicExplanationGeneratorBasedOnIncrementalOPlusWithDeltaPlusFilt
                     }
                     subClassDisjuncts.addAll(sca.getSubClass().asDisjunctSet());
                     superClassConjuncts.addAll(sca.getSuperClass().asConjunctSet());
-                    OWLSubClassOfAxiom mergedAxiom = createSubClassAxiom(dataFactory, subClassDisjuncts, superClassConjuncts);
+                    OWLSubClassOfAxiom mergedAxiom = createSubClassAxiom(subClassDisjuncts, superClassConjuncts);
                     if (strictOPlus.contains(mergedAxiom)) {
                         reconstitutedAxioms.add(mergedAxiom);
                         oPlusGenerator.addSources(mergedAxiom, oPlusGenerator.getSources(explAx));
@@ -415,7 +415,7 @@ public class LaconicExplanationGeneratorBasedOnIncrementalOPlusWithDeltaPlusFilt
         }
     }
 
-    private OWLSubClassOfAxiom createSubClassAxiom(OWLDataFactory dataFactory, Set<OWLClassExpression> subClassDisjuncts, Set<OWLClassExpression> superClassConjuncts) {
+    private OWLSubClassOfAxiom createSubClassAxiom(Set<OWLClassExpression> subClassDisjuncts, Set<OWLClassExpression> superClassConjuncts) {
         OWLClassExpression mergedSubClass;
         if (subClassDisjuncts.size() == 1) {
             mergedSubClass = subClassDisjuncts.iterator().next();

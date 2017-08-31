@@ -83,10 +83,10 @@ public class LaconicExplanationGenerator<E> implements ExplanationGenerator<E>, 
     }
 
 
-    public Set<OWLAxiom> computeOPlus(Set<OWLAxiom> axioms) {
+    public Set<OWLAxiom> computeOPlus(Set<OWLAxiom> inputAxioms) {
         OPlusGenerator oPlusGenerator = new OPlusGenerator(man.getOWLDataFactory(), OPlusSplitting.TOP_LEVEL);
         Set<OWLAxiom> oPlus = new HashSet<>();
-        for (OWLAxiom ax : axioms) {
+        for (OWLAxiom ax : inputAxioms) {
             Set<? extends OWLAxiom> weakenedAxioms = ax.accept(oPlusGenerator);
             oPlus.addAll(weakenedAxioms);
         }
@@ -124,8 +124,8 @@ public class LaconicExplanationGenerator<E> implements ExplanationGenerator<E>, 
         return null;
     }
 
-    public Set<Explanation<E>> computePreciseJusts(E entailment, int limit) throws OWLException {
-        return computePreciseJustsOptimised(entailment, limit);
+    public Set<Explanation<E>> computePreciseJusts(E entailment, int l) throws OWLException {
+        return computePreciseJustsOptimised(entailment, l);
     }
 
 
@@ -180,8 +180,8 @@ public class LaconicExplanationGenerator<E> implements ExplanationGenerator<E>, 
     // END of progress monitor implementation
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public Set<Explanation<E>> computePreciseJustsOptimised(E entailment, int limit) {
-        this.limit = limit;
+    public Set<Explanation<E>> computePreciseJustsOptimised(E entailment, int l) {
+        this.limit = l;
         foundLaconicJustifications.clear();
         ExplanationGenerator<E> gen = explanationGeneratorFactory.createExplanationGenerator(axioms, this);
         Set<Explanation<E>> regularJusts = null;
@@ -437,8 +437,8 @@ public class LaconicExplanationGenerator<E> implements ExplanationGenerator<E>, 
 
 
     @Override
-    public Set<Explanation<E>> getExplanations(E entailment, int limit) throws ExplanationException {
-        return computePreciseJustsOptimised(entailment, limit);
+    public Set<Explanation<E>> getExplanations(E entailment, int l) throws ExplanationException {
+        return computePreciseJustsOptimised(entailment, l);
     }
 
 
