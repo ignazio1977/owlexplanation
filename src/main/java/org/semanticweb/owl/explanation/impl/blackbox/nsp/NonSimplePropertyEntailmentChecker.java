@@ -4,6 +4,8 @@ import org.semanticweb.owl.explanation.impl.blackbox.EntailmentChecker;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.util.OWLObjectPropertyManager;
 
+import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.asSet;
+
 import java.util.HashSet;
 import java.util.Set;
 /*
@@ -61,7 +63,7 @@ public class NonSimplePropertyEntailmentChecker implements EntailmentChecker<OWL
 
     @Override
     public Set<OWLEntity> getSeedSignature() {
-        return prop.getSignature();
+        return asSet(prop.signature());
     }
 
     @Override
@@ -72,7 +74,7 @@ public class NonSimplePropertyEntailmentChecker implements EntailmentChecker<OWL
 
     @Override
     public Set<OWLEntity> getEntailmentSignature() {
-        return prop.getSignature();
+        return asSet(prop.signature());
     }
 
 

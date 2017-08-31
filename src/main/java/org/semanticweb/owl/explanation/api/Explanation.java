@@ -5,6 +5,9 @@ import org.semanticweb.owlapi.model.*;
 import uk.ac.manchester.cs.owl.explanation.ordering.ExplanationOrderer;
 import uk.ac.manchester.cs.owl.explanation.ordering.ExplanationOrdererImplNoManager;
 
+import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.add;
+import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.asSet;
+
 import java.io.*;
 import java.util.*;
 /*
@@ -112,9 +115,7 @@ public class Explanation<E> {
      */
     public Set<OWLClassExpression> getNestedClassExpressions() {
         Set<OWLClassExpression> subConcepts = new HashSet<>();
-        for (OWLAxiom ax : justification) {
-            subConcepts.addAll(ax.getNestedClassExpressions());
-        }
+        justification.forEach(ax -> add(subConcepts, ax.nestedClassExpressions()));
         return subConcepts;
     }
 
@@ -216,20 +217,10 @@ public class Explanation<E> {
             OWLOntology ontology = m.get().loadOntologyFromOntologyDocument(new BufferedInputStream(is));
             OWLDataFactory df = ontology.getOWLOntologyManager().getOWLDataFactory();
             OWLAnnotationProperty entailmentMarkerAnnotationProperty = df.getOWLAnnotationProperty(ENTAILMENT_MARKER_IRI);
-            Set<OWLAxiom> justificationAxioms = new HashSet<>();
-            OWLAxiom entailment = null;
-            for(OWLAxiom ax : ontology.getAxioms()) {
-                boolean isEntailmentAxiom = !ax.getAnnotations(entailmentMarkerAnnotationProperty).isEmpty();
-                if(!isEntailmentAxiom) {
-                    justificationAxioms.add(ax);
-                }
-                else {
-                    entailment = ax.getAxiomWithoutAnnotations();
-                }
-            }
-            if(entailment == null) {
-                throw new IllegalStateException("Not a serialisation of an Explanation");
-            }
+            Set<OWLAxiom> justificationAxioms = asSet(ontology.axioms().filter(ax -> isNotEntailment(entailmentMarkerAnnotationProperty, ax)));
+            // Expected one and only one entailment axiom
+            OWLAxiom entailment = ontology.axioms().filter(ax->isEntailment(entailmentMarkerAnnotationProperty, ax)).findAny()
+                .orElseThrow(() -> new IllegalStateException("Not a serialisation of an Explanation"));
             return new Explanation<>(entailment, justificationAxioms);
         }
         catch (OWLOntologyCreationException e) {
@@ -237,4 +228,11 @@ public class Explanation<E> {
         }
     }
 
+    protected static boolean isEntailment(OWLAnnotationProperty entailmentMarkerAnnotationProperty, OWLAxiom ax) {
+        return ax.annotations(entailmentMarkerAnnotationProperty).count()>0;
+    }
+
+    protected static boolean isNotEntailment(OWLAnnotationProperty entailmentMarkerAnnotationProperty, OWLAxiom ax) {
+        return ax.annotations(entailmentMarkerAnnotationProperty).count()==0;
+    }
 }

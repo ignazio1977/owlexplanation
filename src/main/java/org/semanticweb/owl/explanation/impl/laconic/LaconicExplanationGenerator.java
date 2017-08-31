@@ -236,14 +236,15 @@ public class LaconicExplanationGenerator<E> implements ExplanationGenerator<E>, 
             // found, but it never appears in O+ then we don't add it to the ontology.
             // The rationale behind this is that certain axioms such as equivalent classes
             // checker will never ever appear in O+ or in a precise justification.
-            for (OWLAxiom ax : ont.getLogicalAxioms()) {
+            ont.logicalAxioms().forEach(ax-> {
                 // If we have found the checker previously in a justification
                 // but our O+ doesn't contain it then we don't add it.
                 if (unionOfAllJustifications.contains(ax) && !oPlus.contains(ax)) {
-                    continue;
+                    //continue; do noting
+                } else {
+                    augmentedAxioms.add(ax);
                 }
-                augmentedAxioms.add(ax);
-            }
+            });
 
             //////////////////////////////////////////////////////////////////////////
             //////////////////////////////////////////////////////////////////////////

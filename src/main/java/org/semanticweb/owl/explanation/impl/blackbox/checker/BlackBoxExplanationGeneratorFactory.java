@@ -7,6 +7,9 @@ import org.semanticweb.owl.explanation.impl.blackbox.BlackBoxExplanationGenerato
 import org.semanticweb.owl.explanation.impl.blackbox.Configuration;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.parameters.Imports;
+
+import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.add;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -57,10 +60,8 @@ public class BlackBoxExplanationGeneratorFactory<E> implements ExplanationGenera
 
     @Override
     public ExplanationGenerator<E> createExplanationGenerator(OWLOntology ontology, ExplanationProgressMonitor<E> progressMonitor) {
-        Set<OWLAxiom> axioms = new HashSet<>(ontology.getLogicalAxiomCount());
-        for(OWLOntology ont : ontology.getImportsClosure()) {
-            axioms.addAll(ont.getLogicalAxioms());
-        }
+        Set<OWLAxiom> axioms = new HashSet<>(ontology.getLogicalAxiomCount(Imports.INCLUDED));
+        ontology.importsClosure().forEach(ont -> add(axioms, ont.logicalAxioms()));
         return new BlackBoxExplanationGenerator2<>(
                 axioms,
                 configuration.getCheckerFactory(),

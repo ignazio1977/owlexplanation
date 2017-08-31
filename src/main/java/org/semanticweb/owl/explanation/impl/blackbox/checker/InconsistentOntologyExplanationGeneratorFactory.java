@@ -4,6 +4,7 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.parameters.Imports;
 import org.semanticweb.owl.explanation.api.ExplanationGeneratorFactory;
 import org.semanticweb.owl.explanation.api.ExplanationGenerator;
 import org.semanticweb.owl.explanation.api.ExplanationProgressMonitor;
@@ -13,6 +14,9 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 
 import java.util.Set;
 import java.util.function.Supplier;
+
+import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.add;
+
 import java.util.HashSet;
 /*
  * Copyright (C) 2009, University of Manchester
@@ -70,10 +74,8 @@ public class InconsistentOntologyExplanationGeneratorFactory implements Explanat
 
     @Override
     public ExplanationGenerator<OWLAxiom> createExplanationGenerator(OWLOntology ontology, ExplanationProgressMonitor<OWLAxiom> progressMonitor) {
-        Set<OWLAxiom> axioms = new HashSet<>(ontology.getLogicalAxiomCount());
-        for(OWLOntology ont : ontology.getImportsClosure()) {
-            axioms.addAll(ont.getLogicalAxioms());
-        }
+        Set<OWLAxiom> axioms = new HashSet<>(ontology.getLogicalAxiomCount(Imports.INCLUDED));
+        ontology.importsClosure().forEach(ont -> add(axioms, ont.logicalAxioms()));
         return new BlackBoxExplanationGenerator2<>(
                 axioms,
                 consistencyEntailmentCheckerFactory,

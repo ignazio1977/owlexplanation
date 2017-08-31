@@ -3,6 +3,9 @@ package org.semanticweb.owl.explanation.impl.blackbox;
 import org.semanticweb.owl.explanation.api.ExplanationProgressMonitor;
 import org.semanticweb.owlapi.model.*;
 
+import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.add;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -51,14 +54,11 @@ public class StructuralExpansionStrategy implements ExpansionStrategy {
         try {
             OWLOntology ont = m.get().createOntology(axioms);
 
-            Set<OWLEntity> entailmentSignature = new HashSet<>();
-            entailmentSignature.addAll(checker.getEntailmentSignature());
+            Set<OWLEntity> entailmentSignature = checker.getEntailmentSignature();
 
 
             Set<OWLAxiom> expansion = new HashSet<>();
-            for (OWLEntity ent : entailmentSignature) {
-                expansion.addAll(ont.getReferencingAxioms(ent));
-            }
+            entailmentSignature.forEach(ent->add(expansion, ont.referencingAxioms(ent)));
 
             while (true) {
                 count++;
@@ -70,11 +70,9 @@ public class StructuralExpansionStrategy implements ExpansionStrategy {
                 }
 
                 // Add some more
-                for (OWLAxiom ax : new HashSet<>(expansion)) {
-                    for (OWLEntity ent : ax.getSignature()) {
-                        Set<OWLAxiom> owlAxioms = ont.getReferencingAxioms(ent);
-                        expansion.addAll(owlAxioms);
-                    }
+                for (OWLAxiom ax : new ArrayList<>(expansion)) {
+                    ax.signature()
+                        .forEach(ent -> add(expansion, ont.referencingAxioms(ent)));
                 }
             }
         }

@@ -7,6 +7,9 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.search.EntitySearcher;
 
+import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.add;
+import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.asList;
+
 import java.util.*;
 /*
  * Copyright (C) 2008, University of Manchester
@@ -76,7 +79,7 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
     public OWLOntology getMergedOntology() throws ExplanationException {
         try {
             if (mergedOntology == null) {
-                mergedOntology = man.createOntology(IRI.create("owlapi:ontology:merge"), reasoner.getRootOntology().getImportsClosure(), true);
+                mergedOntology = man.createOntology(IRI.create("owlapi:ontology:merge"), reasoner.getRootOntology().importsClosure(), true);
             }
             return mergedOntology;
         }
@@ -230,17 +233,13 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
             List<OWLOntologyChange> appliedChanges = new ArrayList<>();
 
             Set<OWLClass> potentialRoots = new HashSet<>();
-            for (OWLDisjointClassesAxiom ax : new ArrayList<>(mergedOntology.getAxioms(AxiomType.DISJOINT_CLASSES))) {
+            for (OWLDisjointClassesAxiom ax : asList(mergedOntology.axioms(AxiomType.DISJOINT_CLASSES))) {
                 for (OWLClass cls : rootUnsatClses) {
-                    if (ax.getSignature().contains(cls)) {
+                    if (ax.containsEntityInSignature(cls)) {
                         RemoveAxiom chg = new RemoveAxiom(mergedOntology, ax);
                         man.applyChange(chg);
                         appliedChanges.add(chg);
-                        for (OWLEntity ent : ax.getSignature()) {
-                            if (ent.isOWLClass()) {
-                                potentialRoots.add(ent.asOWLClass());
-                            }
-                        }
+                        add(potentialRoots, ax.classesInSignature());
                     }
                 }
             }
@@ -264,8 +263,7 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
 
 
     private void computeCandidateRoots() throws ExplanationException {
-        Set<OWLClass> unsatisfiableClasses = reasoner.getUnsatisfiableClasses().getEntities();
-        OWLOntology ont = getMergedOntology();
+        List<OWLClass> unsatisfiableClasses = asList(reasoner.getUnsatisfiableClasses().entities());
         SuperClassChecker checker = new SuperClassChecker();
         for (OWLClass cls : unsatisfiableClasses) {
             checker.reset();
@@ -427,14 +425,17 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
 
         @Override
         public void visit(OWLObjectIntersectionOf desc) {
-            for (OWLClassExpression op : desc.getOperands()) {
-                if (op.isAnonymous()) {
-                    op.accept(this);
-                }
-                else {
-                    if (!reasoner.isSatisfiable(op)) {
-                        dependsOn.add(op.asOWLClass());
-                    }
+            desc.operands().forEach(this::updateUnsatisfiableDependents);
+        }
+
+
+        protected void updateUnsatisfiableDependents(OWLClassExpression op) {
+            if (op.isAnonymous()) {
+                op.accept(this);
+            }
+            else {
+                if (!reasoner.isSatisfiable(op)) {
+                    dependsOn.add(op.asOWLClass());
                 }
             }
         }
@@ -491,18 +492,19 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
 
         @Override
         public void visit(OWLObjectUnionOf desc) {
-            for (OWLClassExpression op : desc.getOperands()) {
-                if (reasoner.isSatisfiable(op)) {
-                    return;
-                }
+            if(desc.operands().anyMatch(op->reasoner.isSatisfiable(op))) {
+                return;
             }
-            for (OWLClassExpression op : desc.getOperands()) {
-                if (op.isAnonymous()) {
-                    op.accept(this);
-                }
-                else {
-                    dependsOn.add(op.asOWLClass());
-                }
+            desc.operands().forEach(this::updateDependents);
+        }
+
+
+        protected void updateDependents(OWLClassExpression op) {
+            if (op.isAnonymous()) {
+                op.accept(this);
+            }
+            else {
+                dependsOn.add(op.asOWLClass());
             }
         }
 

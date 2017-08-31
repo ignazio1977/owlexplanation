@@ -5,6 +5,8 @@ import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 
+import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.add;
+
 import java.util.*;
 import java.util.function.Supplier;
 /*
@@ -68,9 +70,8 @@ public class CompleteRootDerivedReasoner implements RootDerivedReasoner {
         Set<OWLClass> estimatedRoots = srd.getRootUnsatisfiableClasses();
         cls2JustificationMap = new HashMap<>();
         Set<OWLAxiom> allAxioms = new HashSet<>();
-        for (OWLOntology ont : baseReasoner.getRootOntology().getImportsClosure()) {
-            allAxioms.addAll(ont.getLogicalAxioms());
-        }
+        baseReasoner.getRootOntology().importsClosure()
+            .forEach(ont -> add(allAxioms, ont.logicalAxioms()));
 
         for (OWLClass cls : estimatedRoots) {
             cls2JustificationMap.put(cls, new HashSet<Explanation<OWLAxiom>>());

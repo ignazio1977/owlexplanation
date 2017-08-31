@@ -4,6 +4,9 @@ import org.semanticweb.owl.explanation.api.ExplanationGeneratorInterruptedExcept
 import org.semanticweb.owl.explanation.api.ExplanationProgressMonitor;
 import org.semanticweb.owlapi.model.*;
 
+import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.add;
+import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.asList;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -31,6 +34,7 @@ import java.util.Set;
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 
 /**
@@ -77,8 +81,9 @@ public class StructuralTypePriorityExpansionStrategy implements ExpansionStrateg
             EntityFilteredDefinitionExpander expander = new EntityFilteredDefinitionExpander(ont);
             Set<OWLEntity> expandedWithDefinition = new HashSet<>();
             Set<OWLAxiom> addedAxioms = new HashSet<>();
+            OWLDataFactory df = ont.getOWLOntologyManager().getOWLDataFactory();
             for(OWLEntity ent : entailmentSignature) {
-                OWLDeclarationAxiom declAx = ont.getOWLOntologyManager().getOWLDataFactory().getOWLDeclarationAxiom(ent);
+                OWLDeclarationAxiom declAx = df.getOWLDeclarationAxiom(ent);
                 expansion.add(declAx);
                 addedAxioms.add(declAx);
             }
@@ -87,8 +92,7 @@ public class StructuralTypePriorityExpansionStrategy implements ExpansionStrateg
 //        // Initial expansion
             for (OWLEntity ent : entailmentSignature) {
                 expandedWithDefinition.add(ent);
-                Set<? extends OWLAxiom> owlAxioms = ent.accept(expander);
-                expansion.addAll(owlAxioms);
+                add(expansion, ent.accept(expander));
             }
             int size = 0;
             Set<OWLDisjointClassesAxiom> disjointClassesAxioms = new HashSet<>();
@@ -103,7 +107,7 @@ public class StructuralTypePriorityExpansionStrategy implements ExpansionStrateg
                 Set<OWLAxiom> combined = new HashSet<>(disjointClassesAxioms.size() + expansion.size() + 50);
                 combined.addAll(expansion);
                 for(OWLDisjointClassesAxiom disjointAx : disjointClassesAxioms) {
-                    for(OWLClassExpression desc : disjointAx.getClassExpressions()) {
+                    for(OWLClassExpression desc : asList(disjointAx.classExpressions())) {
                         if(desc.isAnonymous()) {
                             combined.add(disjointAx);
                             break;
@@ -125,28 +129,17 @@ public class StructuralTypePriorityExpansionStrategy implements ExpansionStrateg
                 // Expand more
 
                 for (OWLAxiom ax : new ArrayList<>(expansion)) {
-                    for (OWLEntity ent : ax.getSignature()) {
+                    ax.signature().forEach(ent-> {
                         if (!expandedWithDefinition.contains(ent)) {
-                            Set<? extends OWLAxiom> owlAxioms = ent.accept(expander);
-                            for (OWLAxiom expAx : owlAxioms) {
-                                if (!expAx.getAxiomType().equals(AxiomType.DISJOINT_CLASSES) && !expAx.isOfType(AxiomType.CLASS_ASSERTION, AxiomType.OBJECT_PROPERTY_ASSERTION, AxiomType.DATA_PROPERTY_ASSERTION, AxiomType.SAME_INDIVIDUAL, AxiomType.DIFFERENT_INDIVIDUALS)) {
-                                    expansion.add(expAx);
-                                    expansionSig.addAll(expAx.getSignature());
-                                }
-                                else {
-                                    if (expAx instanceof OWLDisjointClassesAxiom) {
-                                        disjointClassesAxioms.add((OWLDisjointClassesAxiom) expAx);
-                                    }
-                                }
-                            }
+                            ent.accept(expander).forEach(expAx -> dealWithDisjoints(expansion, disjointClassesAxioms, expansionSig, expAx));
                             expandedWithDefinition.add(ent);
                         }
-                    }
+                    });
                 }
             }
             for(OWLEntity ent : expansionSig) {
                 if (ent.isOWLClass()) {
-                    expansion.addAll(ont.getDisjointClassesAxioms(ent.asOWLClass()));
+                    add(expansion, ont.disjointClassesAxioms(ent.asOWLClass()));
                 }
             }
             count++;
@@ -157,23 +150,20 @@ public class StructuralTypePriorityExpansionStrategy implements ExpansionStrateg
             }
             // Not worked ... now we fall back
             // TODO: Optimise more
-            while (!expansion.containsAll(ont.getLogicalAxioms())) {
+            while (!expansion.containsAll(asList(ont.logicalAxioms()))) {
                 if(progressMonitor.isCancelled()) {
                     return Collections.emptySet();
                 }
                 // Expand more
                 for (OWLAxiom ax : new ArrayList<>(expansion)) {
-                    for (OWLEntity ent : ax.getSignature()) {
-                            Set<? extends OWLAxiom> owlAxioms = ont.getReferencingAxioms(ent);
-                            expansion.addAll(owlAxioms);
-                    }
+                    ax.signature()
+                        .forEach(ent -> add(expansion, ont.referencingAxioms(ent)));
                 }
                 count++;
                 if (checker.isEntailed(expansion)) {
                     Set<OWLAxiom> result = new HashSet<OWLAxiom>(checker.getEntailingAxioms(expansion));
                     result.removeAll(addedAxioms);
                     return result;
-
                 }
             }
         }
@@ -183,12 +173,23 @@ public class StructuralTypePriorityExpansionStrategy implements ExpansionStrateg
         return expansion;
     }
 
+    protected void dealWithDisjoints(Set<OWLAxiom> expansion,Set<OWLDisjointClassesAxiom> disjointClassesAxioms,Set<OWLEntity> expansionSig, OWLAxiom expAx) {
+        if (!expAx.getAxiomType().equals(AxiomType.DISJOINT_CLASSES) && !expAx.isOfType(AxiomType.CLASS_ASSERTION, AxiomType.OBJECT_PROPERTY_ASSERTION, AxiomType.DATA_PROPERTY_ASSERTION, AxiomType.SAME_INDIVIDUAL, AxiomType.DIFFERENT_INDIVIDUALS)) {
+            expansion.add(expAx);
+            add(expansionSig, expAx.signature());
+        } else {
+            if (expAx instanceof OWLDisjointClassesAxiom) {
+                disjointClassesAxioms.add((OWLDisjointClassesAxiom) expAx);
+            }
+        }
+    }
+
     @Override
     public int getNumberOfSteps() {
         return count;
     }
 
-    private class EntityFilteredDefinitionExpander implements OWLEntityVisitorEx<Set<? extends OWLAxiom>> {
+    private class EntityFilteredDefinitionExpander implements OWLEntityVisitorEx<Stream<? extends OWLAxiom>> {
 
         private OWLOntology theOnt;
 
@@ -197,9 +198,9 @@ public class StructuralTypePriorityExpansionStrategy implements ExpansionStrateg
         }
 
         @Override
-        public Set<? extends OWLAxiom> visit(OWLClass cls) {
+        public Stream<OWLClassAxiom> visit(OWLClass cls) {
             // Return axioms that define the class
-            Set<OWLAxiom> axioms = new HashSet<>(theOnt.getAxioms(cls));
+            return theOnt.axioms(cls);
 //            for(OWLAxiom ax : theOnt.getReferencingAxioms(cls)) {
 //                if (axioms.contains(ax)) {
 //                    if(ax.getAxiomType().equals(AxiomType.EQUIVALENT_CLASSES)) {
@@ -215,43 +216,39 @@ public class StructuralTypePriorityExpansionStrategy implements ExpansionStrateg
 //                    }
 //                }
 //            }
-            return axioms;
         }
 
 
         @Override
-        public Set<? extends OWLAxiom> visit(OWLAnnotationProperty owlAnnotationProperty) {
-            return Collections.emptySet();
+        public Stream<OWLAxiom> visit(OWLAnnotationProperty owlAnnotationProperty) {
+            return Stream.empty();
         }
 
 
         @Override
-        public Set<? extends OWLAxiom> visit(OWLObjectProperty property) {
-            return theOnt.getAxioms(property);
+        public Stream<? extends OWLAxiom> visit(OWLObjectProperty property) {
+            return theOnt.axioms(property);
         }
 
 
         @Override
-        public Set<? extends OWLAxiom> visit(OWLDataProperty property) {
-            return theOnt.getAxioms(property);
+        public Stream<? extends OWLAxiom> visit(OWLDataProperty property) {
+            return theOnt.axioms(property);
         }
 
 
         @Override
-        public Set<? extends OWLAxiom> visit(OWLNamedIndividual individual) {
-            Set<OWLAxiom> axioms = new HashSet<>(theOnt.getAxioms(individual));
-            for(OWLObjectPropertyAssertionAxiom ax : theOnt.getAxioms(AxiomType.OBJECT_PROPERTY_ASSERTION)) {
-                if(ax.getObject().equals(individual)) {
-                    axioms.add(ax);       
-                }
-            }
-            return axioms;
+        public Stream<? extends OWLAxiom> visit(OWLNamedIndividual individual) {
+            return Stream.concat(
+                theOnt.axioms(individual),
+                theOnt.axioms(AxiomType.OBJECT_PROPERTY_ASSERTION)
+                .filter(ax -> ax.getObject().equals(individual)));
         }
 
 
         @Override
-        public Set<? extends OWLAxiom> visit(OWLDatatype dataType) {
-            return Collections.emptySet();
+        public Stream<? extends OWLAxiom> visit(OWLDatatype dataType) {
+            return Stream.empty();
         }
     }
 }

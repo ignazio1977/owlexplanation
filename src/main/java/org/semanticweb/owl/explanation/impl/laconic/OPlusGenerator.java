@@ -3,6 +3,8 @@ package org.semanticweb.owl.explanation.impl.laconic;
 import org.semanticweb.owl.explanation.impl.util.AxiomTransformation;
 import org.semanticweb.owlapi.model.*;
 
+import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.asList;
+
 import java.util.*;
 /*
  * Copyright (C) 2008, University of Manchester
@@ -293,20 +295,14 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
 
     @Override
     public Set<? extends OWLAxiom> visit(OWLDisjointClassesAxiom axiom) {
-        boolean containAnonDescriptions = false;
-        for (OWLClassExpression desc : axiom.getClassExpressions()) {
-            if (desc.isAnonymous()) {
-                containAnonDescriptions = true;
-                break;
-            }
-        }
+        boolean containAnonDescriptions = axiom.classExpressions().anyMatch(OWLClassExpression::isAnonymous);
         if (!containAnonDescriptions) {
             return log(axiom);
         }
         // We treat DisjointClasses(C, D) as syntactic sugar for
         // SubClassOf(C, ObjectComplementOf(D)).
         Set<OWLAxiom> axioms = new HashSet<>();
-        List<OWLClassExpression> descs = new ArrayList<>(axiom.getClassExpressions());
+        List<OWLClassExpression> descs = asList(axiom.classExpressions());
         for (int i = 0; i < descs.size(); i++) {
             for (int j = i + 1; j < descs.size(); j++) {
                 Set<? extends OWLAxiom> weakendAxioms = dataFactory.getOWLSubClassOfAxiom(descs.get(i), dataFactory.getOWLObjectComplementOf(descs.get(j))).accept(this);
@@ -362,13 +358,8 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
     public Set<? extends OWLAxiom> visit(OWLEquivalentObjectPropertiesAxiom axiom) {
         // Bi-implications
         Set<OWLAxiom> result = new HashSet<>();
-        for (OWLObjectPropertyExpression propA : axiom.getProperties()) {
-            for (OWLObjectPropertyExpression propB : axiom.getProperties()) {
-                if (!propA.equals(propB)) {
-                    result.add(dataFactory.getOWLSubObjectPropertyOfAxiom(propA, propB));
-                }
-            }
-        }
+        axiom.walkAllPairwise(
+            (propA, propB) -> result.add(dataFactory.getOWLSubObjectPropertyOfAxiom(propA, propB)));
         return log(axiom, result);
     }
 
@@ -384,15 +375,9 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
         // Pairwise, or the power set?  It should be pairwise - an optimisation.
         // This means if we have something like  Diff(a, b, c, d) and we only
         // care that Diff(a, b) and Diff(a, c) then we can strike out d
-        // from the original checker. In otherwords, we only need the weakest sets
+        // from the original checker. In other words, we only need the weakest sets
         Set<OWLAxiom> result = new HashSet<>();
-        for (OWLIndividual indA : axiom.getIndividuals()) {
-            for (OWLIndividual indB : axiom.getIndividuals()) {
-                if (!indA.equals(indB)) {
-                    result.add(dataFactory.getOWLDifferentIndividualsAxiom(indA, indB));
-                }
-            }
-        }
+        axiom.walkAllPairwise((a, b) -> result.add(dataFactory.getOWLDifferentIndividualsAxiom(a, b)));
         return log(axiom, result);
     }
 
@@ -531,13 +516,7 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
     @Override
     public Set<? extends OWLAxiom> visit(OWLEquivalentClassesAxiom axiom) {
         Set<OWLAxiom> axioms = new HashSet<>();
-        for (OWLClassExpression descA : axiom.getClassExpressions()) {
-            for (OWLClassExpression descB : axiom.getClassExpressions()) {
-                if (!descA.equals(descB)) {
-                    axioms.addAll(dataFactory.getOWLSubClassOfAxiom(descA, descB).accept(this));
-                }
-            }
-        }
+        axiom.walkAllPairwise((a,b) -> axioms.addAll(dataFactory.getOWLSubClassOfAxiom(a,b).accept(this)));
         return log(axiom, axioms);
     }
 

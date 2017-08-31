@@ -3,6 +3,8 @@ package org.semanticweb.owl.explanation.impl.blackbox;
 import org.semanticweb.owl.explanation.api.Explanation;
 import org.semanticweb.owlapi.model.*;
 
+import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.asList;
+
 import java.util.*;
 
 /**
@@ -15,7 +17,7 @@ public class PatternBasedEntailmentChecker {
 
     private OWLAxiom entailment;
 
-    private OWLSubClassOfAxiom subClassOfEntailment;
+    protected OWLSubClassOfAxiom subClassOfEntailment;
 
     private OWLClassAssertionAxiom classAssertionEntailment;
 
@@ -180,6 +182,7 @@ public class PatternBasedEntailmentChecker {
             // EquivalentClasses(C, D)
             // EquivalentClasses(C, ObjectIntersectionOf(D, ...))
             // EquivalentClasses(D, ObjectUnionOf(C, ...))
+            List<OWLClassExpression> asList = asList(axiom.classExpressions());
             if (subClassOfEntailment != null) {
                 OWLClassExpression subClass = subClassOfEntailment.getSubClass();
                 OWLClassExpression superClass = subClassOfEntailment.getSuperClass();
@@ -187,7 +190,7 @@ public class PatternBasedEntailmentChecker {
                     addExplanation(axiom);
                 }
                 else if (axiom.contains(subClass)) {
-                    for (OWLClassExpression ce : axiom.getClassExpressions()) {
+                    for (OWLClassExpression ce : asList) {
                         if (!ce.equals(subClass)) {
                             if (ce.asConjunctSet().contains(superClass)) {
                                 addExplanation(axiom);
@@ -197,7 +200,7 @@ public class PatternBasedEntailmentChecker {
                     }
                 }
                 else if (axiom.contains(superClass)) {
-                    for (OWLClassExpression ce : axiom.getClassExpressions()) {
+                    for (OWLClassExpression ce : asList) {
                         if (!ce.equals(superClass)) {
                             if (ce.asDisjunctSet().contains(subClass)) {
                                 addExplanation(axiom);

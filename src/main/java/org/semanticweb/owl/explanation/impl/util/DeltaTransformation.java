@@ -2,7 +2,10 @@ package org.semanticweb.owl.explanation.impl.util;
 
 import org.semanticweb.owlapi.model.*;
 
+import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.asSet;
+
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * Author: Matthew Horridge<br>
@@ -14,7 +17,7 @@ public class DeltaTransformation implements AxiomTransformation {
 
     private int freshIRICounter = 0;
 
-    private OWLDataFactory dataFactory;
+    protected OWLDataFactory dataFactory;
 
     private Set<OWLEntity> freshEntities = new HashSet<>();
 
@@ -26,17 +29,17 @@ public class DeltaTransformation implements AxiomTransformation {
 
     private Map<OWLAxiom, Integer> namingAxiom2ModalDepth = new HashMap<>();
 
-    private int modalDepth = 0;
+    protected int modalDepth = 0;
 
     public DeltaTransformation(OWLDataFactory dataFactory) {
         this.dataFactory = dataFactory;
     }
 
-    private boolean isFreshEntity(OWLEntity entity) {
+    protected boolean isFreshEntity(OWLEntity entity) {
         return freshEntities.contains(entity);
     }
 
-    private OWLClass getFreshClass() {
+    protected OWLClass getFreshClass() {
         OWLClass freshClass = dataFactory.getOWLClass(getNextFreshIRI());
         freshEntities.add(freshClass);
         return freshClass;
@@ -98,7 +101,7 @@ public class DeltaTransformation implements AxiomTransformation {
 //        return dr.isDatatype() && freshEntities.contains(dr.asOWLDatatype());
 //    }
 
-    private OWLNamedIndividual assignName(OWLIndividual individual) {
+    protected OWLNamedIndividual assignName(OWLIndividual individual) {
         OWLNamedIndividual freshIndividual = getFreshIndividual();
         Set<OWLIndividual> individuals = new HashSet<>();
         individuals.add(individual);
@@ -111,7 +114,7 @@ public class DeltaTransformation implements AxiomTransformation {
         return freshIndividual;
     }
 
-    private OWLClass assignName(OWLClassExpression classExpression, Polarity polarity) {
+    protected OWLClass assignName(OWLClassExpression classExpression, Polarity polarity) {
         if(polarity.isPositive()) {
             if(classExpression.isOWLThing()) {
                 return classExpression.asOWLClass();
@@ -278,10 +281,7 @@ public class DeltaTransformation implements AxiomTransformation {
 
         @Override
         public Set<OWLAxiom> visit(OWLDifferentIndividualsAxiom axiom) {
-            Set<OWLIndividual> renamed = new HashSet<>();
-            for(OWLIndividual ind : axiom.getIndividuals()) {
-                renamed.add(assignName(ind));
-            }
+            Set<OWLIndividual> renamed = asSet(axiom.individuals().map(ind -> assignName(ind)));
             return Collections.<OWLAxiom>singleton(dataFactory.getOWLDifferentIndividualsAxiom(renamed));
         }
 
@@ -400,10 +400,7 @@ public class DeltaTransformation implements AxiomTransformation {
 
         @Override
         public Set<OWLAxiom> visit(OWLSameIndividualAxiom axiom) {
-            Set<OWLNamedIndividual> renamed = new HashSet<>();
-            for(OWLIndividual ind : axiom.getIndividuals()) {
-                renamed.add(assignName(ind));
-            }
+            Set<OWLNamedIndividual> renamed = asSet(axiom.individuals().map(ind -> assignName(ind)));
             return Collections.<OWLAxiom>singleton(dataFactory.getOWLSameIndividualAxiom(renamed));
 
         }
@@ -460,34 +457,31 @@ public class DeltaTransformation implements AxiomTransformation {
             this.polarity = polarity;
         }
 
-        private Set<OWLClassExpression> getRenamedClasses(Set<OWLClassExpression> classes, boolean useSameName) {
-            Set<OWLClassExpression> result = new HashSet<>();
+        private Set<OWLClassExpression> getRenamedClasses(Stream<OWLClassExpression> classes, boolean useSameName) {
             if(useSameName) {
                 OWLClass name = getFreshClass();
-                for(OWLClassExpression ce : classes) {
-                    if(polarity.isPositive()) {
-                        if(!ce.isOWLThing()) {
-                            OWLClassExpression ceP = ce.accept(this);
-                            assignName(ceP, Polarity.POSITIVE, name);
-                        }
-                    }
-                    else {
-                        if(!ce.isOWLNothing()) {
-                            OWLClassExpression ceP = ce.accept(this);
-                            assignName(ceP, Polarity.NEGATIVE, name);
-                        }
-                    }
-                }
+                classes.forEach(ce -> assignByPolarity(name, ce));
                 return Collections.<OWLClassExpression>singleton(name);
             }
-            else {
-                for (OWLClassExpression cls : classes) {
-                    OWLClassExpression transCls = cls.accept(this);
-                    OWLClassExpression renaming = assignName(transCls, polarity);
-                    result.add(renaming);
+            return asSet(
+                classes
+                    .map(cls->cls.accept(this))
+                    .map(transCls->assignName(transCls, polarity)));
+        }
+
+        protected void assignByPolarity(OWLClass name, OWLClassExpression ce) {
+            if(polarity.isPositive()) {
+                if(!ce.isOWLThing()) {
+                    OWLClassExpression ceP = ce.accept(this);
+                    assignName(ceP, Polarity.POSITIVE, name);
                 }
             }
-            return result;
+            else {
+                if(!ce.isOWLNothing()) {
+                    OWLClassExpression ceP = ce.accept(this);
+                    assignName(ceP, Polarity.NEGATIVE, name);
+                }
+            }
         }
 
         @Override
@@ -497,7 +491,7 @@ public class DeltaTransformation implements AxiomTransformation {
 
         @Override
         public OWLClassExpression visit(OWLObjectIntersectionOf ce) {
-            Set<OWLClassExpression> renamedOperands = getRenamedClasses(ce.getOperands(), polarity.isPositive());
+            Set<OWLClassExpression> renamedOperands = getRenamedClasses(ce.operands(), polarity.isPositive());
             if (renamedOperands.size() == 1) {
                 return renamedOperands.iterator().next();
             }
@@ -508,7 +502,7 @@ public class DeltaTransformation implements AxiomTransformation {
 
         @Override
         public OWLClassExpression visit(OWLObjectUnionOf ce) {
-            Set<OWLClassExpression> renamedOperands = getRenamedClasses(ce.getOperands(), !polarity.isPositive());
+            Set<OWLClassExpression> renamedOperands = getRenamedClasses(ce.operands(), !polarity.isPositive());
             if(renamedOperands.size() == 1) {
                 return renamedOperands.iterator().next();
             }
@@ -546,7 +540,7 @@ public class DeltaTransformation implements AxiomTransformation {
         @Override
         public OWLClassExpression visit(OWLObjectHasValue ce) {
             modalDepth++;
-            OWLNamedIndividual renamedInd = assignName(ce.getValue());
+            OWLNamedIndividual renamedInd = assignName(ce.getFiller());
             modalDepth--;
             return dataFactory.getOWLObjectHasValue(ce.getProperty(), renamedInd);
         }
@@ -585,11 +579,7 @@ public class DeltaTransformation implements AxiomTransformation {
 
         @Override
         public OWLClassExpression visit(OWLObjectOneOf ce) {
-            Set<OWLNamedIndividual> renamed = new HashSet<>();
-            for(OWLIndividual ind : ce.getIndividuals()) {
-                renamed.add(assignName(ind));
-            }
-            return dataFactory.getOWLObjectOneOf(renamed);
+            return dataFactory.getOWLObjectOneOf(ce.individuals().map(ind -> assignName(ind)));
         }
 
         @Override

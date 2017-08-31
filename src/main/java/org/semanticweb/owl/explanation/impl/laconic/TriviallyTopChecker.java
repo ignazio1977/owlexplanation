@@ -41,23 +41,13 @@ public class TriviallyTopChecker implements OWLClassExpressionVisitorEx<Boolean>
 
     @Override
     public Boolean visit(OWLObjectIntersectionOf desc) {
-        for(OWLClassExpression op : desc.getOperands()) {
-            if(!op.accept(this)) {
-                return false;
-            }
-        }
-        return true;
+        return !desc.operands().anyMatch(op->!op.accept(this));
     }
 
 
     @Override
     public Boolean visit(OWLObjectUnionOf desc) {
-        for(OWLClassExpression op : desc.getOperands()) {
-            if(op.accept(this)) {
-                return true;
-            }
-        }
-        return false;
+        return desc.operands().anyMatch(op->op.accept(this));
     }
 
 
