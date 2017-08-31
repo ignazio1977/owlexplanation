@@ -37,9 +37,6 @@ import java.util.*;
 public class BreadthFirstStrategy<E> implements HittingSetTreeConstructionStrategy<E> {
 
 
-    public void start(HittingSetTree<E> hittingSetTree) {
-    }
-
     @Override
     public void constructTree(HittingSetTree<E> hittingSetTree, int limit, ExplanationGeneratorMediator<E> handler) {
         if (hittingSetTree.getProgressMonitor().isCancelled()) {
@@ -56,8 +53,6 @@ public class BreadthFirstStrategy<E> implements HittingSetTreeConstructionStrate
             }
         }
     }
-
-    private boolean rebuilt = false;
 
     public boolean buildHittingSetTree(HittingSetTree<E> hittingSetTree, int limit, ExplanationGeneratorMediator<E> handler, List<HittingSetTreeNode<E>> queue) {
         while (!queue.isEmpty()) {
@@ -88,7 +83,7 @@ public class BreadthFirstStrategy<E> implements HittingSetTreeConstructionStrate
                         }
 
                         // See if we can reuse a justification.
-                        Explanation<E> expl = getNonIntersectingExplanation(hittingSetTree, pathContents, queue);
+                        Explanation<E> expl = getNonIntersectingExplanation(hittingSetTree, pathContents);
                         boolean reuse = true;
                         if (expl == null) {
                             reuse = false;
@@ -105,7 +100,7 @@ public class BreadthFirstStrategy<E> implements HittingSetTreeConstructionStrate
                         }
 
                         if (!expl.isEmpty()) {
-                            HittingSetTreeNode<E> hittingSetTreeNode = new HittingSetTreeNode<>(hittingSetTree, ax, currentNode, expl, reuse);
+                            HittingSetTreeNode<E> hittingSetTreeNode = new HittingSetTreeNode<>(ax, currentNode, expl, reuse);
                             currentNode.addChild(ax, hittingSetTreeNode);
                             queue.add(hittingSetTreeNode);
                         }
@@ -120,22 +115,17 @@ public class BreadthFirstStrategy<E> implements HittingSetTreeConstructionStrate
                         }
                     }
                 }
-                else {
-
-                }
             }
         }
         return false;
     }
 
-    private Explanation<E> getNonIntersectingExplanation(HittingSetTree<E> hittingSetTree, Set<OWLAxiom> pathContents, List<HittingSetTreeNode<E>> queue) {
+    private Explanation<E> getNonIntersectingExplanation(HittingSetTree<E> hittingSetTree, Set<OWLAxiom> pathContents) {
 
 
         List<Explanation<E>> explanations = hittingSetTree.getSortedExplanations();
 
         // Choose an explanation that contains axioms that are contained in other openFromFolder paths
-
-        int pathsToExploreMinimum = Integer.MAX_VALUE;
 
         Explanation<E> currentCandidate = null;
 
@@ -152,34 +142,9 @@ public class BreadthFirstStrategy<E> implements HittingSetTreeConstructionStrate
             }
             if (!overlaps) {
                 return existingExpl;
-
-//                // It is a candidate
-//                int pathsToExploreForCurrentNode = getNumberOfPathsToExploreForCandidateExplanation(hittingSetTree, pathContents, existingExpl);
-//                if(pathsToExploreForCurrentNode < pathsToExploreMinimum) {
-//                    pathsToExploreMinimum = pathsToExploreForCurrentNode;
-//                    currentCandidate = existingExpl;
-//                }
             }
         }
         return currentCandidate;
 
     }
-
-//    private int getNumberOfPathsToExploreForCandidateExplanation(HittingSetTree<E> hittingSetTree, Set<OWLAxiom> pathContents, Explanation<E> existingExpl) {
-//        int pathsToExploreForCurrentNode = existingExpl.getAxioms().size();
-//        Set<OWLAxiom> currentNodePath = new HashSet<OWLAxiom>(pathContents);
-//        for (OWLAxiom currentNodeAx : existingExpl.getAxioms()) {
-//            currentNodePath.add(currentNodeAx);
-//            if (hittingSetTree.isExplored(currentNodePath)) {
-//                pathsToExploreForCurrentNode--;
-//            }
-//            currentNodePath.remove(currentNodeAx);
-//        }
-//        return pathsToExploreForCurrentNode;
-//    }
-
-    public void finish(HittingSetTree<E> hittingSetTree) {
-    }
-
-
 }

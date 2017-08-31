@@ -6,7 +6,6 @@ import org.semanticweb.owl.explanation.impl.laconic.LaconicExplanationGeneratorF
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.util.StructuralTransformation;
 
 import java.util.Set;
@@ -43,13 +42,10 @@ public class MaskingDetectorDeltaImpl implements MaskingDetector {
 
     private OWLOntologyManager manager;
 
-    private OWLReasonerFactory reasonerFactory;
-
     private LaconicExplanationGeneratorFactory<OWLAxiom> expGenFac;
 
-    public MaskingDetectorDeltaImpl(OWLOntologyManager manager, LaconicExplanationGeneratorFactory<OWLAxiom> expGenFac, OWLReasonerFactory reasonerFactory) {
+    public MaskingDetectorDeltaImpl(OWLOntologyManager manager, LaconicExplanationGeneratorFactory<OWLAxiom> expGenFac) {
         this.manager = manager;
-        this.reasonerFactory = reasonerFactory;
         this.expGenFac = expGenFac;
     }
 

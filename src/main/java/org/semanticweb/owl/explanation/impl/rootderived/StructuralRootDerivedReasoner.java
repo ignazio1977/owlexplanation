@@ -3,11 +3,9 @@ package org.semanticweb.owl.explanation.impl.rootderived;
 import org.semanticweb.owl.explanation.api.ExplanationException;
 import org.semanticweb.owl.explanation.api.RootDerivedReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
-import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.search.EntitySearcher;
 
-import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.add;
 import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.asList;
 
 import java.util.*;
@@ -45,8 +43,6 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
 
     protected OWLReasoner reasoner;
 
-    private OWLReasonerFactory reasonerFactory;
-
     private OWLOntology mergedOntology;
 
     private Map<OWLClass, Set<OWLClass>> child2Parent;
@@ -58,9 +54,8 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
     private boolean dirty;
 
 
-    public StructuralRootDerivedReasoner(OWLOntologyManager man, OWLReasoner reasoner, OWLReasonerFactory reasonerFactory) {
+    public StructuralRootDerivedReasoner(OWLOntologyManager man, OWLReasoner reasoner) {
         this.man = man;
-        this.reasonerFactory = reasonerFactory;
         this.reasoner = reasoner;
         this.child2Parent = new HashMap<>();
         this.parent2Child = new HashMap<>();
@@ -142,54 +137,17 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
 
             for (OWLClass cls : child2Parent.keySet()) {
                 if (!processed.contains(cls)) {
-                    tarjan(cls, 0, new Stack<OWLClass>(), new HashMap<OWLClass, Integer>(), new HashMap<OWLClass, Integer>(), result, processed, new HashSet<OWLClass>());
+                    tarjan(cls, 0, new LinkedList<OWLClass>(), new HashMap<OWLClass, Integer>(), new HashMap<OWLClass, Integer>(), result, processed, new HashSet<OWLClass>());
                 }
 
 
-//                Set<List<OWLClass>> paths = new HashSet<List<OWLClass>>();
-//                getPaths(cls, new ArrayList<OWLClass>(), new HashSet<OWLClass>(), paths);
-//                for (List<OWLClass> path : paths) {
-//                    System.out.println(path);
-//                    if (path.size() > 2 && path.get(0).equals(path.get(path.size() - 1))) {
-//                        System.out.println(path);
-//                        roots.add(cls);
-//                    }
-//                }
             }
-//            if(!result.isEmpty()) {
-//                    System.out.println("CYCLES:");
-//                    System.out.println(result);
-//                    roots.add(cls);
-//                }
             for (Set<OWLClass> res : result) {
                 roots.addAll(res);
             }
-//            System.out.println(result );
     }
 
-    private void getPaths(OWLClass cls, List<OWLClass> curPath, Set<OWLClass> curPathSet, Set<List<OWLClass>> paths) {
-        if (curPathSet.contains(cls)) {
-            curPath.add(cls);
-            paths.add(new ArrayList<>(curPath));
-            return;
-        }
-        curPathSet.add(cls);
-        curPath.add(cls);
-        Set<OWLClass> parents = child2Parent.get(cls);
-        if (parents.isEmpty()) {
-            paths.add(new ArrayList<>(curPath));
-        }
-        for (OWLClass dep : parents) {
-            getPaths(dep, curPath, curPathSet, paths);
-            if (!curPath.isEmpty()) {
-                curPath.remove(curPath.size() - 1);
-                curPathSet.remove(dep);
-            }
-        }
-    }
-
-
-    public void tarjan(OWLClass cls, int index, Stack<OWLClass> stack, Map<OWLClass, Integer> indexMap, Map<OWLClass, Integer> lowlinkMap, Set<Set<OWLClass>> result, Set<OWLClass> processed, Set<OWLClass> stackClass) {
+    public void tarjan(OWLClass cls, int index, Deque<OWLClass> stack, Map<OWLClass, Integer> indexMap, Map<OWLClass, Integer> lowlinkMap, Set<Set<OWLClass>> result, Set<OWLClass> processed, Set<OWLClass> stackClass) {
         processed.add(cls);
         indexMap.put(cls, index);
         lowlinkMap.put(cls, index);
@@ -221,40 +179,6 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
         }
     }
 
-
-    private void pruneRoots() throws ExplanationException {
-        try {
-            Set<OWLClass> rootUnsatClses = new HashSet<>(roots);
-            List<OWLOntologyChange> appliedChanges = new ArrayList<>();
-
-            Set<OWLClass> potentialRoots = new HashSet<>();
-            for (OWLDisjointClassesAxiom ax : asList(mergedOntology.axioms(AxiomType.DISJOINT_CLASSES))) {
-                for (OWLClass cls : rootUnsatClses) {
-                    if (ax.containsEntityInSignature(cls)) {
-                        RemoveAxiom chg = new RemoveAxiom(mergedOntology, ax);
-                        man.applyChange(chg);
-                        appliedChanges.add(chg);
-                        add(potentialRoots, ax.classesInSignature());
-                    }
-                }
-            }
-
-            for (OWLClass c : rootUnsatClses) {
-                man.addAxiom(mergedOntology, man.getOWLDataFactory().getOWLDeclarationAxiom(c));
-            }
-
-
-            OWLReasoner checkingReasoner = reasonerFactory.createReasoner(mergedOntology);
-            for (OWLClass root : new ArrayList<>(rootUnsatClses)) {
-                if (!potentialRoots.contains(root) && checkingReasoner.isSatisfiable(root)) {
-                    rootUnsatClses.remove(root);
-                }
-            }
-        }
-        catch (OWLOntologyChangeException e) {
-            throw new ExplanationException(e);
-        }
-    }
 
 
     private void computeCandidateRoots() throws ExplanationException {
@@ -314,19 +238,6 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
 
 
         public Set<OWLClass> getDependencies() {
-//            for (int depth : modalDepth2UniversalRestrictionPropertyMap.keySet()) {
-//                Set<OWLObjectPropertyExpression> successors = modalDepth2ExistsRestrictionPropertyMap.get(depth);
-//                if (successors == null) {
-//                    continue;
-//                }
-//                for (OWLObjectAllValuesFrom r : modalDepth2UniversalRestrictionPropertyMap.get(depth)) {
-//                    if (successors.contains(r.getProperty())) {
-//                        if (!r.getFiller().isAnonymous()) {
-//                            dependsOn.add(r.getFiller().asOWLClass());
-//                        }
-//                    }
-//                }
-//            }
             return Collections.unmodifiableSet(dependsOn);
         }
 
@@ -408,10 +319,8 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
                 modalDepth--;
             }
             else {
-                if (!reasoner.isSatisfiable(desc.getFiller())) {
-                    if (!desc.getFiller().isAnonymous()) {
-                        dependsOn.add(desc.getFiller().asOWLClass());
-                    }
+                if (!reasoner.isSatisfiable(desc.getFiller()) && !desc.getFiller().isAnonymous()) {
+                    dependsOn.add(desc.getFiller().asOWLClass());
                 }
             }
             addExistsRestrictionProperty(desc.getProperty());

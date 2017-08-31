@@ -2,7 +2,6 @@ package org.semanticweb.owl.explanation.impl.blackbox;
 
 import org.semanticweb.owl.explanation.api.ExplanationProgressMonitor;
 import org.semanticweb.owlapi.model.*;
-import uk.ac.manchester.cs.owl.explanation.ordering.Tree;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 
@@ -49,20 +48,6 @@ public class ModularityContractionStrategy<E> implements ContractionStrategy<E> 
     public ModularityContractionStrategy(Supplier<OWLOntologyManager> m) {
         this.m = m;
     }
-
-    private static <E> void toList(Tree<OWLAxiom> tree, List<OWLAxiom> axioms, EntailmentChecker<E> checker) {
-        OWLAxiom axiom = tree.getUserObject();
-        if (axiom == null) {
-            return;
-        }
-        if (!axiom.equals(checker.getEntailment())) {
-            axioms.add(axiom);
-        }
-        for (Tree<OWLAxiom> t : tree.getChildren()) {
-            toList(t, axioms, checker);
-        }
-    }
-
 
     @Override
     public Set<OWLAxiom> doPruning(Set<OWLAxiom> axioms, EntailmentChecker<E> checker, ExplanationProgressMonitor<?> progressMonitor) {
@@ -149,22 +134,4 @@ public class ModularityContractionStrategy<E> implements ContractionStrategy<E> 
         }
         return finished;
     }
-
-
-//    private void dumpDiff(Set<OWLAxiom> fast, Set<OWLAxiom> slow) {
-//        System.out.println("");
-//        System.out.println("");
-//        System.out.println("***************************************************************************");
-//        System.out.println("***************************************************************************");
-//        for (OWLAxiom ax : new TreeSet<OWLAxiom>(fast)) {
-//            if (!slow.contains(ax)) {
-//                System.out.print("\t\t");
-//            }
-//            System.out.println(ax);
-//        }
-//        System.out.println("");
-//        System.out.println("");
-//        System.out.println("");
-//        System.out.println("");
-//    }
 }

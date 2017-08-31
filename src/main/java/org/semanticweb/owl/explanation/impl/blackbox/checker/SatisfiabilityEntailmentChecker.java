@@ -66,8 +66,6 @@ public class SatisfiabilityEntailmentChecker implements EntailmentChecker<OWLAxi
 
     private OWLReasonerFactory reasonerFactory;
 
-    private Set<OWLAxiom> seedSignature;
-
     private boolean useModularisation;
 
     final private Set<OWLAxiom> lastAxioms;
@@ -89,7 +87,6 @@ public class SatisfiabilityEntailmentChecker implements EntailmentChecker<OWLAxi
         this.axiom = entailment;
         this.useModularisation = useModularisation;
         this.timeOutMS = timeOutMS;
-        this.seedSignature = new HashSet<>();
         this.lastAxioms = new HashSet<>();
         this.lastEntailingAxioms = new HashSet<>();
         freshEntities = new HashSet<>();
@@ -104,14 +101,6 @@ public class SatisfiabilityEntailmentChecker implements EntailmentChecker<OWLAxi
             unsatDesc = entailment.accept(con);
         }
     }
-
-//    public static int getTimeOut() {
-//        return TIME_OUT;
-//    }
-//
-//    public static void setTimeOut(int timeOut) {
-//        SatisfiabilityEntailmentChecker.TIME_OUT = timeOut;
-//    }
 
     @Override
     public String getModularisationTypeDescription() {
@@ -172,18 +161,6 @@ public class SatisfiabilityEntailmentChecker implements EntailmentChecker<OWLAxi
         }
     }
 
-    private static OWLOntology createEmptyOntology(OWLOntologyManager man) {
-        try {
-            return man.createOntology();
-        } catch (OWLOntologyCreationException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static boolean containsNominals(OWLAxiom ax) {
-        return ax.nestedClassExpressions().anyMatch(ce->ce instanceof OWLObjectOneOf);
-    }
-
     @Override
     public boolean isEntailed(Set<OWLAxiom> axioms) {
 
@@ -197,7 +174,6 @@ public class SatisfiabilityEntailmentChecker implements EntailmentChecker<OWLAxi
         boolean entailed = true;
         OWLOntology toSave = null;
         try {
-//            transmitter.recordObject(info, "entailment", "", getEntailment());
             transmitter.recordMeasurement(info, "input size", axioms.size());
             totalTimer.start();
 
@@ -289,221 +265,6 @@ public class SatisfiabilityEntailmentChecker implements EntailmentChecker<OWLAxi
             isEntailed(axioms);
         }
         return lastEntailingAxioms;
-    }
-
-
-
-    private class AxiomsSplitter implements OWLAxiomVisitor {
-
-        private Set<OWLAxiom> aboxAxioms;
-
-        private Set<OWLAxiom> tboxAxioms;
-
-        private AxiomsSplitter(int size) {
-            aboxAxioms = new HashSet<>(size);
-            tboxAxioms = new HashSet<>(size);
-        }
-
-        public Set<OWLAxiom> getAboxAxioms() {
-            return aboxAxioms;
-        }
-
-        public Set<OWLAxiom> getTboxAxioms() {
-            return tboxAxioms;
-        }
-
-        @Override
-        public void visit(OWLDeclarationAxiom ax) {
-        }
-
-
-
-        @Override
-        public void visit(OWLSubClassOfAxiom ax) {
-            tboxAxioms.add(ax);
-
-        }
-
-        @Override
-        public void visit(OWLNegativeObjectPropertyAssertionAxiom ax) {
-            tboxAxioms.add(ax);
-        }
-
-        @Override
-        public void visit(OWLAsymmetricObjectPropertyAxiom ax) {
-            tboxAxioms.add(ax);
-        }
-
-        @Override
-        public void visit(OWLReflexiveObjectPropertyAxiom ax) {
-            tboxAxioms.add(ax);
-        }
-
-        @Override
-        public void visit(OWLDisjointClassesAxiom ax) {
-            tboxAxioms.add(ax);
-        }
-
-        @Override
-        public void visit(OWLDataPropertyDomainAxiom ax) {
-            tboxAxioms.add(ax);
-        }
-
-        @Override
-        public void visit(OWLObjectPropertyDomainAxiom ax) {
-            tboxAxioms.add(ax);
-        }
-
-        @Override
-        public void visit(OWLEquivalentObjectPropertiesAxiom ax) {
-            tboxAxioms.add(ax);
-        }
-
-        @Override
-        public void visit(OWLNegativeDataPropertyAssertionAxiom ax) {
-            tboxAxioms.add(ax);
-        }
-
-        @Override
-        public void visit(OWLDifferentIndividualsAxiom ax) {
-            aboxAxioms.add(ax);
-        }
-
-        @Override
-        public void visit(OWLDisjointDataPropertiesAxiom ax) {
-            tboxAxioms.add(ax);
-        }
-
-        @Override
-        public void visit(OWLDisjointObjectPropertiesAxiom ax) {
-            tboxAxioms.add(ax);
-        }
-
-        @Override
-        public void visit(OWLObjectPropertyRangeAxiom ax) {
-            tboxAxioms.add(ax);
-        }
-
-        @Override
-        public void visit(OWLObjectPropertyAssertionAxiom ax) {
-            aboxAxioms.add(ax);
-        }
-
-        @Override
-        public void visit(OWLFunctionalObjectPropertyAxiom ax) {
-            tboxAxioms.add(ax);
-        }
-
-        @Override
-        public void visit(OWLSubObjectPropertyOfAxiom ax) {
-            tboxAxioms.add(ax);
-        }
-
-        @Override
-        public void visit(OWLDisjointUnionAxiom ax) {
-            tboxAxioms.add(ax);
-        }
-
-        @Override
-        public void visit(OWLSymmetricObjectPropertyAxiom ax) {
-            tboxAxioms.add(ax);
-        }
-
-        @Override
-        public void visit(OWLDataPropertyRangeAxiom ax) {
-            tboxAxioms.add(ax);
-        }
-
-        @Override
-        public void visit(OWLFunctionalDataPropertyAxiom ax) {
-            tboxAxioms.add(ax);
-        }
-
-        @Override
-        public void visit(OWLEquivalentDataPropertiesAxiom ax) {
-            tboxAxioms.add(ax);
-        }
-
-        @Override
-        public void visit(OWLClassAssertionAxiom ax) {
-            aboxAxioms.add(ax);
-        }
-
-        @Override
-        public void visit(OWLEquivalentClassesAxiom ax) {
-            tboxAxioms.add(ax);
-        }
-
-        @Override
-        public void visit(OWLDataPropertyAssertionAxiom ax) {
-            aboxAxioms.add(ax);
-        }
-
-        @Override
-        public void visit(OWLTransitiveObjectPropertyAxiom ax) {
-            tboxAxioms.add(ax);
-        }
-
-        @Override
-        public void visit(OWLIrreflexiveObjectPropertyAxiom ax) {
-            tboxAxioms.add(ax);
-        }
-
-        @Override
-        public void visit(OWLSubDataPropertyOfAxiom ax) {
-            tboxAxioms.add(ax);
-        }
-
-        @Override
-        public void visit(OWLInverseFunctionalObjectPropertyAxiom ax) {
-            tboxAxioms.add(ax);
-        }
-
-        @Override
-        public void visit(OWLSameIndividualAxiom ax) {
-            aboxAxioms.add(ax);
-        }
-
-        @Override
-        public void visit(OWLSubPropertyChainOfAxiom ax) {
-            tboxAxioms.add(ax);
-        }
-
-        @Override
-        public void visit(OWLInverseObjectPropertiesAxiom ax) {
-            tboxAxioms.add(ax);
-        }
-
-        @Override
-        public void visit(OWLHasKeyAxiom ax) {
-            tboxAxioms.add(ax);
-        }
-
-        @Override
-        public void visit(OWLDatatypeDefinitionAxiom ax) {
-            tboxAxioms.add(ax);
-        }
-
-        @Override
-        public void visit(SWRLRule rule) {
-            tboxAxioms.add(rule);
-        }
-
-        @Override
-        public void visit(OWLAnnotationAssertionAxiom ax) {
-        }
-
-        @Override
-        public void visit(OWLSubAnnotationPropertyOfAxiom ax) {
-        }
-
-        @Override
-        public void visit(OWLAnnotationPropertyDomainAxiom ax) {
-        }
-
-        @Override
-        public void visit(OWLAnnotationPropertyRangeAxiom ax) {
-        }
     }
 
 

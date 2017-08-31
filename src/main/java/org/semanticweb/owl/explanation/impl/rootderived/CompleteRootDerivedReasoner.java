@@ -66,7 +66,7 @@ public class CompleteRootDerivedReasoner implements RootDerivedReasoner {
      */
     @Override
     public Set<OWLClass> getRootUnsatisfiableClasses() throws ExplanationException {
-        StructuralRootDerivedReasoner srd = new StructuralRootDerivedReasoner(manager, baseReasoner, reasonerFactory);
+        StructuralRootDerivedReasoner srd = new StructuralRootDerivedReasoner(manager, baseReasoner);
         Set<OWLClass> estimatedRoots = srd.getRootUnsatisfiableClasses();
         cls2JustificationMap = new HashMap<>();
         Set<OWLAxiom> allAxioms = new HashSet<>();
@@ -103,12 +103,10 @@ public class CompleteRootDerivedReasoner implements RootDerivedReasoner {
                             if(isRootFor(clsAExpl, clsBExpl)) {
                                 // A is a root of B
                                 clsARootForClsB = true;
-//                                System.out.println(clsB + "  --- depends --->  " + clsA);
                             }
                             else if(isRootFor(clsBExpl, clsAExpl)) {
                                 // B is a root of A
                                 clsBRootForClsA = true;
-//                                System.out.println(clsA + "  --- depends --->  " + clsB);
                             }
                         }
                     }
@@ -133,37 +131,11 @@ public class CompleteRootDerivedReasoner implements RootDerivedReasoner {
 
     @Override
     public Set<OWLClass> getDependentChildClasses(OWLClass cls) {
-        return null;
+        return Collections.emptySet();
     }
 
     @Override
     public Set<OWLClass> getDependentDescendantClasses(OWLClass cls) {
-        return null;
-    }
-
-
-    public static void main(String[] args) {
-//        try {
-//            SimpleRenderer renderer = new SimpleRenderer();
-//            renderer.setShortFormProvider(new DefaultPrefixManager("http://www.mindswap.org/ontologies/tambis-full.owl#"));
-//            ToStringRenderer.getInstance().setRenderer(renderer);
-//            OWLOntologyManager man = OWLManager.createOWLOntologyManager();
-////            OWLOntology ont = man.loadOntologyFromOntologyDocument(URI.create("http://owl.cs.manchester.ac.uk/repository/download?ontology=http://miniTambis&format=RDF/XML"));
-//            OWLOntology ont = man.loadOntologyFromOntologyDocument(IRI.create("http://owl.cs.manchester.ac.uk/repository/download?ontology=http://www.cs.manchester.ac.uk/owl/ontologies/tambis-patched.owl&format=RDF/XML"));
-//            System.out.println("Loaded!");
-//            OWLReasonerFactory reasonerFactory = new PelletReasonerFactory();
-//            OWLReasoner reasoner = reasonerFactory.createReasoner(ont);
-//            reasoner.getUnsatisfiableClasses();
-//            CompleteRootDerivedReasoner rdr = new CompleteRootDerivedReasoner(man, reasoner, reasonerFactory);
-//            for(OWLClass cls : rdr.getRootUnsatisfiableClasses()) {
-//                System.out.println("ROOT! " + cls);
-//            }
-//        }
-//        catch (OWLOntologyCreationException e) {
-//            e.printStackTrace();
-//        }
-//        catch (ExplanationException e) {
-//            e.printStackTrace();
-//        }
+        return Collections.emptySet();
     }
 }

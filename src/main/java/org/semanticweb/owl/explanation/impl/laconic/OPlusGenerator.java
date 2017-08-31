@@ -64,22 +64,10 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
     @Override
     public Set<OWLAxiom> transform(Set<OWLAxiom> axioms) {
         Set<OWLAxiom> result = new HashSet<>();
-        int count = 0;
         for(OWLAxiom ax : axioms) {
-            count++;
-//            System.out.print(count);
-//            System.out.print("   ");
-//            System.out.println(ax);
             currentSourceAxiom = ax;
-                Set<? extends OWLAxiom> axiomResult = ax.accept(this);
-//            for(OWLAxiom a : axiomResult) {
-//                System.out.println("\t\t\t" + a);
-//            }
-
-                result.addAll(axiomResult);
-//            System.out.println("----   " + axiomResult.size());
+            result.addAll(ax.accept(this));
         }
-//        System.out.println("Result size: " + result.size());
         return result;
     }
 
@@ -163,15 +151,7 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
         return sources;
     }
 
-    public Set<OWLAxiom> log(OWLAxiom source, Set<OWLAxiom> axioms) {
-//        getSourceAxiomAnnotation(source);
-//        Set<OWLAxiom> annotatedAxioms = new HashSet<OWLAxiom>();
-//        for (OWLAxiom ax : axioms) {
-//            OWLAxiom annotated = ax.getAnnotatedAxiom(Collections.singleton(sourceAnnotation));
-//            annotatedAxioms.add(annotated);
-//        }
-//        return annotatedAxioms;
-        //--------------------------------------------
+    public Set<OWLAxiom> log(Set<OWLAxiom> axioms) {
         for(OWLAxiom ax : axioms) {
             Set<OWLAxiom> sourceAxioms = axiom2SourceMap.get(ax);
             if(sourceAxioms == null) {
@@ -183,14 +163,8 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
         return axioms;
     }
 
-    private OWLAnnotation getSourceAxiomAnnotation(OWLAxiom source) {
-        OWLAnnotationProperty sourceAnnotationProperty = dataFactory.getOWLAnnotationProperty(OPlusSplitting.SOURCE_AXIOM_IRI);
-        OWLLiteral identityLiteral = dataFactory.getOWLLiteral(System.identityHashCode(source));
-        return dataFactory.getOWLAnnotation(sourceAnnotationProperty, identityLiteral);
-    }
-
     public Set<OWLAxiom> log(OWLAxiom source) {
-        return log(source, Collections.singleton(source));
+        return log(Collections.singleton(source));
     }
 
     @Override
@@ -220,7 +194,6 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
                 subClassDisjuncts = subClass.asDisjunctSet();
             }
             for(OWLClassExpression subClassDisjunct : subClassDisjuncts) {
-//                beta.addAll(Collections.singleton(subClassDisjunct));
                 beta.addAll(subClassDisjunct.accept(betaGenerator));
             }
             sourceAnnotations = Collections.emptySet();// Collections.singleton(getSourceAxiomAnnotation(axiom));
@@ -231,47 +204,19 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
             sourceAnnotations = Collections.emptySet();
         }
 
-//            if (axiom.getSuperClass() instanceof OWLObjectUnionOf) {
-//                boolean allNamed = true;
-//                for (OWLClassExpression op : (((OWLObjectUnionOf) axiom.getSuperClass()).getOperands())) {
-//                    if (op.isAnonymous()) {
-//                        allNamed = false;
-//                        break;
-//                    }
-//                }
-//                if (allNamed) {
-//                    tau.add(axiom.getSuperClass());
-//                }
-//                else {
-//                    tau = axiom.getSuperClass().accept(tauGenerator);
-//                }
-//            }
-//            else {
-//                tau = axiom.getSuperClass().accept(tauGenerator);
-//            }
-//
-
 
         // Generate all possible LHS and RHS concepts and pair them up
         for (OWLClassExpression tauDesc : tau) {
             if (!isThing(tauDesc)) {
                 for (OWLClassExpression betaDesc : beta) {
-//                    if (!isNothing(betaDesc) && !(tauDesc instanceof OWLObjectIntersectionOf) && !(betaDesc instanceof OWLObjectUnionOf)) {
                     if (!isNothing(betaDesc) && !isThing(tauDesc)) {
                         OWLSubClassOfAxiom ax = dataFactory.getOWLSubClassOfAxiom(betaDesc, tauDesc, sourceAnnotations);
                         axioms.add(ax);
                     }
-//                    }
-//                    else {
-//                        System.out.println("IGNORING: " + betaDesc + " -> XXXX");
-//                    }
                 }
             }
-            else {
-//                System.out.println("IGNORING: XXXX -> " + tauDesc);
-            }
         }
-        return log(axiom, axioms);
+        return log(axioms);
     }
 
 
@@ -329,7 +274,7 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
                 }
             }
         }
-        return log(axiom, axioms);
+        return log(axioms);
     }
 
 
@@ -350,7 +295,7 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
                 result.add(dataFactory.getOWLObjectPropertyDomainAxiom(axiom.getProperty(), dom));
             }
         }
-        return log(axiom, result);
+        return log(result);
     }
 
 
@@ -360,7 +305,7 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
         Set<OWLAxiom> result = new HashSet<>();
         axiom.walkAllPairwise(
             (propA, propB) -> result.add(dataFactory.getOWLSubObjectPropertyOfAxiom(propA, propB)));
-        return log(axiom, result);
+        return log(result);
     }
 
 
@@ -378,7 +323,7 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
         // from the original checker. In other words, we only need the weakest sets
         Set<OWLAxiom> result = new HashSet<>();
         axiom.walkAllPairwise((a, b) -> result.add(dataFactory.getOWLDifferentIndividualsAxiom(a, b)));
-        return log(axiom, result);
+        return log(result);
     }
 
 
@@ -426,7 +371,7 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
                 result.add(dataFactory.getOWLObjectPropertyRangeAxiom(axiom.getProperty(), rng));
             }
         }
-        return log(axiom, result);
+        return log(result);
     }
 
 
@@ -438,7 +383,7 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
         result.add(axiom);
         OWLClassExpression type = dataFactory.getOWLObjectSomeValuesFrom(axiom.getProperty(), dataFactory.getOWLThing());
         result.add(dataFactory.getOWLClassAssertionAxiom(type, axiom.getSubject()));
-        return log(axiom, result);
+        return log(result);
     }
 
 
@@ -509,7 +454,7 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
                 result.add(dataFactory.getOWLClassAssertionAxiom(cls, axiom.getIndividual()));
             }
         }
-        return log(axiom, result);
+        return log(result);
     }
 
 
@@ -517,7 +462,7 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
     public Set<? extends OWLAxiom> visit(OWLEquivalentClassesAxiom axiom) {
         Set<OWLAxiom> axioms = new HashSet<>();
         axiom.walkAllPairwise((a,b) -> axioms.addAll(dataFactory.getOWLSubClassOfAxiom(a,b).accept(this)));
-        return log(axiom, axioms);
+        return log(axioms);
     }
 
 
@@ -527,10 +472,7 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
         // must use nominals and change the syntax to a subclass checker
         Set<OWLAxiom> result = new HashSet<>(2);
         result.add(axiom);
-//        OWLClassExpression nominal = dataFactory.getOWLObjectOneOf(axiom.getSubject());
-//        OWLClassExpression type = dataFactory.getOWLDataSomeValuesFrom(axiom.getProperty(), dataFactory.getTopDatatype());
-//        result.add(dataFactory.getOWLSubClassOfAxiom(nominal, type));
-        return log(axiom, result);
+        return log(result);
     }
 
 
@@ -577,7 +519,7 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
         Set<OWLAxiom> result = new HashSet<>();
         result.add(dataFactory.getOWLSubObjectPropertyOfAxiom(axiom.getFirstProperty(), dataFactory.getOWLObjectInverseOf(axiom.getSecondProperty().asOWLObjectProperty())));
         result.add(dataFactory.getOWLSubObjectPropertyOfAxiom(axiom.getSecondProperty(), dataFactory.getOWLObjectInverseOf(axiom.getFirstProperty().asOWLObjectProperty())));
-        return log(axiom, result);
+        return log(result);
     }
 
     @Override

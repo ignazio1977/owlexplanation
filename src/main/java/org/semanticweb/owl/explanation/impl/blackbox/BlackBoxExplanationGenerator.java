@@ -7,7 +7,6 @@ import uk.ac.manchester.cs.owl.explanation.ordering.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 /*
@@ -61,15 +60,9 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
 
     private Set<OWLAxiom> module = null;
 
-    private MutableTree<Explanation<E>> hst;
-
     private ExplanationProgressMonitor<E> progressMonitor;
 
     private List<Integer> prunningDifferences = new ArrayList<>();
-
-    private int hittingSetTreeOperationsCount = 0;
-    
-
 
     /**
      * Constructs a blackbox explanation generator.
@@ -119,7 +112,6 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
     public Set<Explanation<E>> getExplanations(E entailment, int limit) throws ExplanationException {
         try {
             module = extractModule(workingAxioms, checkerFactory.createEntailementChecker(entailment));
-            hittingSetTreeOperationsCount = 0;
             prunningDifferences.clear();
             Set<Explanation<E>> explanations = new HashSet<>();
             Explanation<E> expl = computeExplanation(entailment);
@@ -128,7 +120,6 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
             if (progressMonitor.isCancelled()) {
                 return Collections.singleton(expl);
             }
-            hst = new MutableTree<>(expl);
             if (expl.isEmpty()) {
                 return Collections.emptySet();
             }
@@ -140,56 +131,10 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
                 throw new NotEntailedException(entailment);
             }
 
-//            dumpHST();
-//            dumpHSTStats();
-
             return explanations;
         }
         catch (OWLException e) {
             throw new ExplanationException(e);
-        }
-    }
-
-//    public MutableTree<Explanation> getHst() {
-//        return hst;
-//    }
-//
-    private void dumpHST() {
-        try {
-            File file = new File("/tmp/hst" + System.currentTimeMillis() + ".txt");
-            PrintWriter pw = new PrintWriter(new FileWriter(file));
-            hst.dump(pw);
-            pw.flush();
-            pw.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-//
-//
-    private void dumpHSTStats() {
-        Map<OWLAxiom, AtomicInteger> map = new HashMap<>();
-        collectEmptyNodes(hst, map);
-        TreeMap<Integer, OWLAxiom> orderedMap = new TreeMap<>();
-        for (OWLAxiom ax : map.keySet()) {
-            orderedMap.put(map.get(ax).get(), ax);
-        }
-        //for (Integer i : orderedMap.keySet()) {
-            // System.out.println(i + " ---> " + orderedMap.get(i));
-        //}
-    }
-
-    private void collectEmptyNodes(Tree<Explanation<E>> exp, Map<OWLAxiom, AtomicInteger> axs) {
-        for (Tree<Explanation<E>> child : exp.getChildren()) {
-            Explanation<E> userObject = child.getUserObject();
-            if (userObject!=null) {
-                if (userObject.getAxioms().isEmpty()) {
-                    OWLAxiom label = (OWLAxiom) exp.getEdge(child);
-                    axs.computeIfAbsent(label, x->new AtomicInteger(0)).incrementAndGet();
-                } else {
-                    collectEmptyNodes(child, axs);
-                }
-            }
         }
     }
 
@@ -204,7 +149,6 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
      *
      * @param entailment The entailment
      * @return The justification or an empty set if the entailment does not hold.
-     * @throws org.semanticweb.owlapi.model.OWLException if there was a problem.
      */
     protected Explanation<E> computeExplanation(E entailment) {
         if (isLoggable()) {
@@ -214,13 +158,11 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
                 
         // We gradually expand until the entailment holds
         // and then we prune
-//        EntailmentChecker<E> checker = checkerFactory.createEntailementChecker(entailment);
 
         // Module?
         EntailmentChecker<E> checker = checkerFactory.createEntailementChecker(entailment);
 
         // We should
-
         // Pre-check that the entailment actually holds
         if (!checker.isEntailed(module)) {
             return Explanation.getEmptyExplanation(entailment);
@@ -310,10 +252,6 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
         return count;
     }
 
-    private Map<OWLAxiom, AtomicInteger> axiom2LeafCount = new HashMap<>();
-
-
-
     /**
      * This is a recursive method that builds a hitting set tree to obtain all
      * justifications for an unsatisfiable class.
@@ -331,7 +269,6 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
                                          Set<Set<OWLAxiom>> satPaths, Set<OWLAxiom> currentPathContents,
                                          int maxExplanations) throws OWLException {
 
-//        dumpHSTNodeDiagnostics(entailment, justification, allJustifications, currentPathContents);
         // We go through the current justifications, checker by checker, and extend the tree
         // with edges for each checker
         List<OWLAxiom> orderedJustification = getOrderedJustifications(new ArrayList<>(justification.getAxioms()), allJustifications);
@@ -371,7 +308,7 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
                     }
                 }
                 if (newJustification == null) {
-                    newJustification = computeExplanation(entailment);//getExplanation();
+                    newJustification = computeExplanation(entailment);
                 }
                 // Generate a new node - i.e. a new justification set
                 if (axiom.isLogicalAxiom() && newJustification.contains(axiom)) {
@@ -393,8 +330,6 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
                     }
 
                     // Recompute priority here?
-//                    MutableTree<Explanation> node = new MutableTree<Explanation>(newJustification);
-//                    currentNode.addChild(node, checker);
                     constructHittingSetTree(entailment,
                             newJustification,
                             allJustifications,
@@ -407,10 +342,6 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
                 } else {
                     // End of current path - add it to the list of paths
                     satPaths.add(new HashSet<>(currentPathContents));
-                    Explanation<E> exp = new Explanation<>(entailment, new HashSet<OWLAxiom>(0));
-                    MutableTree<Explanation<E>> node = new MutableTree<>(exp);
-//                    currentNode.addChild(node, checker);
-//                    increment(checker);
                 }
             }
 
@@ -421,31 +352,6 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
             module.add(axiom);
         }
     }
-
-    private void dumpHSTNodeDiagnostics(E entailment, Explanation<E> justification, Set<Explanation<E>> allJustifications, Set<OWLAxiom> currentPathContents) {
-        hittingSetTreeOperationsCount++;
-        StringBuilder sb = new StringBuilder();
-        sb.append("FOR ");
-        sb.append(entailment);
-        sb.append(" (");
-        sb.append(allJustifications.size());
-        sb.append(" explanations found so far)\n");
-        sb.append("    CALLS TO BUILD HST: ");
-        sb.append(hittingSetTreeOperationsCount);
-        sb.append("\n");
-        sb.append("    CURRENT NODE SIZE: ");
-        sb.append(justification.getAxioms().size());
-        sb.append("\n");
-        sb.append("    EXTENDING HST (In path of depth ");
-        sb.append(currentPathContents.size());
-        sb.append(")");
-//        System.out.println(sb.toString());
-    }
-
-    private void incremeSnt(OWLAxiom ax) {
-        axiom2LeafCount.computeIfAbsent(ax, x->new AtomicInteger(0)).incrementAndGet();
-    }
-
 
     private static boolean isLoggable() {
         return logger.isLoggable(LEVEL);

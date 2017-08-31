@@ -6,7 +6,6 @@ import org.semanticweb.owl.explanation.api.ExplanationGenerator;
 import org.semanticweb.owl.explanation.api.NullExplanationProgressMonitor;
 import org.semanticweb.owl.explanation.impl.blackbox.*;
 import org.semanticweb.owlapi.model.*;
-import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 
@@ -27,8 +26,6 @@ import java.util.function.Supplier;
  */
 public class SETreeExplanationGenerator implements ExplanationGenerator<OWLAxiom> {
 
-    private OWLReasonerFactory reasonerFactory;
-
     private EntailmentCheckerFactory<OWLAxiom> entailmentCheckerFactory;
 
     private Set<OWLAxiom> workingAxioms = new HashSet<>();
@@ -37,9 +34,8 @@ public class SETreeExplanationGenerator implements ExplanationGenerator<OWLAxiom
 
     private Supplier<OWLOntologyManager> m;
 
-    public SETreeExplanationGenerator(OWLReasonerFactory reasonerFactory, EntailmentCheckerFactory<OWLAxiom> entailmentCheckerFactory, Set<? extends OWLAxiom> workingAxioms, Supplier<OWLOntologyManager> m) {
+    public SETreeExplanationGenerator(EntailmentCheckerFactory<OWLAxiom> entailmentCheckerFactory, Set<? extends OWLAxiom> workingAxioms, Supplier<OWLOntologyManager> m) {
         this.workingAxioms = new HashSet<>(workingAxioms);
-        this.reasonerFactory = reasonerFactory;
         this.entailmentCheckerFactory = entailmentCheckerFactory;
         this.m = m;
     }

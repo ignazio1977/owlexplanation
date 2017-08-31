@@ -20,15 +20,13 @@ public class DeltaPlusTransformation implements AxiomTransformation {
 
     protected int cardinalityBound;
 
-    private ModularityStrategy modularityStrategy = ModularityStrategy.DONT_USE_MODULARITY;
-
-    public DeltaPlusTransformation(OWLDataFactory dataFactory, int cardinalityBound, ModularityStrategy modularityStrategy) {
+    public DeltaPlusTransformation(OWLDataFactory dataFactory, int cardinalityBound) {
         this.dataFactory = dataFactory;
-        this.modularityStrategy = modularityStrategy;
+        this.cardinalityBound=cardinalityBound;
     }
 
     public DeltaPlusTransformation(OWLDataFactory dataFactory) {
-        this(dataFactory, 0, ModularityStrategy.DONT_USE_MODULARITY);
+        this(dataFactory, 0);
     }
 
     @Override
@@ -336,7 +334,6 @@ public class DeltaPlusTransformation implements AxiomTransformation {
         public Set<OWLClassExpression> visit(OWLDataSomeValuesFrom ce) {
             Set<OWLClassExpression> result = new HashSet<>();
             result.add(ce);
-//            result.add(dataFactory.getOWLDataSomeValuesFrom(ce.getProperty(), dataFactory.getTopDatatype()));
             return result;
         }
 
@@ -349,7 +346,6 @@ public class DeltaPlusTransformation implements AxiomTransformation {
         public Set<OWLClassExpression> visit(OWLDataHasValue ce) {
             Set<OWLClassExpression> result = new HashSet<>();
             result.add(ce);
-//            result.add(dataFactory.getOWLDataSomeValuesFrom(ce.getProperty(), dataFactory.getTopDatatype()));
             return result;
         }
 

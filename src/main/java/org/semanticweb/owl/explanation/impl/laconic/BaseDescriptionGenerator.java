@@ -114,7 +114,6 @@ public abstract class BaseDescriptionGenerator implements OWLClassExpressionVisi
                 descs.add(factory.getOWLObjectIntersectionOf(conjuncts));
             }
             else {
-//                descs.add(factory.getOWLObjectIntersectionOf(conjuncts));
                 descs.add(conjuncts.iterator().next());
             }
         }
@@ -176,9 +175,6 @@ public abstract class BaseDescriptionGenerator implements OWLClassExpressionVisi
     public Set<OWLClassExpression> visit(OWLObjectHasValue desc) {
         Set<OWLClassExpression> descs = new HashSet<>();
         descs.add(desc);
-//        for (OWLClassExpression filler : factory.getOWLObjectOneOf(desc.getValue()).accept(this)) {
-//            descs.add(factory.getOWLObjectSomeValuesFrom(desc.getProperty(), filler));
-//        }
         descs.add(factory.getOWLObjectSomeValuesFrom(desc.getProperty(), factory.getOWLThing()));
         descs.add(getLimit());
         return descs;
@@ -223,10 +219,6 @@ public abstract class BaseDescriptionGenerator implements OWLClassExpressionVisi
 
     @Override
     public Set<OWLClassExpression> visit(OWLDataSomeValuesFrom desc) {
-//        Set<OWLClassExpression> result = new HashSet<OWLClassExpression>();
-//        result.add(desc);
-//        result.add(factory.getOWLDataSomeValuesFrom(desc.getProperty(), factory.getTopDatatype()));
-//        return result;
         return Collections.<OWLClassExpression>singleton(desc);
     }
 
@@ -239,10 +231,6 @@ public abstract class BaseDescriptionGenerator implements OWLClassExpressionVisi
 
     @Override
     public Set<OWLClassExpression> visit(OWLDataHasValue desc) {
-//        Set<OWLClassExpression> result = new HashSet<OWLClassExpression>(2);
-//        result.add(desc);
-//        result.add(getDataFactory().getOWLDataSomeValuesFrom(desc.getProperty(),  getDataLimit()));
-//        return result;
         return Collections.<OWLClassExpression>singleton(desc);
     }
 

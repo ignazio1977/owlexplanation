@@ -37,9 +37,6 @@ import java.util.Set;
 public class DepthFirstStrategy<E> implements HittingSetTreeConstructionStrategy<E> {
 
 
-    public void start(HittingSetTree<E> hittingSetTree) {
-    }
-
     @Override
     public void constructTree(HittingSetTree<E> hittingSetTree, int limit, ExplanationGeneratorMediator<E> handler) {
         buildHittingSetTree(hittingSetTree, limit, handler, hittingSetTree.getRoot());
@@ -63,14 +60,15 @@ public class DepthFirstStrategy<E> implements HittingSetTreeConstructionStrategy
                     }
                 }
                 if (!expl.isEmpty()) {
-                    HittingSetTreeNode<E> hittingSetTreeNode = new HittingSetTreeNode<>(hittingSetTree, ax, currentNode, expl, reuse);
+                    HittingSetTreeNode<E> hittingSetTreeNode = new HittingSetTreeNode<>(ax, currentNode, expl, reuse);
                     currentNode.addChild(ax, hittingSetTreeNode);
                     buildHittingSetTree(hittingSetTree, limit, handler, hittingSetTreeNode);
                 }
                 else {
                   hittingSetTree.addClosedPath(new HashSet<>(pathContents));
                 }
-            }handler.addAxiom(ax);
+            }
+            handler.addAxiom(ax);
         }
     }
 
@@ -90,8 +88,5 @@ public class DepthFirstStrategy<E> implements HittingSetTreeConstructionStrategy
             }
         }
         return null;
-    }
-
-    public void finish(HittingSetTree<E> hittingSetTree) {
     }
 }
