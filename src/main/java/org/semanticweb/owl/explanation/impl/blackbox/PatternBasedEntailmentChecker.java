@@ -55,7 +55,7 @@ public class PatternBasedEntailmentChecker {
         }
     }
 
-    private void addExplanation(OWLAxiom explanationAxiom) {
+    protected void addExplanation(OWLAxiom explanationAxiom) {
 
     }
 
@@ -64,6 +64,7 @@ public class PatternBasedEntailmentChecker {
 
         private Map<OWLObjectPropertyExpression, Set<OWLAxiom>> existentials = new HashMap<>();
 
+        public WorkingAxiomVisitor() {}
 
         @Override
         public void visit(OWLDeclarationAxiom axiom) {

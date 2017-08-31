@@ -76,13 +76,7 @@ public class DeltaTransformation implements AxiomTransformation {
     }
 
     public int getModalDepth(OWLAxiom renamingAxiom) {
-        Integer depth = namingAxiom2ModalDepth.get(renamingAxiom);
-        if(depth == null) {
-            return 0;
-        }
-        else {
-            return depth;
-        }
+        return namingAxiom2ModalDepth.getOrDefault(renamingAxiom, 0).intValue();
     }
 
 
@@ -159,7 +153,7 @@ public class DeltaTransformation implements AxiomTransformation {
 //        return freshDatatype;
 //    }
 
-    private OWLClass assignName(OWLClassExpression classExpression, Polarity polarity, OWLClass freshClass) {
+    protected OWLClass assignName(OWLClassExpression classExpression, Polarity polarity, OWLClass freshClass) {
         OWLSubClassOfAxiom namingAxiom;
         Set<OWLAnnotation> axiomId = Collections.emptySet();
         if (polarity.isPositive()) {
@@ -182,6 +176,8 @@ public class DeltaTransformation implements AxiomTransformation {
         private ClassExpressionTransformer positiveTransformer = new ClassExpressionTransformer(Polarity.POSITIVE);
 
         private ClassExpressionTransformer negativeTransformer = new ClassExpressionTransformer(Polarity.NEGATIVE);
+
+        public AxiomTransformer() {}
 
         private Set<OWLAxiom> visit(Collection<? extends OWLAxiom> axioms) {
             Set<OWLAxiom> result = new HashSet<>();
@@ -453,7 +449,7 @@ public class DeltaTransformation implements AxiomTransformation {
 
         private Polarity polarity;
 
-        private ClassExpressionTransformer(Polarity polarity) {
+        protected ClassExpressionTransformer(Polarity polarity) {
             this.polarity = polarity;
         }
 

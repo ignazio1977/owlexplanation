@@ -29,13 +29,13 @@ public class LaconicExplanationGeneratorBasedOnOPlusWithDeltaPlusFiltering imple
 
     private ExplanationGeneratorFactory<OWLAxiom> delegateFactory;
 
-    private ExplanationProgressMonitor<OWLAxiom> progressMonitor;
+    protected ExplanationProgressMonitor<OWLAxiom> progressMonitor;
 
     private OPlusSplitting oplusSplitting = OPlusSplitting.TOP_LEVEL;
 
     private ModularityTreatment modularityTreatment = ModularityTreatment.MODULE;
 
-    private int numberOfOPlusJustificationsFound = 0;
+    protected int numberOfOPlusJustificationsFound = 0;
 
     private Supplier<OWLOntologyManager> m;
 
@@ -266,7 +266,7 @@ public class LaconicExplanationGeneratorBasedOnOPlusWithDeltaPlusFiltering imple
     }
 
 
-    private Set<OWLAxiom> getSourceAxioms(Explanation<OWLAxiom> expl, OPlusGenerator oPlusGenerator) {
+    private static Set<OWLAxiom> getSourceAxioms(Explanation<OWLAxiom> expl, OPlusGenerator oPlusGenerator) {
         Set<OWLAxiom> result = new HashSet<>();
         for (OWLAxiom ax : expl.getAxioms()) {
             Set<OWLAxiom> sourceAxioms = oPlusGenerator.getAxiom2SourceMap().get(ax);
@@ -347,7 +347,7 @@ public class LaconicExplanationGeneratorBasedOnOPlusWithDeltaPlusFiltering imple
         }
     }
 
-    private OWLSubClassOfAxiom createSubClassAxiom(OWLDataFactory dataFactory, Set<OWLClassExpression> subClassDisjuncts, Set<OWLClassExpression> superClassConjuncts) {
+    private static OWLSubClassOfAxiom createSubClassAxiom(OWLDataFactory dataFactory, Set<OWLClassExpression> subClassDisjuncts, Set<OWLClassExpression> superClassConjuncts) {
         OWLClassExpression mergedSubClass;
         if (subClassDisjuncts.size() == 1) {
             mergedSubClass = subClassDisjuncts.iterator().next();
@@ -367,6 +367,7 @@ public class LaconicExplanationGeneratorBasedOnOPlusWithDeltaPlusFiltering imple
 
 
     private class MediatingProgresssMonitor implements ExplanationProgressMonitor<OWLAxiom> {
+        public MediatingProgresssMonitor() {}
 
         @Override
         public void foundExplanation(ExplanationGenerator<OWLAxiom> owlAxiomExplanationGenerator, Explanation<OWLAxiom> owlAxiomExplanation, Set<Explanation<OWLAxiom>> allFoundExplanations) {

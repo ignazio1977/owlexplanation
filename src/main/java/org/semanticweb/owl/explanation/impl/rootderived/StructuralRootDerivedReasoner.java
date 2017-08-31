@@ -43,7 +43,7 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
 
     private OWLOntologyManager man;
 
-    private OWLReasoner reasoner;
+    protected OWLReasoner reasoner;
 
     private OWLReasonerFactory reasonerFactory;
 
@@ -91,13 +91,8 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
         }
     }
 
-    private Set<OWLClass> get(OWLClass c, Map<OWLClass, Set<OWLClass>> map) {
-        Set<OWLClass> set = map.get(c);
-        if (set == null) {
-            set = new HashSet<>();
-            map.put(c, set);
-        }
-        return set;
+    private static Set<OWLClass> get(OWLClass c, Map<OWLClass, Set<OWLClass>> map) {
+        return map.computeIfAbsent(c, x->new HashSet<>());
     }
 
     @Override

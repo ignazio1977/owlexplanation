@@ -31,25 +31,29 @@ import org.semanticweb.owlapi.model.*;
  */
 public class TriviallyBottomChecker implements OWLClassExpressionVisitorEx<Boolean> {
 
+    @Override
+    public <T> Boolean doDefault(T object) {
+        return Boolean.FALSE;
+    }
 
     @Override
     public Boolean visit(OWLClass desc) {
-        return desc.isOWLNothing();
+        return Boolean.valueOf(desc.isOWLNothing());
     }
 
     @Override
     public Boolean visit(OWLObjectIntersectionOf desc) {
-        return desc.operands().anyMatch(conjunct->conjunct.accept(this));
+        return Boolean.valueOf(desc.operands().anyMatch(conjunct->conjunct.accept(this) == Boolean.TRUE));
     }
 
     @Override
     public Boolean visit(OWLObjectUnionOf desc) {
-        return !desc.operands().anyMatch(conjunct->!conjunct.accept(this));
+        return Boolean.valueOf(!desc.operands().anyMatch(conjunct->conjunct.accept(this) == Boolean.FALSE));
     }
 
     @Override
     public Boolean visit(OWLObjectComplementOf desc) {
-        return desc.isOWLThing();
+        return Boolean.valueOf(desc.isOWLThing());
     }
 
     @Override
@@ -57,81 +61,13 @@ public class TriviallyBottomChecker implements OWLClassExpressionVisitorEx<Boole
         return desc.getFiller().accept(this);
     }
 
-
-    @Override
-    public Boolean visit(OWLObjectAllValuesFrom desc) {
-        return Boolean.FALSE;
-    }
-
-
-    @Override
-    public Boolean visit(OWLObjectHasValue desc) {
-        return Boolean.FALSE;
-    }
-
-
     @Override
     public Boolean visit(OWLObjectMinCardinality desc) {
         return desc.getFiller().accept(this);
     }
 
-
     @Override
     public Boolean visit(OWLObjectExactCardinality desc) {
         return desc.getFiller().accept(this);
-    }
-
-
-    @Override
-    public Boolean visit(OWLObjectMaxCardinality desc) {
-        return Boolean.FALSE;
-    }
-
-
-    @Override
-    public Boolean visit(OWLObjectHasSelf desc) {
-        return Boolean.FALSE;
-    }
-
-
-    @Override
-    public Boolean visit(OWLObjectOneOf desc) {
-        return Boolean.FALSE;
-    }
-
-
-    @Override
-    public Boolean visit(OWLDataSomeValuesFrom desc) {
-        return Boolean.FALSE;
-    }
-
-
-    @Override
-    public Boolean visit(OWLDataAllValuesFrom desc) {
-        return Boolean.FALSE;
-    }
-
-
-    @Override
-    public Boolean visit(OWLDataHasValue desc) {
-        return Boolean.FALSE;
-    }
-
-
-    @Override
-    public Boolean visit(OWLDataMinCardinality desc) {
-        return Boolean.FALSE;
-    }
-
-
-    @Override
-    public Boolean visit(OWLDataExactCardinality desc) {
-        return Boolean.FALSE;
-    }
-
-
-    @Override
-    public Boolean visit(OWLDataMaxCardinality desc) {
-        return Boolean.FALSE;
     }
 }
