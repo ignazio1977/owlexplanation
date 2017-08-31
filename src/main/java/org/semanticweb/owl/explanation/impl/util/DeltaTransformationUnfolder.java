@@ -67,7 +67,7 @@ public class DeltaTransformationUnfolder {
         vals.add(val);
     }
 
-    private boolean isFreshName(OWLClassExpression ce, Set<OWLEntity> signature) {
+    private static boolean isFreshName(OWLClassExpression ce, Set<OWLEntity> signature) {
         return !ce.isOWLThing() && !ce.isOWLNothing() && !ce.isAnonymous() && !signature.contains(ce.asOWLClass());
     }
 
@@ -76,6 +76,8 @@ public class DeltaTransformationUnfolder {
         private ClassExpressionUnfolder positiveClassExpressionUnfolder = new ClassExpressionUnfolder(Polarity.POSITIVE);
 
         private ClassExpressionUnfolder negativeClassExpressionUnfolder = new ClassExpressionUnfolder(Polarity.NEGATIVE);
+
+        public AxiomUnfolder() {}
 
         private OWLClassExpression unfold(OWLClassExpression ce, Polarity polarity) {
             ClassExpressionUnfolder classExpressionUnfolder;
@@ -298,7 +300,7 @@ public class DeltaTransformationUnfolder {
         }
     }
 
-    private OWLClassExpression getNamedClassExpression(Polarity pol, OWLClass namingClass) {
+    protected OWLClassExpression getNamedClassExpression(Polarity pol, OWLClass namingClass) {
         if(pol.isPositive()) {
             Set<OWLClassExpression> ops = posName2ClassExpressionMap.get(namingClass);
             if(ops != null) {
@@ -328,7 +330,7 @@ public class DeltaTransformationUnfolder {
 
         private Polarity currentPolarity = Polarity.POSITIVE;
 
-        private ClassExpressionUnfolder(Polarity currentPolarity) {
+        protected ClassExpressionUnfolder(Polarity currentPolarity) {
             this.currentPolarity = currentPolarity;
         }
 

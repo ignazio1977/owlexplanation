@@ -149,7 +149,7 @@ public class HittingSetTree<E> implements TelemetryObject {
             transmitter.recordMeasurement(info, "number of early terminated closed paths", numberOfEarlyTerminatedClosedPaths);
             transmitter.recordMeasurement(info, "closed path min length", closedPathMinLength);
             transmitter.recordMeasurement(info, "closed path max length", closedPathMaxLength);
-            transmitter.recordMeasurement(info, "closed path average length", (summedPathSize * 1.0 / closedPaths.size()));
+            transmitter.recordMeasurement(info, "closed path average length", (((double)summedPathSize) / closedPaths.size()));
             transmitter.recordTiming(info, "construction time", hstTimer);
             transmitter.recordMeasurement(info, "found all", foundAll);
 //            transmitter.recordObject(info, "hst", ".treeml", this);

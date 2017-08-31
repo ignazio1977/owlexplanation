@@ -180,7 +180,7 @@ public class SatisfiabilityEntailmentChecker implements EntailmentChecker<OWLAxi
         }
     }
 
-    private boolean containsNominals(OWLAxiom ax) {
+    private static boolean containsNominals(OWLAxiom ax) {
         return ax.nestedClassExpressions().anyMatch(ce->ce instanceof OWLObjectOneOf);
     }
 
@@ -511,6 +511,8 @@ public class SatisfiabilityEntailmentChecker implements EntailmentChecker<OWLAxi
     private class SatisfiabilityConverter implements OWLAxiomVisitorEx<OWLClassExpression> {
 
         private OWLDataFactory df = man.getOWLDataFactory();
+
+        public SatisfiabilityConverter() {}
 
         @Override
         public OWLClassExpression visit(OWLAsymmetricObjectPropertyAxiom ax) {

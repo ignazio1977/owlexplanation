@@ -46,11 +46,11 @@ public abstract class BaseDescriptionGenerator implements OWLClassExpressionVisi
     }
 
     public boolean isThing(OWLClassExpression description) {
-        return description.accept(topChecker);
+        return description.accept(topChecker) == Boolean.TRUE;
     }
 
     public boolean isNothing(OWLClassExpression description) {
-        return description.accept(bottomChecker);
+        return description.accept(bottomChecker) == Boolean.TRUE;
     }
 
     public OWLDataFactory getDataFactory() {

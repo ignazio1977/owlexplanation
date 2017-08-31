@@ -18,7 +18,7 @@ public class DeltaPlusTransformation implements AxiomTransformation {
 
     protected OWLDataFactory dataFactory;
 
-    private int cardinalityBound;
+    protected int cardinalityBound;
 
     private ModularityStrategy modularityStrategy = ModularityStrategy.DONT_USE_MODULARITY;
 

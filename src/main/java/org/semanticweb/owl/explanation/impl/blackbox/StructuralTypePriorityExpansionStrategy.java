@@ -193,7 +193,7 @@ public class StructuralTypePriorityExpansionStrategy<E> implements ExpansionStra
 
         private OWLOntology theOnt;
 
-        private EntityFilteredDefinitionExpander(OWLOntology theOnt) {
+        public EntityFilteredDefinitionExpander(OWLOntology theOnt) {
             this.theOnt = theOnt;
         }
 

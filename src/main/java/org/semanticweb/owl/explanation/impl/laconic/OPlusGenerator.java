@@ -84,11 +84,11 @@ public class OPlusGenerator implements OWLAxiomVisitorEx<Set<? extends OWLAxiom>
     }
 
     public boolean isNothing(OWLClassExpression desc) {
-        return desc.accept(bottomChecker);
+        return desc.accept(bottomChecker) == Boolean.TRUE;
     }
 
     public boolean isThing(OWLClassExpression desc) {
-        return desc.accept(topChecker);
+        return desc.accept(topChecker) == Boolean.TRUE;
     }
 
     public void reset() {

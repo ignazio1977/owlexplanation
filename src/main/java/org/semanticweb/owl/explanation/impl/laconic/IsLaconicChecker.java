@@ -186,7 +186,7 @@ public class IsLaconicChecker {
         return isEntailedWithReplacement(ax, weakerAxiom, axioms, checker);
     }
 
-    private boolean isEntailedWithReplacement(OWLAxiom axiom, OWLAxiom replacementAxiom, Set<OWLAxiom> axioms, EntailmentChecker<OWLAxiom> checker) {
+    private static boolean isEntailedWithReplacement(OWLAxiom axiom, OWLAxiom replacementAxiom, Set<OWLAxiom> axioms, EntailmentChecker<OWLAxiom> checker) {
         axioms.remove(axiom);
         axioms.add(replacementAxiom);
         boolean entailed = checker.isEntailed(axioms);

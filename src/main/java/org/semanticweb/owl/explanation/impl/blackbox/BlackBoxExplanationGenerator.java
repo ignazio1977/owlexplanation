@@ -7,6 +7,7 @@ import uk.ac.manchester.cs.owl.explanation.ordering.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 /*
@@ -43,6 +44,7 @@ import java.util.logging.Logger;
  *
  * @deprecated Use {@link BlackBoxExplanationGenerator2}
  */
+@Deprecated
 public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> {
 
     public static Logger logger = Logger.getLogger("BlackBoxExplanationGenerator");
@@ -166,29 +168,24 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
 //
 //
     private void dumpHSTStats() {
-        Map<OWLAxiom, Integer> map = new HashMap<>();
+        Map<OWLAxiom, AtomicInteger> map = new HashMap<>();
         collectEmptyNodes(hst, map);
         TreeMap<Integer, OWLAxiom> orderedMap = new TreeMap<>();
         for (OWLAxiom ax : map.keySet()) {
-            orderedMap.put(map.get(ax), ax);
+            orderedMap.put(map.get(ax).get(), ax);
         }
-        for (Integer i : orderedMap.keySet()) {
+        //for (Integer i : orderedMap.keySet()) {
             // System.out.println(i + " ---> " + orderedMap.get(i));
-        }
+        //}
     }
 
-    private void collectEmptyNodes(Tree<Explanation<E>> exp, Map<OWLAxiom, Integer> axs) {
+    private void collectEmptyNodes(Tree<Explanation<E>> exp, Map<OWLAxiom, AtomicInteger> axs) {
         for (Tree<Explanation<E>> child : exp.getChildren()) {
             Explanation<E> userObject = child.getUserObject();
             if (userObject!=null) {
                 if (userObject.getAxioms().isEmpty()) {
                     OWLAxiom label = (OWLAxiom) exp.getEdge(child);
-                    Integer count = axs.get(label);
-                    if (count == null) {
-                        count = 0;
-                    }
-                    count++;
-                    axs.put(label, count);
+                    axs.computeIfAbsent(label, x->new AtomicInteger(0)).incrementAndGet();
                 } else {
                     collectEmptyNodes(child, axs);
                 }
@@ -303,7 +300,7 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
      * @param axiomSets The explanations to count from
      * @return the number of occurrences of the specified checker in the explanation
      */
-    private static <E> int getOccurrences(OWLAxiom ax, Set<Explanation<E>> axiomSets) {
+    protected static <E> int getOccurrences(OWLAxiom ax, Set<Explanation<E>> axiomSets) {
         int count = 0;
         for (Explanation<E> explanation : axiomSets) {
             if (explanation.getAxioms().contains(ax)) {
@@ -313,7 +310,7 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
         return count;
     }
 
-    private Map<OWLAxiom, Integer> axiom2LeafCount = new HashMap<>();
+    private Map<OWLAxiom, AtomicInteger> axiom2LeafCount = new HashMap<>();
 
 
 
@@ -446,12 +443,7 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
     }
 
     private void incremeSnt(OWLAxiom ax) {
-        Integer i = axiom2LeafCount.get(ax);
-        if (i == null) {
-            i = 0;
-        }
-        i++;
-        axiom2LeafCount.put(ax, i);
+        axiom2LeafCount.computeIfAbsent(ax, x->new AtomicInteger(0)).incrementAndGet();
     }
 
 
@@ -463,7 +455,7 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
         logger.log(LEVEL, s);
     }
 
-    private void handlePostExpansion() {
+    private static void handlePostExpansion() {
         if (isLoggable()) {
             log("Completed expansion");
         }

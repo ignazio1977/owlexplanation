@@ -25,7 +25,7 @@ public class LaconicExplanationGeneratorBasedOnOPlus implements ExplanationGener
 
     private ExplanationGeneratorFactory<OWLAxiom> delegateFactory;
 
-    private ExplanationProgressMonitor<OWLAxiom> progressMonitor;
+    protected ExplanationProgressMonitor<OWLAxiom> progressMonitor;
 
     private OPlusSplitting oplusSplitting = OPlusSplitting.TOP_LEVEL;
 
@@ -114,7 +114,7 @@ public class LaconicExplanationGeneratorBasedOnOPlus implements ExplanationGener
         return reconstitutedLaconicExpls;
     }
 
-    private void removeWeakerExplanations(OWLDataFactory dataFactory, OPlusGenerator transformation, Set<Explanation<OWLAxiom>> laconicExplanations) {
+    private static void removeWeakerExplanations(OWLDataFactory dataFactory, OPlusGenerator transformation, Set<Explanation<OWLAxiom>> laconicExplanations) {
         for(Explanation<OWLAxiom> explA : new ArrayList<>(laconicExplanations)) {
             for(Explanation<OWLAxiom> explB : new ArrayList<>(laconicExplanations)) {
                 if(explA != explB && laconicExplanations.contains(explA) && laconicExplanations.contains(explB)) {
@@ -138,7 +138,7 @@ public class LaconicExplanationGeneratorBasedOnOPlus implements ExplanationGener
     }
 
 
-    private Set<OWLAxiom> getSourceAxioms(Explanation<OWLAxiom> expl, OPlusGenerator oPlusGenerator) {
+    private static Set<OWLAxiom> getSourceAxioms(Explanation<OWLAxiom> expl, OPlusGenerator oPlusGenerator) {
         Set<OWLAxiom> result = new HashSet<>();
         for(OWLAxiom ax : expl.getAxioms()) {
             Set<OWLAxiom> sourceAxioms = oPlusGenerator.getAxiom2SourceMap().get(ax);
@@ -211,7 +211,7 @@ public class LaconicExplanationGeneratorBasedOnOPlus implements ExplanationGener
         }
     }
 
-    private OWLSubClassOfAxiom createSubClassAxiom(OWLDataFactory dataFactory, Set<OWLClassExpression> subClassDisjuncts, Set<OWLClassExpression> superClassConjuncts) {
+    private static OWLSubClassOfAxiom createSubClassAxiom(OWLDataFactory dataFactory, Set<OWLClassExpression> subClassDisjuncts, Set<OWLClassExpression> superClassConjuncts) {
         OWLClassExpression mergedSubClass;
         if(subClassDisjuncts.size() == 1) {
             mergedSubClass = subClassDisjuncts.iterator().next();
@@ -231,7 +231,7 @@ public class LaconicExplanationGeneratorBasedOnOPlus implements ExplanationGener
 
 
     private class MediatingProgresssMonitor implements ExplanationProgressMonitor<OWLAxiom> {
-
+        public MediatingProgresssMonitor() {}
 
         @Override
         public void foundExplanation(ExplanationGenerator<OWLAxiom> owlAxiomExplanationGenerator, Explanation<OWLAxiom> owlAxiomExplanation, Set<Explanation<OWLAxiom>> allFoundExplanations) {

@@ -31,9 +31,9 @@ public class LaconicExplanationGeneratorBasedOnIncrementalOPlusWithDeltaPlusFilt
 
     private OWLDataFactory dataFactory;
 
-    private ExplanationProgressMonitor<OWLAxiom> progressMonitor = new NullExplanationProgressMonitor<>();
+    protected ExplanationProgressMonitor<OWLAxiom> progressMonitor = new NullExplanationProgressMonitor<>();
 
-    private int numberOfOPlusJustificationsFound;
+    protected int numberOfOPlusJustificationsFound;
 
     private Supplier<OWLOntologyManager> m;
 
@@ -331,7 +331,7 @@ public class LaconicExplanationGeneratorBasedOnIncrementalOPlusWithDeltaPlusFilt
     }
 
 
-    private Set<OWLAxiom> getSourceAxioms(Explanation<OWLAxiom> expl, OPlusGenerator oPlusGenerator) {
+    private static Set<OWLAxiom> getSourceAxioms(Explanation<OWLAxiom> expl, OPlusGenerator oPlusGenerator) {
         Set<OWLAxiom> result = new HashSet<>();
         for (OWLAxiom ax : expl.getAxioms()) {
             Set<OWLAxiom> sourceAxioms = oPlusGenerator.getAxiom2SourceMap().get(ax);
@@ -432,6 +432,7 @@ public class LaconicExplanationGeneratorBasedOnIncrementalOPlusWithDeltaPlusFilt
 
 
     private class MediatingProgresssMonitor implements ExplanationProgressMonitor<OWLAxiom> {
+        public MediatingProgresssMonitor() {}
 
         @Override
         public void foundExplanation(ExplanationGenerator<OWLAxiom> owlAxiomExplanationGenerator, Explanation<OWLAxiom> owlAxiomExplanation, Set<Explanation<OWLAxiom>> allFoundExplanations) {
