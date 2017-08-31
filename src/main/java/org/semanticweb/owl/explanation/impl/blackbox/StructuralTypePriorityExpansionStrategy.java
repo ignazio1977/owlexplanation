@@ -41,7 +41,7 @@ import java.util.stream.Stream;
  * Author: Matthew Horridge<br> The University Of Manchester<br> Information Management Group<br> Date:
  * 16-Sep-2008<br><br>
  */
-public class StructuralTypePriorityExpansionStrategy implements ExpansionStrategy {
+public class StructuralTypePriorityExpansionStrategy<E> implements ExpansionStrategy<E> {
 
     private int count = 0;
 
@@ -55,7 +55,7 @@ public class StructuralTypePriorityExpansionStrategy implements ExpansionStrateg
     }
 
     @Override
-    public Set<OWLAxiom> doExpansion(Set<OWLAxiom> axioms, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor) {
+    public Set<OWLAxiom> doExpansion(Set<OWLAxiom> axioms, EntailmentChecker<E> checker, ExplanationProgressMonitor<?> progressMonitor) {
 
         Set<OWLAxiom> expansion;
         try {
@@ -122,7 +122,7 @@ public class StructuralTypePriorityExpansionStrategy implements ExpansionStrateg
                 }
                 count++;
                 if (checker.isEntailed(combined)) {
-                    Set<OWLAxiom> result = new HashSet<OWLAxiom>(checker.getEntailingAxioms(combined));
+                    Set<OWLAxiom> result = new HashSet<>(checker.getEntailingAxioms(combined));
                     result.removeAll(addedAxioms);
                     return result;
                 }
@@ -144,7 +144,7 @@ public class StructuralTypePriorityExpansionStrategy implements ExpansionStrateg
             }
             count++;
             if(checker.isEntailed(expansion)) {
-                Set<OWLAxiom> result = new HashSet<OWLAxiom>(checker.getEntailingAxioms(expansion));
+                Set<OWLAxiom> result = new HashSet<>(checker.getEntailingAxioms(expansion));
                 result.removeAll(addedAxioms);
                 return result;
             }
@@ -161,7 +161,7 @@ public class StructuralTypePriorityExpansionStrategy implements ExpansionStrateg
                 }
                 count++;
                 if (checker.isEntailed(expansion)) {
-                    Set<OWLAxiom> result = new HashSet<OWLAxiom>(checker.getEntailingAxioms(expansion));
+                    Set<OWLAxiom> result = new HashSet<>(checker.getEntailingAxioms(expansion));
                     result.removeAll(addedAxioms);
                     return result;
                 }

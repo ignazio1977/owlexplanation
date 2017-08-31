@@ -36,7 +36,7 @@ import java.util.function.Supplier;
  * Author: Matthew Horridge<br> The University Of Manchester<br> Information Management Group<br> Date:
  * 25-Sep-2008<br><br>
  */
-public class ModularityContractionStrategy implements ContractionStrategy {
+public class ModularityContractionStrategy<E> implements ContractionStrategy<E> {
 
     private int count = 0;
 
@@ -50,7 +50,7 @@ public class ModularityContractionStrategy implements ContractionStrategy {
         this.m = m;
     }
 
-    private static void toList(Tree<OWLAxiom> tree, List<OWLAxiom> axioms, EntailmentChecker checker) {
+    private static <E> void toList(Tree<OWLAxiom> tree, List<OWLAxiom> axioms, EntailmentChecker<E> checker) {
         OWLAxiom axiom = tree.getUserObject();
         if (axiom == null) {
             return;
@@ -65,7 +65,7 @@ public class ModularityContractionStrategy implements ContractionStrategy {
 
 
     @Override
-    public Set<OWLAxiom> doPruning(Set<OWLAxiom> axioms, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor) {
+    public Set<OWLAxiom> doPruning(Set<OWLAxiom> axioms, EntailmentChecker<E> checker, ExplanationProgressMonitor<?> progressMonitor) {
         count = 0;
         windowSize = axioms.size() / 20;
         if (windowSize == 0) {
@@ -121,7 +121,7 @@ public class ModularityContractionStrategy implements ContractionStrategy {
         return count;
     }
 
-    private Set<OWLAxiom> computeModule(Set<OWLAxiom> contraction, EntailmentChecker checker) {
+    private Set<OWLAxiom> computeModule(Set<OWLAxiom> contraction, EntailmentChecker<E> checker) {
         try {
             OWLOntology ont = m.get().createOntology(contraction);
             SyntacticLocalityModuleExtractor extractor = new SyntacticLocalityModuleExtractor(ont.getOWLOntologyManager(), ont, ModuleType.BOT);

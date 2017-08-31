@@ -37,19 +37,19 @@ import java.util.*;
  * This contraction strategy is based on Algorithm 2 presented in Baader and Suntisrivaraporn
  * in "Debugging Snomed CT Using Axiom Pinpointing in the Description Logic EL+".
  */
-public class DivideAndConquerContractionStrategy implements ContractionStrategy {
+public class DivideAndConquerContractionStrategy<E> implements ContractionStrategy<E> {
 
     private int count;
 
     @Override
-    public Set<OWLAxiom> doPruning(Set<OWLAxiom> axioms, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor) {
+    public Set<OWLAxiom> doPruning(Set<OWLAxiom> axioms, EntailmentChecker<E> checker, ExplanationProgressMonitor<?> progressMonitor) {
         count = 0;
         List<OWLAxiom> axiomList = new ArrayList<>(axioms);
         List<OWLAxiom> result = extract(new ArrayList<OWLAxiom>(), axiomList, checker, progressMonitor);
         return new HashSet<>(result);
     }
 
-    public List<OWLAxiom> extract(List<OWLAxiom> listS, List<OWLAxiom> listO, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor) {
+    public List<OWLAxiom> extract(List<OWLAxiom> listS, List<OWLAxiom> listO, EntailmentChecker<E> checker, ExplanationProgressMonitor<?> progressMonitor) {
         if(progressMonitor.isCancelled()) {
             throw new ExplanationGeneratorInterruptedException();
         }
@@ -75,7 +75,7 @@ public class DivideAndConquerContractionStrategy implements ContractionStrategy 
         return listS1PrimeWithS2Prime;
     }
 
-    private boolean isEntailed(List<OWLAxiom> listA, List<OWLAxiom> listB, EntailmentChecker checker) {
+    private boolean isEntailed(List<OWLAxiom> listA, List<OWLAxiom> listB, EntailmentChecker<E> checker) {
         count++;
         Set<OWLAxiom> axioms = new HashSet<>((int)((listA.size() + listB.size()) * 1.3));
         axioms.addAll(listA);

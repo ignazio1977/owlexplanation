@@ -35,22 +35,22 @@ import java.util.function.Supplier;
  * Information Management Group<br>
  * Date: 24-May-2009
  */
-public class InconsistentOntologyClashExpansionStrategy implements ExpansionStrategy {
+public class InconsistentOntologyClashExpansionStrategy<E> implements ExpansionStrategy<E> {
 
     private int count = 0;
 
-    private StructuralTypePriorityExpansionStrategy strategy;
+    private StructuralTypePriorityExpansionStrategy<E> strategy;
 
-    private InconsistentOntologyExpansionStrategy defaultStrategy = new InconsistentOntologyExpansionStrategy();
+    private InconsistentOntologyExpansionStrategy<E> defaultStrategy = new InconsistentOntologyExpansionStrategy<>();
 
     private Supplier<OWLOntologyManager> m;
 
     public InconsistentOntologyClashExpansionStrategy(Supplier<OWLOntologyManager> m) {
         this.m = m;
-        this.strategy=new StructuralTypePriorityExpansionStrategy(null, m);
+        this.strategy=new StructuralTypePriorityExpansionStrategy<>(null, m);
     }
     @Override
-    public Set<OWLAxiom> doExpansion(Set<OWLAxiom> axioms, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor) {
+    public Set<OWLAxiom> doExpansion(Set<OWLAxiom> axioms, EntailmentChecker<E> checker, ExplanationProgressMonitor<?> progressMonitor) {
         return defaultStrategy.doExpansion(axioms, checker, progressMonitor);
     }
 

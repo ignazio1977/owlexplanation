@@ -3,7 +3,6 @@ package org.semanticweb.owl.explanation.impl.blackbox.hst;
 import org.semanticweb.owl.explanation.api.Explanation;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
-import java.util.Set;
 /*
  * Copyright (C) 2010, University of Manchester
  *

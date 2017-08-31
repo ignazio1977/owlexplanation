@@ -35,9 +35,9 @@ import java.util.Set;
  * Represents a method of contracting a set of axioms that support an entailment down to a minimal
  * set of axioms that support the entailment.
  */
-public interface ContractionStrategy {
+public interface ContractionStrategy<E> {
 
-    Set<OWLAxiom> doPruning(Set<OWLAxiom> axioms, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor);
+    Set<OWLAxiom> doPruning(Set<OWLAxiom> axioms, EntailmentChecker<E> checker, ExplanationProgressMonitor<?> progressMonitor);
 
     int getNumberOfSteps();
 }

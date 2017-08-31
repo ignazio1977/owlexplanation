@@ -2,8 +2,6 @@ package org.semanticweb.owl.explanation.impl.util;
 
 import org.semanticweb.owlapi.model.*;
 
-import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.asSet;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;

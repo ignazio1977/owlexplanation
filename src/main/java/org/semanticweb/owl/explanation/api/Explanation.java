@@ -171,7 +171,7 @@ public class Explanation<E> {
         if (!(obj instanceof Explanation)) {
             return false;
         }
-        Explanation other = (Explanation) obj;
+        Explanation<?> other = (Explanation<?>) obj;
         return other.getEntailment().equals(entailment) && other.getAxioms().equals(justification);
     }
 

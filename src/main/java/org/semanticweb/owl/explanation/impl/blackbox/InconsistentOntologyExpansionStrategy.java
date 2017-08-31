@@ -33,7 +33,7 @@ import java.util.*;
  * Information Management Group<br>
  * Date: 01-May-2009
  */
-public class InconsistentOntologyExpansionStrategy implements ExpansionStrategy {
+public class InconsistentOntologyExpansionStrategy<E> implements ExpansionStrategy<E> {
 
 
     public InconsistentOntologyExpansionStrategy() {
@@ -41,7 +41,7 @@ public class InconsistentOntologyExpansionStrategy implements ExpansionStrategy 
 
 
     @Override
-    public Set<OWLAxiom> doExpansion(Set<OWLAxiom> axioms, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor) {
+    public Set<OWLAxiom> doExpansion(Set<OWLAxiom> axioms, EntailmentChecker<E> checker, ExplanationProgressMonitor<?> progressMonitor) {
         if(checker.isEntailed(axioms)) {
             return axioms;
         }

@@ -52,7 +52,7 @@ public class HittingSetTree<E> implements TelemetryObject {
 
     private Set<Set<OWLAxiom>> exploredPaths = new HashSet<>();
 
-    private ExplanationComparator<E> explanationComparator = new ExplanationComparator(this);
+    private ExplanationComparator<E> explanationComparator = new ExplanationComparator<>(this);
 
     private int treeSize = 0;
 

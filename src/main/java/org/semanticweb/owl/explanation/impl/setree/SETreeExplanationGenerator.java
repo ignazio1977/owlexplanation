@@ -70,7 +70,7 @@ public class SETreeExplanationGenerator implements ExplanationGenerator<OWLAxiom
         OWLOntologyManager manager = m.get();
         SyntacticLocalityModuleExtractor extractor = new SyntacticLocalityModuleExtractor(manager, workingAxioms.stream(), ModuleType.STAR);
         module = extractor.extract(asSet(entailment.signature()));
-        BlackBoxExplanationGenerator2<OWLAxiom> gen = new BlackBoxExplanationGenerator2<>(module, entailmentCheckerFactory, new StructuralTypePriorityExpansionStrategy(null, m), new DivideAndConquerContractionStrategy(), new NullExplanationProgressMonitor<OWLAxiom>(), m);
+        BlackBoxExplanationGenerator2<OWLAxiom> gen = new BlackBoxExplanationGenerator2<>(module, entailmentCheckerFactory, new StructuralTypePriorityExpansionStrategy<>(null, m), new DivideAndConquerContractionStrategy<OWLAxiom>(), new NullExplanationProgressMonitor<OWLAxiom>(), m);
         Set<Explanation<OWLAxiom>> expls = gen.getExplanations(entailment, 1);
         Explanation<OWLAxiom> expl = expls.iterator().next();
         Set<OWLAxiom> commonAxioms = new HashSet<>();

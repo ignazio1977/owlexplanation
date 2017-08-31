@@ -37,7 +37,7 @@ import java.util.Set;
  *
  * A contraction strategy that uses a sliding window to improve performance.
  */
-public class SlidingWindowContractionStrategy implements ContractionStrategy {
+public class SlidingWindowContractionStrategy<E> implements ContractionStrategy<E> {
 
     final private int windowSize;
 
@@ -56,7 +56,7 @@ public class SlidingWindowContractionStrategy implements ContractionStrategy {
 
 
     @Override
-    public Set<OWLAxiom> doPruning(Set<OWLAxiom> axioms, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor) {
+    public Set<OWLAxiom> doPruning(Set<OWLAxiom> axioms, EntailmentChecker<E> checker, ExplanationProgressMonitor<?> progressMonitor) {
         count = 0;
         List<OWLAxiom> axiomList = new ArrayList<>(axioms);
         int windowCount = axiomList.size() / windowSize;

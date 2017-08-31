@@ -17,7 +17,6 @@ import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.asList;
 import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.asSet;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collections;
@@ -801,7 +800,7 @@ public class SatisfiabilityEntailmentChecker implements EntailmentChecker<OWLAxi
 
     public static class UnsupportedAxiomTypeException extends RuntimeException {
 
-        private AxiomType type;
+        private AxiomType<?> type;
 
 
         public UnsupportedAxiomTypeException(OWLAxiom ax) {
@@ -810,7 +809,7 @@ public class SatisfiabilityEntailmentChecker implements EntailmentChecker<OWLAxi
         }
 
 
-        public AxiomType getType() {
+        public AxiomType<?> getType() {
             return type;
         }
     }

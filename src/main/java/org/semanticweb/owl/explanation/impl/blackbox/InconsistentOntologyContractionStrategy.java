@@ -33,7 +33,7 @@ import java.util.Set;
  * Information Management Group<br>
  * Date: 01-May-2009
  */
-public class InconsistentOntologyContractionStrategy extends DivideAndConquerContractionStrategy {
+public class InconsistentOntologyContractionStrategy<E> extends DivideAndConquerContractionStrategy<E> {
 
 
     public InconsistentOntologyContractionStrategy() {
@@ -42,7 +42,7 @@ public class InconsistentOntologyContractionStrategy extends DivideAndConquerCon
 
 
     @Override
-    public Set<OWLAxiom> doPruning(Set<OWLAxiom> axioms, EntailmentChecker checker, ExplanationProgressMonitor<?> progressMonitor) {
+    public Set<OWLAxiom> doPruning(Set<OWLAxiom> axioms, EntailmentChecker<E> checker, ExplanationProgressMonitor<?> progressMonitor) {
         return super.doPruning(axioms, checker, progressMonitor);
     }
 }
