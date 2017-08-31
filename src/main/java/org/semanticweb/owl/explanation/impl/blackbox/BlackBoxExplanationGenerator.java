@@ -179,16 +179,19 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
 
     private void collectEmptyNodes(Tree<Explanation> exp, Map<OWLAxiom, Integer> axs) {
         for (Tree<Explanation> child : exp.getChildren()) {
-            if (child.getUserObject().getAxioms().isEmpty()) {
-                OWLAxiom label = (OWLAxiom) exp.getEdge(child);
-                Integer count = axs.get(label);
-                if (count == null) {
-                    count = 0;
+            Explanation userObject = child.getUserObject();
+            if (userObject!=null) {
+                if (userObject.getAxioms().isEmpty()) {
+                    OWLAxiom label = (OWLAxiom) exp.getEdge(child);
+                    Integer count = axs.get(label);
+                    if (count == null) {
+                        count = 0;
+                    }
+                    count++;
+                    axs.put(label, count);
+                } else {
+                    collectEmptyNodes(child, axs);
                 }
-                count++;
-                axs.put(label, count);
-            } else {
-                collectEmptyNodes(child, axs);
             }
         }
     }

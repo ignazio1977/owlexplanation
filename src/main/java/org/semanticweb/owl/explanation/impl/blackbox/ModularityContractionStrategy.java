@@ -52,6 +52,9 @@ public class ModularityContractionStrategy implements ContractionStrategy {
 
     private static void toList(Tree<OWLAxiom> tree, List<OWLAxiom> axioms, EntailmentChecker checker) {
         OWLAxiom axiom = tree.getUserObject();
+        if (axiom == null) {
+            return;
+        }
         if (!axiom.equals(checker.getEntailment())) {
             axioms.add(axiom);
         }
