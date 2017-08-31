@@ -181,8 +181,8 @@ public class SatisfiabilityEntailmentChecker implements EntailmentChecker<OWLAxi
         }
     }
 
-    private boolean containsNominals(OWLAxiom axiom) {
-        return axiom.nestedClassExpressions().anyMatch(ce->ce instanceof OWLObjectOneOf);
+    private boolean containsNominals(OWLAxiom ax) {
+        return ax.nestedClassExpressions().anyMatch(ce->ce instanceof OWLObjectOneOf);
     }
 
     @Override
@@ -314,196 +314,196 @@ public class SatisfiabilityEntailmentChecker implements EntailmentChecker<OWLAxi
         }
 
         @Override
-        public void visit(OWLDeclarationAxiom axiom) {
+        public void visit(OWLDeclarationAxiom ax) {
         }
 
 
 
         @Override
-        public void visit(OWLSubClassOfAxiom axiom) {
-            tboxAxioms.add(axiom);
+        public void visit(OWLSubClassOfAxiom ax) {
+            tboxAxioms.add(ax);
 
         }
 
         @Override
-        public void visit(OWLNegativeObjectPropertyAssertionAxiom axiom) {
-            tboxAxioms.add(axiom);
+        public void visit(OWLNegativeObjectPropertyAssertionAxiom ax) {
+            tboxAxioms.add(ax);
         }
 
         @Override
-        public void visit(OWLAsymmetricObjectPropertyAxiom axiom) {
-            tboxAxioms.add(axiom);
+        public void visit(OWLAsymmetricObjectPropertyAxiom ax) {
+            tboxAxioms.add(ax);
         }
 
         @Override
-        public void visit(OWLReflexiveObjectPropertyAxiom axiom) {
-            tboxAxioms.add(axiom);
+        public void visit(OWLReflexiveObjectPropertyAxiom ax) {
+            tboxAxioms.add(ax);
         }
 
         @Override
-        public void visit(OWLDisjointClassesAxiom axiom) {
-            tboxAxioms.add(axiom);
+        public void visit(OWLDisjointClassesAxiom ax) {
+            tboxAxioms.add(ax);
         }
 
         @Override
-        public void visit(OWLDataPropertyDomainAxiom axiom) {
-            tboxAxioms.add(axiom);
+        public void visit(OWLDataPropertyDomainAxiom ax) {
+            tboxAxioms.add(ax);
         }
 
         @Override
-        public void visit(OWLObjectPropertyDomainAxiom axiom) {
-            tboxAxioms.add(axiom);
+        public void visit(OWLObjectPropertyDomainAxiom ax) {
+            tboxAxioms.add(ax);
         }
 
         @Override
-        public void visit(OWLEquivalentObjectPropertiesAxiom axiom) {
-            tboxAxioms.add(axiom);
+        public void visit(OWLEquivalentObjectPropertiesAxiom ax) {
+            tboxAxioms.add(ax);
         }
 
         @Override
-        public void visit(OWLNegativeDataPropertyAssertionAxiom axiom) {
-            tboxAxioms.add(axiom);
+        public void visit(OWLNegativeDataPropertyAssertionAxiom ax) {
+            tboxAxioms.add(ax);
         }
 
         @Override
-        public void visit(OWLDifferentIndividualsAxiom axiom) {
-            aboxAxioms.add(axiom);
+        public void visit(OWLDifferentIndividualsAxiom ax) {
+            aboxAxioms.add(ax);
         }
 
         @Override
-        public void visit(OWLDisjointDataPropertiesAxiom axiom) {
-            tboxAxioms.add(axiom);
+        public void visit(OWLDisjointDataPropertiesAxiom ax) {
+            tboxAxioms.add(ax);
         }
 
         @Override
-        public void visit(OWLDisjointObjectPropertiesAxiom axiom) {
-            tboxAxioms.add(axiom);
+        public void visit(OWLDisjointObjectPropertiesAxiom ax) {
+            tboxAxioms.add(ax);
         }
 
         @Override
-        public void visit(OWLObjectPropertyRangeAxiom axiom) {
-            tboxAxioms.add(axiom);
+        public void visit(OWLObjectPropertyRangeAxiom ax) {
+            tboxAxioms.add(ax);
         }
 
         @Override
-        public void visit(OWLObjectPropertyAssertionAxiom axiom) {
-            aboxAxioms.add(axiom);
+        public void visit(OWLObjectPropertyAssertionAxiom ax) {
+            aboxAxioms.add(ax);
         }
 
         @Override
-        public void visit(OWLFunctionalObjectPropertyAxiom axiom) {
-            tboxAxioms.add(axiom);
+        public void visit(OWLFunctionalObjectPropertyAxiom ax) {
+            tboxAxioms.add(ax);
         }
 
         @Override
-        public void visit(OWLSubObjectPropertyOfAxiom axiom) {
-            tboxAxioms.add(axiom);
+        public void visit(OWLSubObjectPropertyOfAxiom ax) {
+            tboxAxioms.add(ax);
         }
 
         @Override
-        public void visit(OWLDisjointUnionAxiom axiom) {
-            tboxAxioms.add(axiom);
+        public void visit(OWLDisjointUnionAxiom ax) {
+            tboxAxioms.add(ax);
         }
 
         @Override
-        public void visit(OWLSymmetricObjectPropertyAxiom axiom) {
-            tboxAxioms.add(axiom);
+        public void visit(OWLSymmetricObjectPropertyAxiom ax) {
+            tboxAxioms.add(ax);
         }
 
         @Override
-        public void visit(OWLDataPropertyRangeAxiom axiom) {
-            tboxAxioms.add(axiom);
+        public void visit(OWLDataPropertyRangeAxiom ax) {
+            tboxAxioms.add(ax);
         }
 
         @Override
-        public void visit(OWLFunctionalDataPropertyAxiom axiom) {
-            tboxAxioms.add(axiom);
+        public void visit(OWLFunctionalDataPropertyAxiom ax) {
+            tboxAxioms.add(ax);
         }
 
         @Override
-        public void visit(OWLEquivalentDataPropertiesAxiom axiom) {
-            tboxAxioms.add(axiom);
+        public void visit(OWLEquivalentDataPropertiesAxiom ax) {
+            tboxAxioms.add(ax);
         }
 
         @Override
-        public void visit(OWLClassAssertionAxiom axiom) {
-            aboxAxioms.add(axiom);
+        public void visit(OWLClassAssertionAxiom ax) {
+            aboxAxioms.add(ax);
         }
 
         @Override
-        public void visit(OWLEquivalentClassesAxiom axiom) {
-            tboxAxioms.add(axiom);
+        public void visit(OWLEquivalentClassesAxiom ax) {
+            tboxAxioms.add(ax);
         }
 
         @Override
-        public void visit(OWLDataPropertyAssertionAxiom axiom) {
-            aboxAxioms.add(axiom);
+        public void visit(OWLDataPropertyAssertionAxiom ax) {
+            aboxAxioms.add(ax);
         }
 
         @Override
-        public void visit(OWLTransitiveObjectPropertyAxiom axiom) {
-            tboxAxioms.add(axiom);
+        public void visit(OWLTransitiveObjectPropertyAxiom ax) {
+            tboxAxioms.add(ax);
         }
 
         @Override
-        public void visit(OWLIrreflexiveObjectPropertyAxiom axiom) {
-            tboxAxioms.add(axiom);
+        public void visit(OWLIrreflexiveObjectPropertyAxiom ax) {
+            tboxAxioms.add(ax);
         }
 
         @Override
-        public void visit(OWLSubDataPropertyOfAxiom axiom) {
-            tboxAxioms.add(axiom);
+        public void visit(OWLSubDataPropertyOfAxiom ax) {
+            tboxAxioms.add(ax);
         }
 
         @Override
-        public void visit(OWLInverseFunctionalObjectPropertyAxiom axiom) {
-            tboxAxioms.add(axiom);
+        public void visit(OWLInverseFunctionalObjectPropertyAxiom ax) {
+            tboxAxioms.add(ax);
         }
 
         @Override
-        public void visit(OWLSameIndividualAxiom axiom) {
-            aboxAxioms.add(axiom);
+        public void visit(OWLSameIndividualAxiom ax) {
+            aboxAxioms.add(ax);
         }
 
         @Override
-        public void visit(OWLSubPropertyChainOfAxiom axiom) {
-            tboxAxioms.add(axiom);
+        public void visit(OWLSubPropertyChainOfAxiom ax) {
+            tboxAxioms.add(ax);
         }
 
         @Override
-        public void visit(OWLInverseObjectPropertiesAxiom axiom) {
-            tboxAxioms.add(axiom);
+        public void visit(OWLInverseObjectPropertiesAxiom ax) {
+            tboxAxioms.add(ax);
         }
 
         @Override
-        public void visit(OWLHasKeyAxiom axiom) {
-            tboxAxioms.add(axiom);
+        public void visit(OWLHasKeyAxiom ax) {
+            tboxAxioms.add(ax);
         }
 
         @Override
-        public void visit(OWLDatatypeDefinitionAxiom axiom) {
-            tboxAxioms.add(axiom);
+        public void visit(OWLDatatypeDefinitionAxiom ax) {
+            tboxAxioms.add(ax);
         }
 
         @Override
         public void visit(SWRLRule rule) {
-            tboxAxioms.add(axiom);
+            tboxAxioms.add(rule);
         }
 
         @Override
-        public void visit(OWLAnnotationAssertionAxiom axiom) {
+        public void visit(OWLAnnotationAssertionAxiom ax) {
         }
 
         @Override
-        public void visit(OWLSubAnnotationPropertyOfAxiom axiom) {
+        public void visit(OWLSubAnnotationPropertyOfAxiom ax) {
         }
 
         @Override
-        public void visit(OWLAnnotationPropertyDomainAxiom axiom) {
+        public void visit(OWLAnnotationPropertyDomainAxiom ax) {
         }
 
         @Override
-        public void visit(OWLAnnotationPropertyRangeAxiom axiom) {
+        public void visit(OWLAnnotationPropertyRangeAxiom ax) {
         }
     }
 
@@ -514,96 +514,96 @@ public class SatisfiabilityEntailmentChecker implements EntailmentChecker<OWLAxi
         private OWLDataFactory df = man.getOWLDataFactory();
 
         @Override
-        public OWLClassExpression visit(OWLAsymmetricObjectPropertyAxiom axiom) {
-            throw new UnsupportedAxiomTypeException(axiom);
+        public OWLClassExpression visit(OWLAsymmetricObjectPropertyAxiom ax) {
+            throw new UnsupportedAxiomTypeException(ax);
         }
 
 
         @Override
-        public OWLClassExpression visit(OWLClassAssertionAxiom axiom) {
-            OWLClassExpression nominal = df.getOWLObjectOneOf(axiom.getIndividual());
-            return df.getOWLObjectIntersectionOf(nominal, df.getOWLObjectComplementOf(axiom.getClassExpression()));
+        public OWLClassExpression visit(OWLClassAssertionAxiom ax) {
+            OWLClassExpression nominal = df.getOWLObjectOneOf(ax.getIndividual());
+            return df.getOWLObjectIntersectionOf(nominal, df.getOWLObjectComplementOf(ax.getClassExpression()));
         }
 
 
         @Override
-        public OWLClassExpression visit(OWLDataPropertyAssertionAxiom axiom) {
-            OWLClassExpression nom = df.getOWLObjectOneOf(axiom.getSubject());
-            OWLClassExpression hasVal = df.getOWLDataHasValue(axiom.getProperty(), axiom.getObject());
+        public OWLClassExpression visit(OWLDataPropertyAssertionAxiom ax) {
+            OWLClassExpression nom = df.getOWLObjectOneOf(ax.getSubject());
+            OWLClassExpression hasVal = df.getOWLDataHasValue(ax.getProperty(), ax.getObject());
             return df.getOWLObjectIntersectionOf(nom, df.getOWLObjectComplementOf(hasVal));
         }
 
 
         @Override
-        public OWLClassExpression visit(OWLDataPropertyDomainAxiom axiom) {
-            OWLClassExpression exists = df.getOWLDataSomeValuesFrom(axiom.getProperty(), df.getTopDatatype());
-            return df.getOWLObjectIntersectionOf(exists, df.getOWLObjectComplementOf(axiom.getDomain()));
+        public OWLClassExpression visit(OWLDataPropertyDomainAxiom ax) {
+            OWLClassExpression exists = df.getOWLDataSomeValuesFrom(ax.getProperty(), df.getTopDatatype());
+            return df.getOWLObjectIntersectionOf(exists, df.getOWLObjectComplementOf(ax.getDomain()));
         }
 
 
         @Override
-        public OWLClassExpression visit(OWLDataPropertyRangeAxiom axiom) {
-            OWLClassExpression forall = df.getOWLDataAllValuesFrom(axiom.getProperty(), axiom.getRange());
+        public OWLClassExpression visit(OWLDataPropertyRangeAxiom ax) {
+            OWLClassExpression forall = df.getOWLDataAllValuesFrom(ax.getProperty(), ax.getRange());
             return df.getOWLObjectIntersectionOf(df.getOWLThing(), df.getOWLObjectComplementOf(forall));
         }
 
 
         @Override
-        public OWLClassExpression visit(OWLSubDataPropertyOfAxiom axiom) {
+        public OWLClassExpression visit(OWLSubDataPropertyOfAxiom ax) {
             OWLLiteral c = df.getOWLLiteral("x");
-            OWLClassExpression subHasValue = df.getOWLDataHasValue(axiom.getSubProperty(), c);
-            OWLClassExpression supHasValue = df.getOWLDataHasValue(axiom.getSuperProperty(), c);
+            OWLClassExpression subHasValue = df.getOWLDataHasValue(ax.getSubProperty(), c);
+            OWLClassExpression supHasValue = df.getOWLDataHasValue(ax.getSuperProperty(), c);
             return df.getOWLObjectIntersectionOf(subHasValue, df.getOWLObjectComplementOf(supHasValue));
         }
 
 
         @Override
-        public OWLClassExpression visit(OWLDeclarationAxiom axiom) {
-            throw new UnsupportedAxiomTypeException(axiom);
+        public OWLClassExpression visit(OWLDeclarationAxiom ax) {
+            throw new UnsupportedAxiomTypeException(ax);
         }
 
 
         @Override
-        public OWLClassExpression visit(OWLDifferentIndividualsAxiom axiom) {
-            throw new UnsupportedAxiomTypeException(axiom);
+        public OWLClassExpression visit(OWLDifferentIndividualsAxiom ax) {
+            throw new UnsupportedAxiomTypeException(ax);
         }
 
 
         @Override
-        public OWLClassExpression visit(OWLDisjointClassesAxiom axiom) {
-            return df.getOWLObjectIntersectionOf(axiom.classExpressions());
+        public OWLClassExpression visit(OWLDisjointClassesAxiom ax) {
+            return df.getOWLObjectIntersectionOf(ax.classExpressions());
         }
 
 
         @Override
-        public OWLClassExpression visit(OWLDisjointDataPropertiesAxiom axiom) {
-            throw new UnsupportedAxiomTypeException(axiom);
+        public OWLClassExpression visit(OWLDisjointDataPropertiesAxiom ax) {
+            throw new UnsupportedAxiomTypeException(ax);
         }
 
 
         @Override
-        public OWLClassExpression visit(OWLDisjointObjectPropertiesAxiom axiom) {
-            throw new UnsupportedAxiomTypeException(axiom);
+        public OWLClassExpression visit(OWLDisjointObjectPropertiesAxiom ax) {
+            throw new UnsupportedAxiomTypeException(ax);
         }
 
 
         @Override
-        public OWLClassExpression visit(OWLDisjointUnionAxiom axiom) {
-            throw new UnsupportedAxiomTypeException(axiom);
+        public OWLClassExpression visit(OWLDisjointUnionAxiom ax) {
+            throw new UnsupportedAxiomTypeException(ax);
         }
 
 
         @Override
-        public OWLClassExpression visit(OWLAnnotationAssertionAxiom axiom) {
-            throw new UnsupportedAxiomTypeException(axiom);
+        public OWLClassExpression visit(OWLAnnotationAssertionAxiom ax) {
+            throw new UnsupportedAxiomTypeException(ax);
         }
 
 
         @Override
-        public OWLClassExpression visit(OWLEquivalentClassesAxiom axiom) {
-            List<OWLClassExpression> expressions=asList(axiom.classExpressions());
+        public OWLClassExpression visit(OWLEquivalentClassesAxiom ax) {
+            List<OWLClassExpression> expressions=asList(ax.classExpressions());
             if (expressions.size() != 2) {
-                throw new UnsupportedAxiomTypeException(axiom);
+                throw new UnsupportedAxiomTypeException(ax);
             }
 
             OWLClassExpression d1 = expressions.get(0);
@@ -628,44 +628,44 @@ public class SatisfiabilityEntailmentChecker implements EntailmentChecker<OWLAxi
 
 
         @Override
-        public OWLClassExpression visit(OWLEquivalentDataPropertiesAxiom axiom) {
-            throw new UnsupportedAxiomTypeException(axiom);
+        public OWLClassExpression visit(OWLEquivalentDataPropertiesAxiom ax) {
+            throw new UnsupportedAxiomTypeException(ax);
         }
 
 
         @Override
-        public OWLClassExpression visit(OWLEquivalentObjectPropertiesAxiom axiom) {
-            throw new UnsupportedAxiomTypeException(axiom);
+        public OWLClassExpression visit(OWLEquivalentObjectPropertiesAxiom ax) {
+            throw new UnsupportedAxiomTypeException(ax);
         }
 
 
         @Override
-        public OWLClassExpression visit(OWLFunctionalDataPropertyAxiom axiom) {
-            return axiom.asOWLSubClassOfAxiom().accept(this);
+        public OWLClassExpression visit(OWLFunctionalDataPropertyAxiom ax) {
+            return ax.asOWLSubClassOfAxiom().accept(this);
         }
 
 
         @Override
-        public OWLClassExpression visit(OWLFunctionalObjectPropertyAxiom axiom) {
-            return axiom.asOWLSubClassOfAxiom().accept(this);
+        public OWLClassExpression visit(OWLFunctionalObjectPropertyAxiom ax) {
+            return ax.asOWLSubClassOfAxiom().accept(this);
         }
 
         @Override
-        public OWLClassExpression visit(OWLInverseFunctionalObjectPropertyAxiom axiom) {
-            return axiom.asOWLSubClassOfAxiom().accept(this);
+        public OWLClassExpression visit(OWLInverseFunctionalObjectPropertyAxiom ax) {
+            return ax.asOWLSubClassOfAxiom().accept(this);
         }
 
 
         @Override
-        public OWLClassExpression visit(OWLInverseObjectPropertiesAxiom axiom) {
+        public OWLClassExpression visit(OWLInverseObjectPropertiesAxiom ax) {
             OWLClass clsA = df.getOWLClass(IRI.create("owlapi:explanation:clsA"));
             freshEntities.add(clsA);
             OWLClass clsB = df.getOWLClass(IRI.create("owlapi:explanation:clsB"));
             freshEntities.add(clsB);
-            OWLClassExpression subHasValueA = df.getOWLObjectSomeValuesFrom(axiom.getFirstProperty(), clsA);
-            OWLClassExpression supHasValueA = df.getOWLObjectSomeValuesFrom(axiom.getSecondProperty().getInverseProperty(), clsA);
-            OWLClassExpression subHasValueB = df.getOWLObjectSomeValuesFrom(axiom.getSecondProperty(), clsB);
-            OWLClassExpression supHasValueB = df.getOWLObjectSomeValuesFrom(axiom.getFirstProperty().getInverseProperty(), clsB);
+            OWLClassExpression subHasValueA = df.getOWLObjectSomeValuesFrom(ax.getFirstProperty(), clsA);
+            OWLClassExpression supHasValueA = df.getOWLObjectSomeValuesFrom(ax.getSecondProperty().getInverseProperty(), clsA);
+            OWLClassExpression subHasValueB = df.getOWLObjectSomeValuesFrom(ax.getSecondProperty(), clsB);
+            OWLClassExpression supHasValueB = df.getOWLObjectSomeValuesFrom(ax.getFirstProperty().getInverseProperty(), clsB);
             OWLClassExpression ceA = df.getOWLObjectIntersectionOf(subHasValueA, df.getOWLObjectComplementOf(supHasValueA));
             OWLClassExpression ceB = df.getOWLObjectIntersectionOf(subHasValueB, df.getOWLObjectComplementOf(supHasValueB));
             return df.getOWLObjectUnionOf(ceA, ceB);
@@ -673,26 +673,26 @@ public class SatisfiabilityEntailmentChecker implements EntailmentChecker<OWLAxi
 
 
         @Override
-        public OWLClassExpression visit(OWLIrreflexiveObjectPropertyAxiom axiom) {
-            return axiom.asOWLSubClassOfAxiom().accept(this);
+        public OWLClassExpression visit(OWLIrreflexiveObjectPropertyAxiom ax) {
+            return ax.asOWLSubClassOfAxiom().accept(this);
         }
 
 
         @Override
-        public OWLClassExpression visit(OWLNegativeDataPropertyAssertionAxiom axiom) {
-            return axiom.asOWLSubClassOfAxiom().accept(this);
+        public OWLClassExpression visit(OWLNegativeDataPropertyAssertionAxiom ax) {
+            return ax.asOWLSubClassOfAxiom().accept(this);
         }
 
 
         @Override
-        public OWLClassExpression visit(OWLNegativeObjectPropertyAssertionAxiom axiom) {
-            return axiom.asOWLSubClassOfAxiom().accept(this);
+        public OWLClassExpression visit(OWLNegativeObjectPropertyAssertionAxiom ax) {
+            return ax.asOWLSubClassOfAxiom().accept(this);
         }
 
 
         @Override
-        public OWLClassExpression visit(OWLHasKeyAxiom owlHasKeyAxiom) {
-            throw new UnsupportedAxiomTypeException(axiom);
+        public OWLClassExpression visit(OWLHasKeyAxiom ax) {
+            throw new UnsupportedAxiomTypeException(ax);
         }
 
 
@@ -721,73 +721,73 @@ public class SatisfiabilityEntailmentChecker implements EntailmentChecker<OWLAxi
 
 
         @Override
-        public OWLClassExpression visit(OWLObjectPropertyAssertionAxiom axiom) {
-            OWLClassExpression nom = df.getOWLObjectOneOf(axiom.getSubject());
-            OWLClassExpression hasVal = df.getOWLObjectHasValue(axiom.getProperty(), axiom.getObject());
+        public OWLClassExpression visit(OWLObjectPropertyAssertionAxiom ax) {
+            OWLClassExpression nom = df.getOWLObjectOneOf(ax.getSubject());
+            OWLClassExpression hasVal = df.getOWLObjectHasValue(ax.getProperty(), ax.getObject());
             return df.getOWLObjectIntersectionOf(nom, df.getOWLObjectComplementOf(hasVal));
         }
 
 
         @Override
-        public OWLClassExpression visit(OWLSubPropertyChainOfAxiom axiom) {
-            throw new UnsupportedAxiomTypeException(axiom);
+        public OWLClassExpression visit(OWLSubPropertyChainOfAxiom ax) {
+            throw new UnsupportedAxiomTypeException(ax);
         }
 
 
         @Override
-        public OWLClassExpression visit(OWLObjectPropertyDomainAxiom axiom) {
-            OWLClassExpression exists = df.getOWLObjectSomeValuesFrom(axiom.getProperty(), df.getOWLThing());
-            return df.getOWLObjectIntersectionOf(exists, df.getOWLObjectComplementOf(axiom.getDomain()));
+        public OWLClassExpression visit(OWLObjectPropertyDomainAxiom ax) {
+            OWLClassExpression exists = df.getOWLObjectSomeValuesFrom(ax.getProperty(), df.getOWLThing());
+            return df.getOWLObjectIntersectionOf(exists, df.getOWLObjectComplementOf(ax.getDomain()));
         }
 
 
         @Override
-        public OWLClassExpression visit(OWLObjectPropertyRangeAxiom axiom) {
-            OWLClassExpression forall = df.getOWLObjectAllValuesFrom(axiom.getProperty(), axiom.getRange());
+        public OWLClassExpression visit(OWLObjectPropertyRangeAxiom ax) {
+            OWLClassExpression forall = df.getOWLObjectAllValuesFrom(ax.getProperty(), ax.getRange());
             return df.getOWLObjectIntersectionOf(df.getOWLThing(), df.getOWLObjectComplementOf(forall));
         }
 
 
         @Override
-        public OWLClassExpression visit(OWLSubObjectPropertyOfAxiom axiom) {
+        public OWLClassExpression visit(OWLSubObjectPropertyOfAxiom ax) {
             OWLClass clsA = df.getOWLClass(IRI.create("owlapi:explanation:clsA"));
             freshEntities.add(clsA);
-            OWLClassExpression subHasValue = df.getOWLObjectSomeValuesFrom(axiom.getSubProperty(), clsA);
-            OWLClassExpression supHasValue = df.getOWLObjectSomeValuesFrom(axiom.getSuperProperty(), clsA);
+            OWLClassExpression subHasValue = df.getOWLObjectSomeValuesFrom(ax.getSubProperty(), clsA);
+            OWLClassExpression supHasValue = df.getOWLObjectSomeValuesFrom(ax.getSuperProperty(), clsA);
             return df.getOWLObjectIntersectionOf(subHasValue, df.getOWLObjectComplementOf(supHasValue));
         }
 
 
         @Override
-        public OWLClassExpression visit(OWLReflexiveObjectPropertyAxiom axiom) {
-            return df.getOWLObjectHasSelf(axiom.getProperty()).getObjectComplementOf();
+        public OWLClassExpression visit(OWLReflexiveObjectPropertyAxiom ax) {
+            return df.getOWLObjectHasSelf(ax.getProperty()).getObjectComplementOf();
         }
 
 
         @Override
-        public OWLClassExpression visit(OWLSameIndividualAxiom axiom) {
-            throw new UnsupportedAxiomTypeException(axiom);
+        public OWLClassExpression visit(OWLSameIndividualAxiom ax) {
+            throw new UnsupportedAxiomTypeException(ax);
         }
 
 
         @Override
-        public OWLClassExpression visit(OWLSubClassOfAxiom axiom) {
-            return man.getOWLDataFactory().getOWLObjectIntersectionOf(axiom.getSubClass(), man.getOWLDataFactory().getOWLObjectComplementOf(axiom.getSuperClass()));
+        public OWLClassExpression visit(OWLSubClassOfAxiom ax) {
+            return man.getOWLDataFactory().getOWLObjectIntersectionOf(ax.getSubClass(), man.getOWLDataFactory().getOWLObjectComplementOf(ax.getSuperClass()));
         }
 
 
         @Override
-        public OWLClassExpression visit(OWLSymmetricObjectPropertyAxiom axiom) {
-            throw new UnsupportedAxiomTypeException(axiom);
+        public OWLClassExpression visit(OWLSymmetricObjectPropertyAxiom ax) {
+            throw new UnsupportedAxiomTypeException(ax);
         }
 
 
         @Override
-        public OWLClassExpression visit(OWLTransitiveObjectPropertyAxiom axiom) {
+        public OWLClassExpression visit(OWLTransitiveObjectPropertyAxiom ax) {
             OWLClass clsA = df.getOWLClass(IRI.create("owlapi:explanation:clsA"));
             freshEntities.add(clsA);
-            OWLClassExpression subHasValue = df.getOWLObjectSomeValuesFrom(axiom.getProperty(), df.getOWLObjectSomeValuesFrom(axiom.getProperty(), clsA));
-            OWLClassExpression supHasValue = df.getOWLObjectSomeValuesFrom(axiom.getProperty(), clsA);
+            OWLClassExpression subHasValue = df.getOWLObjectSomeValuesFrom(ax.getProperty(), df.getOWLObjectSomeValuesFrom(ax.getProperty(), clsA));
+            OWLClassExpression supHasValue = df.getOWLObjectSomeValuesFrom(ax.getProperty(), clsA);
             return df.getOWLObjectIntersectionOf(subHasValue, df.getOWLObjectComplementOf(supHasValue));
         }
 
