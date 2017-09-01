@@ -2,6 +2,8 @@ package org.semanticweb.owl.explanation.impl.util;
 
 import org.semanticweb.owlapi.model.*;
 
+import gnu.trove.map.hash.TObjectIntHashMap;
+
 import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.asSet;
 
 import java.util.*;
@@ -23,7 +25,7 @@ public class DeltaTransformation implements AxiomTransformation {
 
     private Set<OWLAxiom> transformedAxioms = new HashSet<>();
 
-    private Map<OWLAxiom, Integer> namingAxiom2ModalDepth = new HashMap<>();
+    private TObjectIntHashMap<OWLAxiom> namingAxiom2ModalDepth = new TObjectIntHashMap<>(16, 0.75f, 0);
 
     protected int modalDepth = 0;
 
@@ -64,7 +66,7 @@ public class DeltaTransformation implements AxiomTransformation {
     }
 
     public int getModalDepth(OWLAxiom renamingAxiom) {
-        return namingAxiom2ModalDepth.getOrDefault(renamingAxiom, 0).intValue();
+        return namingAxiom2ModalDepth.get(renamingAxiom);
     }
 
 

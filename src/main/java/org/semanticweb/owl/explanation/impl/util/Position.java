@@ -1,9 +1,9 @@
 package org.semanticweb.owl.explanation.impl.util;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
+
+import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TIntArrayList;
 
 /**
  * Author: Matthew Horridge<br>
@@ -13,18 +13,23 @@ import java.util.List;
  */
 public class Position {
 
-    private List<Integer> positionList = new ArrayList<>();
+    private TIntArrayList positionList = new TIntArrayList();
 
-    public Position(Integer ... position) {
-        positionList.addAll(Arrays.<Integer>asList(position));
+    public Position(int... position) {
+        positionList.addAll(position);
     }
 
-    public Position(List<Integer> position, Integer childPosition) {
+    public Position(List<Integer> position, int childPosition) {
         positionList.addAll(position);
         positionList.add(childPosition);
     }
 
-    public Position(Integer position) {
+    public Position(TIntList position, int childPosition) {
+        positionList.addAll(position);
+        positionList.add(childPosition);
+    }
+
+    public Position(int position) {
         positionList.add(position);
     }
 
@@ -35,21 +40,13 @@ public class Position {
         return positionList.isEmpty();
     }
 
-    public Position addPosition(Integer position) {
+    public Position addPosition(int position) {
         return new Position(positionList, position);
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        for(Iterator<Integer> positionIterator = positionList.iterator(); positionIterator.hasNext(); ) {
-            Integer currentPosition = positionIterator.next();
-            sb.append(currentPosition);
-            if(positionIterator.hasNext()) {
-                sb.append(".");
-            }
-        }
-        return sb.toString();
+        return positionList.toString().replace(", ", ".").replace("{", "").replace("}", "");
     }
 
     @Override

@@ -3,6 +3,8 @@ package org.semanticweb.owl.explanation.impl.blackbox;
 import org.semanticweb.owl.explanation.api.*;
 import org.semanticweb.owl.explanation.api.Explanation;
 import org.semanticweb.owlapi.model.*;
+
+import gnu.trove.list.array.TIntArrayList;
 import uk.ac.manchester.cs.owl.explanation.ordering.*;
 
 import java.io.*;
@@ -62,7 +64,7 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
 
     private ExplanationProgressMonitor<E> progressMonitor;
 
-    private List<Integer> prunningDifferences = new ArrayList<>();
+    private TIntArrayList prunningDifferences = new TIntArrayList();
 
     /**
      * Constructs a blackbox explanation generator.
@@ -91,8 +93,8 @@ public class BlackBoxExplanationGenerator<E> implements ExplanationGenerator<E> 
     }
 
 
-    public List<Integer> getPruningDifferences() {
-        return Collections.unmodifiableList(prunningDifferences);
+    public int[] getPruningDifferences() {
+        return prunningDifferences.toArray();
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////

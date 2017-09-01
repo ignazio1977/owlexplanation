@@ -6,6 +6,9 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.search.EntitySearcher;
 
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+
 import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.asList;
 
 import java.util.*;
@@ -137,7 +140,7 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
 
             for (OWLClass cls : child2Parent.keySet()) {
                 if (!processed.contains(cls)) {
-                    tarjan(cls, 0, new LinkedList<OWLClass>(), new HashMap<OWLClass, Integer>(), new HashMap<OWLClass, Integer>(), result, processed, new HashSet<OWLClass>());
+                    tarjan(cls, 0, new LinkedList<OWLClass>(), new TObjectIntHashMap<OWLClass>(), new TObjectIntHashMap<OWLClass>(), result, processed, new HashSet<OWLClass>());
                 }
 
 
@@ -147,7 +150,8 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
             }
     }
 
-    public void tarjan(OWLClass cls, int index, Deque<OWLClass> stack, Map<OWLClass, Integer> indexMap, Map<OWLClass, Integer> lowlinkMap, Set<Set<OWLClass>> result, Set<OWLClass> processed, Set<OWLClass> stackClass) {
+    public void tarjan(OWLClass cls, int _index, Deque<OWLClass> stack, TObjectIntHashMap<OWLClass> indexMap, TObjectIntHashMap<OWLClass> lowlinkMap, Set<Set<OWLClass>> result, Set<OWLClass> processed, Set<OWLClass> stackClass) {
+        int index = _index;
         processed.add(cls);
         indexMap.put(cls, index);
         lowlinkMap.put(cls, index);
@@ -163,7 +167,7 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
                 lowlinkMap.put(cls, Math.min(lowlinkMap.get(cls), indexMap.get(par)));
             }
         }
-        if (lowlinkMap.get(cls).equals(indexMap.get(cls))) {
+        if (lowlinkMap.get(cls) == indexMap.get(cls)) {
             Set<OWLClass> scc = new HashSet<>();
             while (true) {
                 OWLClass clsPrime = stack.pop();
@@ -204,14 +208,14 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
 
         private int modalDepth;
 
-        private Map<Integer, Set<OWLObjectAllValuesFrom>> modalDepth2UniversalRestrictionPropertyMap;
+        private TIntObjectHashMap<Set<OWLObjectAllValuesFrom>> modalDepth2UniversalRestrictionPropertyMap;
 
-        private Map<Integer, Set<OWLObjectPropertyExpression>> modalDepth2ExistsRestrictionPropertyMap;
+        private TIntObjectHashMap<Set<OWLObjectPropertyExpression>> modalDepth2ExistsRestrictionPropertyMap;
 
 
         public SuperClassChecker() {
-            modalDepth2UniversalRestrictionPropertyMap = new HashMap<>();
-            modalDepth2ExistsRestrictionPropertyMap = new HashMap<>();
+            modalDepth2UniversalRestrictionPropertyMap = new TIntObjectHashMap<>();
+            modalDepth2ExistsRestrictionPropertyMap = new TIntObjectHashMap<>();
             dependsOn = new HashSet<>();
             modalDepth = 0;
         }
