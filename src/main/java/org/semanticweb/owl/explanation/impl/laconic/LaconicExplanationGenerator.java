@@ -102,8 +102,8 @@ public class LaconicExplanationGenerator<E> implements ExplanationGenerator<E>, 
     }
 
 
-    public List<Integer> getPruningDifferences() {
-        return Collections.emptyList();
+    public int[] getPruningDifferences() {
+        return new int[0];
     }
 
     public MutableTree<Explanation<E>> getHst() {
