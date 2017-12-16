@@ -24,7 +24,7 @@
 	<name>OWL Explanation</name>
 	<groupId>net.sourceforge.owlapi</groupId>
 	<artifactId>owlexplanation</artifactId>
-	<version>5.0.0-SNAPSHOT</version>
+	<version>5.0.0</version>
 	<packaging>bundle</packaging>
 	<description>OWL Explanation Generator - see http://www.bcs.org/upload/pdf/dd-matthew-horridge.pdf
 	</description>
@@ -62,7 +62,7 @@
 		<dependency>
 			<groupId>net.sourceforge.owlapi</groupId>
 			<artifactId>telemetry</artifactId>
-			<version>5.0.0-SNAPSHOT</version>
+			<version>5.0.0</version>
 			<exclusions>
 				<exclusion>
 					<groupId>net.sourceforge.owlapi</groupId>
