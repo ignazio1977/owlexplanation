@@ -1,6 +1,5 @@
 package org.semanticweb.owl.explanation.impl.blackbox.checker;
 
-
 import org.semanticweb.owl.explanation.telemetry.DefaultTelemetryInfo;
 import org.semanticweb.owl.explanation.telemetry.TelemetryInfo;
 import org.semanticweb.owl.explanation.telemetry.TelemetryTimer;
@@ -8,6 +7,7 @@ import org.semanticweb.owl.explanation.telemetry.TelemetryTransmitter;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration;
 import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
 
 import java.util.Collections;
@@ -37,120 +37,121 @@ import java.util.function.Supplier;
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-
 /**
- * Author: Matthew Horridge<br> The University Of Manchester<br> Information Management Group<br> Date:
- * 25-Sep-2008<br><br>
+ * Author: Matthew Horridge<br>
+ * The University Of Manchester<br>
+ * Information Management Group<br>
+ * Date: 25-Sep-2008<br>
+ * <br>
  */
-public class ConsistencyEntailmentChecker implements org.semanticweb.owl.explanation.impl.blackbox.EntailmentChecker<OWLAxiom> {
+public class ConsistencyEntailmentChecker
+		implements org.semanticweb.owl.explanation.impl.blackbox.EntailmentChecker<OWLAxiom> {
 
-    private OWLAxiom entailment;
+	private OWLAxiom entailment;
 
-    private OWLReasonerFactory reasonerFactory;
+	private OWLReasonerFactory reasonerFactory;
 
-    private int counter;
+	private int counter;
 
-    private boolean consistent = false;
+	private boolean consistent = false;
 
-    private long timeout = Long.MAX_VALUE;
+	private Supplier<OWLOntologyManager> m;
 
-    private Supplier<OWLOntologyManager> m;
+	private final Supplier<OWLReasonerConfiguration> configurationSupplier;
 
-    public ConsistencyEntailmentChecker(OWLReasonerFactory reasonerFactory, Supplier<OWLOntologyManager> man, OWLDataFactory df, long timeout) {
-        this.timeout = timeout;
-        this.reasonerFactory = reasonerFactory;
-        this.m = man;
-        this.entailment = df.getOWLSubClassOfAxiom(
-                df.getOWLThing(),
-                df.getOWLNothing()
-        );
+	public ConsistencyEntailmentChecker(final OWLReasonerFactory reasonerFactory, final Supplier<OWLOntologyManager> man, final OWLDataFactory df, final long timeout) {
+       this(reasonerFactory, man, df, () -> new SimpleConfiguration(timeout));
     }
 
+	public ConsistencyEntailmentChecker(final OWLReasonerFactory reasonerFactory,
+			final Supplier<OWLOntologyManager> man, final OWLDataFactory df,
+			final Supplier<OWLReasonerConfiguration> rC) {
+		configurationSupplier = rC;
+		this.reasonerFactory = reasonerFactory;
+		m = man;
+		entailment = df.getOWLSubClassOfAxiom(df.getOWLThing(), df.getOWLNothing());
+	}
 
+	@Override
+	public int getCounter() {
+		return counter;
+	}
 
-    @Override
-    public int getCounter() {
-        return counter;
-    }
+	@Override
+	public void resetCounter() {
+		counter = 0;
+	}
 
-    @Override
-    public void resetCounter() {
-        counter = 0;
-    }
+	@Override
+	public OWLAxiom getEntailment() {
+		return entailment;
+	}
 
-    @Override
-    public OWLAxiom getEntailment() {
-        return entailment;
-    }
+	@Override
+	public Set<OWLAxiom> getModule(final Set<OWLAxiom> axioms) {
+		return axioms;
+	}
 
+	@Override
+	public Set<OWLEntity> getEntailmentSignature() {
+		return Collections.emptySet();
+	}
 
-    @Override
-    public Set<OWLAxiom> getModule(Set<OWLAxiom> axioms) {
-        return axioms;
-    }
+	@Override
+	public Set<OWLEntity> getSeedSignature() {
+		return Collections.emptySet();
+	}
 
-    @Override
-    public Set<OWLEntity> getEntailmentSignature() {
-        return Collections.emptySet();
-    }
+	@Override
+	public boolean isEntailed(final Set<OWLAxiom> axiom) {
 
-    @Override
-    public Set<OWLEntity> getSeedSignature() {
-        return Collections.emptySet();
-    }
-
-    @Override
-    public boolean isEntailed(final Set<OWLAxiom> axiom) {
-
-        TelemetryTimer timer = new TelemetryTimer();
-        TelemetryTimer loadTimer = new TelemetryTimer();
-        TelemetryTimer checkTimer = new TelemetryTimer();
-        TelemetryInfo info = new DefaultTelemetryInfo("entailmentcheck", timer, loadTimer, checkTimer);
-        TelemetryTransmitter transmitter = TelemetryTransmitter.getTransmitter();
-        transmitter.beginTransmission(info);
-        try {
+		final TelemetryTimer timer = new TelemetryTimer();
+		final TelemetryTimer loadTimer = new TelemetryTimer();
+		final TelemetryTimer checkTimer = new TelemetryTimer();
+		final TelemetryInfo info = new DefaultTelemetryInfo("entailmentcheck", timer, loadTimer, checkTimer);
+		final TelemetryTransmitter transmitter = TelemetryTransmitter.getTransmitter();
+		transmitter.beginTransmission(info);
+		try {
 //        System.out.print("Checking entailment....");
-            transmitter.recordMeasurement(info, "input size", axiom.size());
-            counter++;
-            timer.start();
-            OWLOntology ont = m.get().createOntology(axiom);
-            SimpleConfiguration config = new SimpleConfiguration(timeout);
-            timer.start();
-            loadTimer.start();
-            OWLReasoner r = reasonerFactory.createReasoner(ont, config);
-            loadTimer.stop();
-            transmitter.recordTiming(info, "load time", timer);
-            checkTimer.start();
-            consistent = r.isConsistent();
-            checkTimer.stop();
-            timer.stop();
-            transmitter.recordTiming(info, "check time", checkTimer);
-            transmitter.recordTiming(info, "time", timer);
-            r.dispose();
+			transmitter.recordMeasurement(info, "input size", axiom.size());
+			counter++;
+			timer.start();
+			final OWLOntology ont = m.get().createOntology(axiom);
+			final OWLReasonerConfiguration config = configurationSupplier.get();
+			timer.start();
+			loadTimer.start();
+			final OWLReasoner r = reasonerFactory.createReasoner(ont, config);
+			loadTimer.stop();
+			transmitter.recordTiming(info, "load time", timer);
+			checkTimer.start();
+			consistent = r.isConsistent();
+			checkTimer.stop();
+			timer.stop();
+			transmitter.recordTiming(info, "check time", checkTimer);
+			transmitter.recordTiming(info, "time", timer);
+			r.dispose();
 
 //        System.out.println(" done!");
-            return !consistent;
-        }
-        catch (OWLOntologyCreationException e) {
-            throw new OWLRuntimeException(e);
-        }
-        finally {
-            transmitter.endTransmission(info);
-        }
-    }
+			return !consistent;
+		} catch (final OWLOntologyCreationException e) {
+			throw new OWLRuntimeException(e);
+		} finally {
+			transmitter.endTransmission(info);
+		}
+	}
 
-    @Override
-    public String getModularisationTypeDescription() {
-        return "none";
-    }
+	@Override
+	public String getModularisationTypeDescription() {
+		return "none";
+	}
 
-    @Override
-    public boolean isUseModularisation() {
-        return false;
-    }
+	@Override
+	public boolean isUseModularisation() {
+		return false;
+	}
 
-    @Override
-    public Set<OWLAxiom> getEntailingAxioms(Set<OWLAxiom> axioms) {
-        return null;
-    }
+	@Override
+	public Set<OWLAxiom> getEntailingAxioms(final Set<OWLAxiom> axioms) {
+		return null;
+	}
 }
