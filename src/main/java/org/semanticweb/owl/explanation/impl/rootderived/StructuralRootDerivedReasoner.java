@@ -6,8 +6,8 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.search.EntitySearcher;
 
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
+import com.carrotsearch.hppcrt.maps.IntObjectHashMap;
+import com.carrotsearch.hppcrt.maps.ObjectIntHashMap;
 
 import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.asList;
 
@@ -140,7 +140,7 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
 
             for (OWLClass cls : child2Parent.keySet()) {
                 if (!processed.contains(cls)) {
-                    tarjan(cls, 0, new LinkedList<OWLClass>(), new TObjectIntHashMap<OWLClass>(), new TObjectIntHashMap<OWLClass>(), result, processed, new HashSet<OWLClass>());
+                    tarjan(cls, 0, new LinkedList<OWLClass>(), new ObjectIntHashMap<OWLClass>(), new ObjectIntHashMap<OWLClass>(), result, processed, new HashSet<OWLClass>());
                 }
 
 
@@ -150,7 +150,7 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
             }
     }
 
-    public void tarjan(OWLClass cls, int _index, Deque<OWLClass> stack, TObjectIntHashMap<OWLClass> indexMap, TObjectIntHashMap<OWLClass> lowlinkMap, Set<Set<OWLClass>> result, Set<OWLClass> processed, Set<OWLClass> stackClass) {
+    public void tarjan(OWLClass cls, int _index, Deque<OWLClass> stack, ObjectIntHashMap<OWLClass> indexMap, ObjectIntHashMap<OWLClass> lowlinkMap, Set<Set<OWLClass>> result, Set<OWLClass> processed, Set<OWLClass> stackClass) {
         int index = _index;
         processed.add(cls);
         indexMap.put(cls, index);
@@ -208,14 +208,14 @@ public class StructuralRootDerivedReasoner implements RootDerivedReasoner {
 
         private int modalDepth;
 
-        private TIntObjectHashMap<Set<OWLObjectAllValuesFrom>> modalDepth2UniversalRestrictionPropertyMap;
+        private IntObjectHashMap<Set<OWLObjectAllValuesFrom>> modalDepth2UniversalRestrictionPropertyMap;
 
-        private TIntObjectHashMap<Set<OWLObjectPropertyExpression>> modalDepth2ExistsRestrictionPropertyMap;
+        private IntObjectHashMap<Set<OWLObjectPropertyExpression>> modalDepth2ExistsRestrictionPropertyMap;
 
 
         public SuperClassChecker() {
-            modalDepth2UniversalRestrictionPropertyMap = new TIntObjectHashMap<>();
-            modalDepth2ExistsRestrictionPropertyMap = new TIntObjectHashMap<>();
+            modalDepth2UniversalRestrictionPropertyMap = new IntObjectHashMap<>();
+            modalDepth2ExistsRestrictionPropertyMap = new IntObjectHashMap<>();
             dependsOn = new HashSet<>();
             modalDepth = 0;
         }

@@ -2,7 +2,7 @@ package org.semanticweb.owl.explanation.impl.setree;
 
 import java.util.*;
 
-import gnu.trove.map.hash.TObjectIntHashMap;
+import com.carrotsearch.hppcrt.maps.ObjectIntHashMap;
 
 /**
  * Author: Matthew Horridge<br>
@@ -14,7 +14,7 @@ public class SETreeBuilder<O> {
 
     private List<O> elements = new ArrayList<>();
 
-    private TObjectIntHashMap<O> indexMap = new TObjectIntHashMap<>(16, 0.75f, 0);
+    private ObjectIntHashMap<O> indexMap = new ObjectIntHashMap<>(16, 0.75f);
 
     public SETreeBuilder(List<O> axioms) {
         this.elements = axioms;

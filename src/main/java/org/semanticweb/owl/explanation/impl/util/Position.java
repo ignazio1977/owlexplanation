@@ -2,8 +2,7 @@ package org.semanticweb.owl.explanation.impl.util;
 
 import java.util.List;
 
-import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TIntArrayList;
+import com.carrotsearch.hppcrt.lists.IntArrayList;
 
 /**
  * Author: Matthew Horridge<br>
@@ -13,18 +12,18 @@ import gnu.trove.list.array.TIntArrayList;
  */
 public class Position {
 
-    private TIntArrayList positionList = new TIntArrayList();
+    private IntArrayList positionList = new IntArrayList();
 
     public Position(int... position) {
-        positionList.addAll(position);
+        positionList.add(position);
     }
 
     public Position(List<Integer> position, int childPosition) {
-        positionList.addAll(position);
+        position.forEach(positionList::add);
         positionList.add(childPosition);
     }
 
-    public Position(TIntList position, int childPosition) {
+    public Position(IntArrayList position, int childPosition) {
         positionList.addAll(position);
         positionList.add(childPosition);
     }

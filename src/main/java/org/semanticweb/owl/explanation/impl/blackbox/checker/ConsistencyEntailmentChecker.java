@@ -8,6 +8,7 @@ import org.semanticweb.owl.explanation.telemetry.TelemetryTransmitter;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration;
 import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
 
 import java.util.Collections;
@@ -52,20 +53,21 @@ public class ConsistencyEntailmentChecker implements org.semanticweb.owl.explana
 
     private boolean consistent = false;
 
-    private long timeout = Long.MAX_VALUE;
+     private Supplier<OWLOntologyManager> m;
 
-    private Supplier<OWLOntologyManager> m;
+    private final Supplier<OWLReasonerConfiguration> configurationSupplier;
 
     public ConsistencyEntailmentChecker(OWLReasonerFactory reasonerFactory, Supplier<OWLOntologyManager> man, OWLDataFactory df, long timeout) {
-        this.timeout = timeout;
-        this.reasonerFactory = reasonerFactory;
-        this.m = man;
-        this.entailment = df.getOWLSubClassOfAxiom(
-                df.getOWLThing(),
-                df.getOWLNothing()
-        );
+        this(reasonerFactory, man, df, () -> new SimpleConfiguration(timeout));
     }
-
+    public ConsistencyEntailmentChecker(OWLReasonerFactory reasonerFactory,
+        Supplier<OWLOntologyManager> man, OWLDataFactory df,
+        Supplier<OWLReasonerConfiguration> rC) {
+    configurationSupplier = rC;
+    this.reasonerFactory = reasonerFactory;
+    m = man;
+    entailment = df.getOWLSubClassOfAxiom(df.getOWLThing(), df.getOWLNothing());
+}
 
 
     @Override
@@ -114,7 +116,7 @@ public class ConsistencyEntailmentChecker implements org.semanticweb.owl.explana
             counter++;
             timer.start();
             OWLOntology ont = m.get().createOntology(axiom);
-            SimpleConfiguration config = new SimpleConfiguration(timeout);
+            OWLReasonerConfiguration config = configurationSupplier.get();
             timer.start();
             loadTimer.start();
             OWLReasoner r = reasonerFactory.createReasoner(ont, config);

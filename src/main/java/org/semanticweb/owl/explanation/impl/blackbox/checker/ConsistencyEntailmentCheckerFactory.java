@@ -1,13 +1,3 @@
-package org.semanticweb.owl.explanation.impl.blackbox.checker;
-
-import org.semanticweb.owl.explanation.impl.blackbox.EntailmentCheckerFactory;
-
-import java.util.function.Supplier;
-
-import org.semanticweb.owl.explanation.impl.blackbox.EntailmentChecker;
-import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLDataFactory;
 /*
  * Copyright (C) 2009, University of Manchester
  *
@@ -30,6 +20,18 @@ import org.semanticweb.owlapi.model.OWLDataFactory;
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+package org.semanticweb.owl.explanation.impl.blackbox.checker;
+
+import org.semanticweb.owl.explanation.impl.blackbox.EntailmentCheckerFactory;
+
+import java.util.function.Supplier;
+
+import org.semanticweb.owl.explanation.impl.blackbox.EntailmentChecker;
+import org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration;
+import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
+import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
+import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 /**
@@ -40,27 +42,27 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
  */
 public class ConsistencyEntailmentCheckerFactory implements EntailmentCheckerFactory<OWLAxiom> {
 
-    private OWLReasonerFactory reasonerFactory;
+    private final OWLReasonerFactory reasonerFactory;
 
-    private long timeout = Long.MAX_VALUE;
+    private final OWLDataFactory df;
 
-    private OWLDataFactory df;
+    private final Supplier<OWLOntologyManager> m;
 
-    private Supplier<OWLOntologyManager> m;
-
-//    public ConsistencyEntailmentCheckerFactory(OWLReasonerFactory reasonerFactory) {
-//        this(reasonerFactory, Long.MAX_VALUE);
-//    }
+    private final Supplier<OWLReasonerConfiguration> rC;
 
     public ConsistencyEntailmentCheckerFactory(OWLReasonerFactory reasonerFactory, Supplier<OWLOntologyManager> m, OWLDataFactory df, long timeout) {
+        this(reasonerFactory, m, df, () -> new SimpleConfiguration(timeout));
+    }
+    public ConsistencyEntailmentCheckerFactory(OWLReasonerFactory reasonerFactory,
+        Supplier<OWLOntologyManager> m, OWLDataFactory df, Supplier<OWLReasonerConfiguration> rC) {
         this.reasonerFactory = reasonerFactory;
-        this.timeout = timeout;
         this.df = df;
         this.m = m;
+        this.rC = rC;
     }
 
     @Override
     public EntailmentChecker<OWLAxiom> createEntailementChecker(OWLAxiom entailment) {
-        return new ConsistencyEntailmentChecker(reasonerFactory, m, df, timeout);
+        return new ConsistencyEntailmentChecker(reasonerFactory, m, df, rC);
     }
 }

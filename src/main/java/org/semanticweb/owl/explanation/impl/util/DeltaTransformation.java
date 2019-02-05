@@ -2,7 +2,7 @@ package org.semanticweb.owl.explanation.impl.util;
 
 import org.semanticweb.owlapi.model.*;
 
-import gnu.trove.map.hash.TObjectIntHashMap;
+import com.carrotsearch.hppcrt.maps.ObjectIntHashMap;
 
 import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.asSet;
 
@@ -25,7 +25,7 @@ public class DeltaTransformation implements AxiomTransformation {
 
     private Set<OWLAxiom> transformedAxioms = new HashSet<>();
 
-    private TObjectIntHashMap<OWLAxiom> namingAxiom2ModalDepth = new TObjectIntHashMap<>(16, 0.75f, 0);
+    private ObjectIntHashMap<OWLAxiom> namingAxiom2ModalDepth = new ObjectIntHashMap<>(16, 0.75f);
 
     protected int modalDepth = 0;
 

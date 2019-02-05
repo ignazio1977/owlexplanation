@@ -1,23 +1,3 @@
-package org.semanticweb.owl.explanation.impl.blackbox.checker;
-
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.parameters.Imports;
-import org.semanticweb.owl.explanation.api.ExplanationGeneratorFactory;
-import org.semanticweb.owl.explanation.api.ExplanationGenerator;
-import org.semanticweb.owl.explanation.api.ExplanationProgressMonitor;
-import org.semanticweb.owl.explanation.api.NullExplanationProgressMonitor;
-import org.semanticweb.owl.explanation.impl.blackbox.*;
-import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
-
-import java.util.Set;
-import java.util.function.Supplier;
-
-import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.add;
-
-import java.util.HashSet;
 /*
  * Copyright (C) 2009, University of Manchester
  *
@@ -40,6 +20,28 @@ import java.util.HashSet;
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+package org.semanticweb.owl.explanation.impl.blackbox.checker;
+
+import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.parameters.Imports;
+import org.semanticweb.owl.explanation.api.ExplanationGeneratorFactory;
+import org.semanticweb.owl.explanation.api.ExplanationGenerator;
+import org.semanticweb.owl.explanation.api.ExplanationProgressMonitor;
+import org.semanticweb.owl.explanation.api.NullExplanationProgressMonitor;
+import org.semanticweb.owl.explanation.impl.blackbox.*;
+import org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration;
+import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
+import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
+
+import java.util.Set;
+import java.util.function.Supplier;
+
+import static org.semanticweb.owlapi.util.OWLAPIStreamUtils.add;
+
+import java.util.HashSet;
 
 /**
  * Author: Matthew Horridge<br>
@@ -49,20 +51,24 @@ import java.util.HashSet;
  */
 public class InconsistentOntologyExplanationGeneratorFactory implements ExplanationGeneratorFactory<OWLAxiom> {
 
+    private final InconsistentOntologyContractionStrategy<OWLAxiom> contractionStrategy;
 
-    private InconsistentOntologyContractionStrategy<OWLAxiom> contractionStrategy;
+    private final ExpansionStrategy<OWLAxiom> expansionStrategy;
 
-    private ExpansionStrategy<OWLAxiom> expansionStrategy;
+    private final ConsistencyEntailmentCheckerFactory consistencyEntailmentCheckerFactory;
 
-    private ConsistencyEntailmentCheckerFactory consistencyEntailmentCheckerFactory;
-
-    private Supplier<OWLOntologyManager> m;
+    private final Supplier<OWLOntologyManager> m;
 
     public InconsistentOntologyExplanationGeneratorFactory(OWLReasonerFactory reasonerFactory, OWLDataFactory df, Supplier<OWLOntologyManager> m, long entailmentCheckingTimeout) {
+        this(reasonerFactory, df, m, () -> new SimpleConfiguration(entailmentCheckingTimeout));
+    }
+    public InconsistentOntologyExplanationGeneratorFactory(OWLReasonerFactory reasonerFactory,
+        OWLDataFactory df, Supplier<OWLOntologyManager> m,
+        Supplier<OWLReasonerConfiguration> rC) {
         expansionStrategy = new InconsistentOntologyExpansionStrategy<>();
         contractionStrategy = new InconsistentOntologyContractionStrategy<>();
         this.m = m;
-        consistencyEntailmentCheckerFactory = new ConsistencyEntailmentCheckerFactory(reasonerFactory, m, df, entailmentCheckingTimeout);
+        consistencyEntailmentCheckerFactory = new ConsistencyEntailmentCheckerFactory(reasonerFactory, m, df, rC);
     }
 
 
