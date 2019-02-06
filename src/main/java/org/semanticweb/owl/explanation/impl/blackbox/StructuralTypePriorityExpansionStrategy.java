@@ -50,7 +50,9 @@ public class StructuralTypePriorityExpansionStrategy<E> implements ExpansionStra
     private Supplier<OWLOntologyManager> m;
 
     public StructuralTypePriorityExpansionStrategy(InitialEntailmentCheckStrategy initialEntailmentCheckStrategy, Supplier<OWLOntologyManager> m) {
-        this.initialEntailmentCheckStrategy = initialEntailmentCheckStrategy;
+        if(initialEntailmentCheckStrategy!=null) {
+            this.initialEntailmentCheckStrategy = initialEntailmentCheckStrategy;
+        }
         this.m = m;
     }
 
