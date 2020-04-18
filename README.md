@@ -7,9 +7,9 @@ Maven Dependency
 ----------------
 ```xml
 <dependency>
-    <groupId>net.sourceforge.owlapitools</groupId>
+    <groupId>net.sourceforge.owlapi</groupId>
     <artifactId>owlexplanation</artifactId>
-    <version>1.0.0</version>
+    <version>5.0.1</version>
 </dependency>
 ```
 
