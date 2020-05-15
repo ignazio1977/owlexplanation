@@ -44,7 +44,7 @@ public class SlidingWindowContractionStrategy<E> implements ContractionStrategy<
     private int count;
 
     public SlidingWindowContractionStrategy() {
-        windowSize = 20;
+        this( 20);
     }
 
 

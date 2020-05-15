@@ -50,7 +50,7 @@ public class OrderedAxiomWithWindowContractionStrategy<E> implements Contraction
     public Set<OWLAxiom> doPruning(Set<OWLAxiom> axioms, EntailmentChecker<E> checker, ExplanationProgressMonitor<?> progressMonitor) {
 
         count = 0;
-        int windowSize = 10;
+        int windowSize = Math.max(axioms.size()/100, 10);
 
         List<OWLAxiom> orderedAxioms = new ArrayList<>(axioms);
         if(!checker.getEntailment().equals(lastEntailment)) {
